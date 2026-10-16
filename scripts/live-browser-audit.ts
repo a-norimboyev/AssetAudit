@@ -366,7 +366,7 @@ async function runLiveAudit() {
       status: detailStatus,
       durationMs: Date.now() - start,
       consoleErrors: [...consoleErrors],
-      notes: "Inventar pasporti, rasmiy QR, ko'chirish formasi (Relocation) va surat menejeri",
+      notes: `Inventar pasporti (${detailUrl}), rasmiy QR, ko'chirish formasi (Relocation) va surat menejeri`,
       screenshot: await capture(page, "17_org_inventory_detail"),
     });
 

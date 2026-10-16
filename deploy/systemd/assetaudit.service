@@ -1,0 +1,51 @@
+[Unit]
+Description=AssetAudit Next.js Production Service (assetaudit.uz)
+Documentation=https://assetaudit.uz
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=assetaudit
+Group=assetaudit
+WorkingDirectory=/var/www/assetaudit/current
+
+# Ishlab chiqarish muhiti sozlamalari
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOSTNAME=127.0.0.1
+# Maxfiy muhit o'zgaruvchilari fayli (chmod 600 bilan himoyalangan)
+EnvironmentFile=/var/www/assetaudit/current/.env.production
+
+# Standalone server.js orqali ishga tushirish (xotirani maksimal tejaydi)
+ExecStart=/usr/bin/node /var/www/assetaudit/current/server.js
+
+# Qayta ishga tushish strategiyasi
+Restart=always
+RestartSec=5s
+
+# Eskiz VPS 1 GB RAM uchun kalibrlangan xotira chegaralari:
+# (Real yuklama testida 150 ta parallel so'rov ostida RSS 214 MB ni tashkil etdi;
+# 380M/450M chegarasi tizimga 2x xavfsizlik zaxirasi beradi va OOM Killerdan himoyalaydi)
+MemoryHigh=380M
+MemoryMax=450M
+TimeoutStopSec=15s
+KillMode=mixed
+
+# Tizim xavfsizligi va izolyatsiyasi
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/var/lib/assetaudit/uploads
+
+# Log jurnallari
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=assetaudit
+
+# Fayl deskriptorlari
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

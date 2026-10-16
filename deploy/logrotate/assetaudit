@@ -1,0 +1,13 @@
+/var/log/assetaudit/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 assetaudit assetaudit
+    sharedscripts
+    postrotate
+        systemctl reload assetaudit > /dev/null 2>/dev/null || true
+    endscript
+}

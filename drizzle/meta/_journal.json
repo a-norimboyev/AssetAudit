@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791960032704,
+      "tag": "0000_dear_spectrum",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791961341449,
+      "tag": "0001_silent_alex_wilder",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791970461047,
+      "tag": "0002_multi_organization",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792024491283,
+      "tag": "0003_small_gladiator",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792055182585,
+      "tag": "0004_odd_the_santerians",
+      "breakpoints": true
+    }
+  ]
+}

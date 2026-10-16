@@ -4,8 +4,11 @@ import { revalidatePath } from "next/cache";
 import { requirePlatformAdmin } from "@/lib/auth/authorization";
 import {
   createOrganization,
+  updateOrganization,
+  toggleOrganizationStatus,
   OrganizationError,
   type CreateOrganizationInput,
+  type UpdateOrganizationInput,
 } from "@/lib/data/organizations";
 import { validateOrganizationInput } from "@/lib/validations/organization";
 import { logSecurityAudit } from "@/lib/audit/logger";
@@ -17,6 +20,15 @@ export interface CreateOrganizationActionResult {
   fieldErrors?: {
     name?: string;
     code?: string;
+    typeId?: string;
+  };
+}
+
+export interface UpdateOrganizationActionResult {
+  success: boolean;
+  error?: string;
+  fieldErrors?: {
+    name?: string;
     typeId?: string;
   };
 }
@@ -140,5 +152,79 @@ export async function createOrganizationAction(
       success: false,
       error: "Tashkilotni yaratishda server xatoligi yuz berdi. Iltimos, qayta urinib ko'ring.",
     };
+  }
+}
+
+/**
+ * Server Action: Tashkilot ma'lumotlarini tahrirlash
+ */
+export async function updateOrganizationAction(
+  data: UpdateOrganizationInput
+): Promise<UpdateOrganizationActionResult> {
+  let actorUserId = "unknown";
+  try {
+    const authContext = await requirePlatformAdmin();
+    actorUserId = authContext.user.id;
+
+    if (!data.id || !data.id.trim()) {
+      return { success: false, error: "Tashkilot ID ko'rsatilmagan." };
+    }
+    if (!data.name || data.name.trim().length < 2) {
+      return { success: false, error: "Tashkilot nomi kamida 2 ta belgidan iborat bo'lishi kerak." };
+    }
+    if (!data.typeId || !data.typeId.trim()) {
+      return { success: false, error: "Tashkilot turi tanlanishi shart." };
+    }
+
+    const updated = await updateOrganization(data);
+
+    logSecurityAudit({
+      event: "ORGANIZATION_UPDATED",
+      actorUserId,
+      organizationId: updated.id,
+      organizationCode: updated.code,
+      metadata: { name: updated.name, typeId: updated.typeId },
+    });
+
+    revalidatePath("/admin/organizations");
+    revalidatePath("/admin");
+
+    return { success: true };
+  } catch (error: unknown) {
+    if (error instanceof OrganizationError) {
+      return { success: false, error: error.message };
+    }
+    return { success: false, error: "Tashkilotni tahrirlashda xatolik yuz berdi." };
+  }
+}
+
+/**
+ * Server Action: Tashkilot faollik holatini o'zgartirish (Active / Inactive toggle)
+ */
+export async function toggleOrganizationStatusAction(
+  id: string,
+  isActive: boolean
+): Promise<{ success: boolean; error?: string }> {
+  let actorUserId = "unknown";
+  try {
+    const authContext = await requirePlatformAdmin();
+    actorUserId = authContext.user.id;
+
+    const updated = await toggleOrganizationStatus(id, isActive);
+
+    logSecurityAudit({
+      event: "ORGANIZATION_STATUS_TOGGLED",
+      actorUserId,
+      organizationId: updated.id,
+      organizationCode: updated.code,
+      metadata: { isActive: updated.isActive },
+    });
+
+    revalidatePath("/admin/organizations");
+    revalidatePath("/admin");
+
+    return { success: true };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : "Xatolik yuz berdi." };
   }
 }

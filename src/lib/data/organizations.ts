@@ -267,3 +267,75 @@ export async function createOrganization(input: CreateOrganizationInput) {
   }
 }
 
+export interface UpdateOrganizationInput {
+  id: string;
+  name: string;
+  typeId: string;
+}
+
+/**
+ * 7. Tashkilot ma'lumotlarini yangilash (Update Organization)
+ */
+export async function updateOrganization(input: UpdateOrganizationInput) {
+  const trimmedName = input.name.trim();
+  const trimmedTypeId = input.typeId.trim().toLowerCase();
+
+  try {
+    const [updated] = await db
+      .update(organizations)
+      .set({
+        name: trimmedName,
+        typeId: trimmedTypeId,
+        updatedAt: new Date(),
+      })
+      .where(eq(organizations.id, input.id))
+      .returning({
+        id: organizations.id,
+        name: organizations.name,
+        code: organizations.code,
+        typeId: organizations.typeId,
+        isActive: organizations.isActive,
+        createdAt: organizations.createdAt,
+      });
+
+    return updated;
+  } catch (error: unknown) {
+    const err = error as { code?: string; cause?: { code?: string } } | null;
+    const pgCode = err?.code || err?.cause?.code;
+
+    if (pgCode === "23503") {
+      throw new OrganizationError(
+        "INVALID_ORGANIZATION_TYPE",
+        "Tanlangan tashkilot turi bazada mavjud emas.",
+        400
+      );
+    }
+    throw error;
+  }
+}
+
+/**
+ * 8. Tashkilot faollik holatini o'zgartirish (Toggle Active / Inactive)
+ */
+export async function toggleOrganizationStatus(id: string, isActive: boolean) {
+  const [updated] = await db
+    .update(organizations)
+    .set({
+      isActive,
+      updatedAt: new Date(),
+    })
+    .where(eq(organizations.id, id))
+    .returning({
+      id: organizations.id,
+      name: organizations.name,
+      code: organizations.code,
+      isActive: organizations.isActive,
+    });
+
+  if (!updated) {
+    throw new OrganizationError("ORGANIZATION_NOT_FOUND", "Tashkilot topilmadi.", 404);
+  }
+
+  return updated;
+}
+

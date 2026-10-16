@@ -7,7 +7,7 @@ import { db } from "@/lib/db";
 import { inventoryCycles, roomAudits, scanEvents, cycleConflicts, cycleItems } from "@/lib/db/schema/audit";
 import { items } from "@/lib/db/schema/inventory";
 import { rooms } from "@/lib/db/schema/locations";
-import { and, eq, desc } from "drizzle-orm";
+import { and, or, eq, desc } from "drizzle-orm";
 
 export interface ScanActionResult {
   success: boolean;
@@ -74,7 +74,13 @@ export async function recordScanAction(
       return { success: false, message: "Tanlangan xona topilmadi yoki boshqa tashkilotga tegishli." };
     }
 
-    // 2. Inventarni QR token yoki inventar raqami bo'yicha qidirish
+    // 2. Token yoki inventar raqamini normalizatsiya qilish (URL bo'lsa token ajratib olinadi)
+    let cleanToken = tokenOrCode.trim();
+    if (cleanToken.includes("/qr/")) {
+      const parts = cleanToken.split("/qr/");
+      cleanToken = parts[parts.length - 1].split("?")[0].split("#")[0].trim();
+    }
+
     const [foundItem] = await db
       .select({
         id: items.id,
@@ -86,9 +92,10 @@ export async function recordScanAction(
       .where(
         and(
           eq(items.organizationId, organization.id),
-          tokenOrCode.includes("-")
-            ? eq(items.inventoryNumber, tokenOrCode.toUpperCase())
-            : eq(items.qrToken, tokenOrCode)
+          or(
+            eq(items.qrToken, cleanToken),
+            eq(items.inventoryNumber, cleanToken.toUpperCase())
+          )
         )
       )
       .limit(1);

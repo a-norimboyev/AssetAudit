@@ -63,6 +63,13 @@ export interface ReconciliationReport {
     scannedAt: Date;
     scannerName: string | null;
   }>;
+  missingItems: Array<{
+    id: string;
+    name: string;
+    inventoryNumber: string;
+    roomNumber: string;
+    buildingName: string;
+  }>;
 }
 
 /**
@@ -261,6 +268,14 @@ export async function getReconciliationReport(options: {
   const completedRoomIds = completedRoomIdsRes.map((r) => r.roomId);
 
   let missingItemsCount = 0;
+  let missingRows: Array<{
+    id: string;
+    name: string;
+    inventoryNumber: string;
+    roomNumber: string;
+    buildingName: string;
+  }> = [];
+
   if (completedRoomIds.length > 0) {
     const [missingRes] = await db
       .select({ count: sql<number>`count(*)::int` })
@@ -273,6 +288,24 @@ export async function getReconciliationReport(options: {
         )
       );
     missingItemsCount = missingRes?.count ?? 0;
+
+    missingRows = await db
+      .select({
+        id: items.id,
+        name: items.name,
+        inventoryNumber: items.inventoryNumber,
+        roomNumber: sql<string>`COALESCE((SELECT room_number FROM rooms WHERE rooms.id = ${items.roomId}), 'N/A')`,
+        buildingName: sql<string>`COALESCE((SELECT buildings.name FROM rooms JOIN buildings ON rooms.building_id = buildings.id WHERE rooms.id = ${items.roomId}), 'N/A')`,
+      })
+      .from(items)
+      .where(
+        and(
+          eq(items.organizationId, options.organizationId),
+          sql`${items.roomId} IN ${completedRoomIds}`,
+          sql`${items.id} NOT IN (SELECT item_id FROM scan_events WHERE scan_events.cycle_id = ${options.cycleId} AND scan_events.organization_id = ${options.organizationId})`
+        )
+      )
+      .limit(100);
   }
 
   const baselineExpected = (cycleSnapshotRes[0]?.count ?? 0) > 0
@@ -292,5 +325,6 @@ export async function getReconciliationReport(options: {
     completedRooms: roomsStatsRes[0]?.completed ?? 0,
     pendingRooms: roomsStatsRes[0]?.pending ?? 0,
     conflicts: conflictRows,
+    missingItems: missingRows,
   };
 }

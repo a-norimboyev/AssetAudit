@@ -22,6 +22,13 @@ interface ExportReportButtonsProps {
       scannerName?: string | null;
       scannedAt: Date;
     }>;
+    missingItems?: Array<{
+      id: string;
+      name: string;
+      inventoryNumber: string;
+      roomNumber: string;
+      buildingName: string;
+    }>;
   };
 }
 
@@ -40,6 +47,14 @@ export function ExportReportButtons({ report }: ExportReportButtonsProps) {
 
     for (const c of report.conflicts) {
       csv += `"${c.inventoryNumber}","${c.itemName}","${c.expectedBuildingName} / ${c.expectedRoomNumber}-xona","${c.scannedBuildingName} / ${c.scannedRoomNumber}-xona","${c.scannerName || "Inspektor"}","${new Date(c.scannedAt).toLocaleString("uz-UZ")}"\n`;
+    }
+
+    if (report.missingItems && report.missingItems.length > 0) {
+      csv += `\nTEKSHIRILGAN XONALARDA TOPILMAGAN MULKLAR\n`;
+      csv += `Inventar raqami,Nomi,Kutilgan joylashuv,Holati\n`;
+      for (const m of report.missingItems) {
+        csv += `"${m.inventoryNumber}","${m.name}","${m.buildingName} / ${m.roomNumber}-xona","Topilmadi"\n`;
+      }
     }
 
     const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);

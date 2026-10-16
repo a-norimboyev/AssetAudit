@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useActionState, useTransition } from "react";
+import { useState, useActionState, useTransition, useRef, useEffect, useCallback } from "react";
 import {
   DoorClosed,
   CheckCircle2,
@@ -8,8 +8,20 @@ import {
   CheckCheck,
   Loader2,
   Scan,
+  Camera,
+  CameraOff,
 } from "lucide-react";
 import { recordScanAction, completeRoomAuditAction, type ScanActionResult } from "@/lib/actions/audit";
+
+declare global {
+  interface Window {
+    BarcodeDetector?: {
+      new (options?: { formats: string[] }): {
+        detect(source: HTMLVideoElement | HTMLCanvasElement | ImageBitmap): Promise<Array<{ rawValue: string }>>;
+      };
+    };
+  }
+}
 
 interface RoomOption {
   id: string;
@@ -38,6 +50,12 @@ export function ScanInterface({
     time: string;
   }>>([]);
 
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const scanThrottleRef = useRef<boolean>(false);
+
   const [state, formAction, isPending] = useActionState<ScanActionResult | null, FormData>(
     async (prev, formData) => {
       const res = await recordScanAction(prev, formData);
@@ -62,6 +80,104 @@ export function ScanInterface({
 
   const [isCompleting, startCompleting] = useTransition();
   const [completeMessage, setCompleteMessage] = useState<string | null>(null);
+
+  // Stop camera helper
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    setIsCameraActive(false);
+  }, []);
+
+  // Cleanup camera stream on unmount
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, [stopCamera]);
+
+  // Handle barcode/QR detection from camera
+  const handleDetectedCode = useCallback(
+    (code: string) => {
+      if (scanThrottleRef.current || isPending) return;
+      scanThrottleRef.current = true;
+      setTokenOrCode(code);
+
+      const formData = new FormData();
+      formData.append("scannedRoomId", selectedRoomId);
+      if (cycleId) formData.append("cycleId", cycleId);
+      formData.append("tokenOrCode", code);
+
+      formAction(formData);
+
+      setTimeout(() => {
+        scanThrottleRef.current = false;
+      }, 2500);
+    },
+    [cycleId, formAction, isPending, selectedRoomId]
+  );
+
+  // Toggle Camera
+  const toggleCamera = async () => {
+    if (isCameraActive) {
+      stopCamera();
+      return;
+    }
+
+    setCameraError(null);
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setCameraError("Brauzeringiz kamera funksiyasini qo'llab-quvvatlamaydi. Quyidagi kiritish maydonidan foydalaning.");
+        return;
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+      });
+
+      streamRef.current = stream;
+      setIsCameraActive(true);
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+    } catch {
+      setCameraError("Kameraga ulanib bo'lmadi yoki ruxsat berilmadi. Quyidagi qo'lda kiritish maydonidan foydalaning.");
+      setIsCameraActive(false);
+    }
+  };
+
+  // Video frame detector loop if BarcodeDetector is available
+  useEffect(() => {
+    if (!isCameraActive || typeof window === "undefined" || !window.BarcodeDetector) {
+      return;
+    }
+
+    let animationFrameId: number;
+    const barcodeDetector = new window.BarcodeDetector({ formats: ["qr_code", "code_128", "ean_13"] });
+
+    const detectFrame = async () => {
+      if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA) {
+        try {
+          const barcodes = await barcodeDetector.detect(videoRef.current);
+          if (barcodes.length > 0 && barcodes[0]?.rawValue) {
+            handleDetectedCode(barcodes[0].rawValue);
+          }
+        } catch {
+          // ignore detection frames
+        }
+      }
+      animationFrameId = requestAnimationFrame(detectFrame);
+    };
+
+    animationFrameId = requestAnimationFrame(detectFrame);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [isCameraActive, handleDetectedCode]);
 
   async function handleCompleteRoom() {
     if (!selectedRoomId || !cycleId) return;
@@ -111,10 +227,67 @@ export function ScanInterface({
             <Scan className="w-4 h-4 text-blue-600" />
             <h3 className="text-sm font-bold text-slate-900">QR Skanerlash</h3>
           </div>
-          <span className="text-[11px] font-mono text-slate-500">
-            {selectedRoom ? `${selectedRoom.roomNumber}-xona` : ""}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-mono text-slate-500 hidden sm:inline">
+              {selectedRoom ? `${selectedRoom.roomNumber}-xona` : ""}
+            </span>
+            <button
+              type="button"
+              onClick={toggleCamera}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] text-xs font-semibold border transition cursor-pointer ${
+                isCameraActive
+                  ? "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100"
+                  : "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+              }`}
+            >
+              {isCameraActive ? (
+                <>
+                  <CameraOff className="w-3.5 h-3.5" />
+                  <span>Kamerani yopish</span>
+                </>
+              ) : (
+                <>
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>Kamerani yoqish</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
+
+        {/* Live Camera Scanner Box */}
+        {isCameraActive && (
+          <div className="relative rounded-[4px] overflow-hidden bg-slate-950 border border-slate-800 aspect-video max-w-md mx-auto flex items-center justify-center">
+            <video
+              ref={(el) => {
+                videoRef.current = el;
+                if (el && streamRef.current && el.srcObject !== streamRef.current) {
+                  el.srcObject = streamRef.current;
+                  el.play().catch(() => {});
+                }
+              }}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover"
+            />
+            {/* Viewfinder Overlay */}
+            <div className="absolute inset-0 border-2 border-blue-500/40 pointer-events-none flex items-center justify-center">
+              <div className="w-48 h-48 border-2 border-blue-400 rounded-[4px] shadow-sm animate-pulse flex items-center justify-center">
+                <span className="text-[10px] text-white/80 bg-slate-900/80 px-2 py-0.5 rounded-[2px]">
+                  QR kodni nishonga oling
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {cameraError && (
+          <div className="p-3 rounded-[3px] text-xs bg-amber-50 text-amber-900 border border-amber-200 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>{cameraError}</span>
+          </div>
+        )}
 
         {/* Natija / Xabar Banneri */}
         {state?.message && (

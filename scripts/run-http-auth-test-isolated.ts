@@ -68,7 +68,7 @@ async function run() {
     }
     console.log(`      OK — Test serveri ${TEST_BASE_URL} da tayyor.`);
 
-    console.log("[3/4] sprint05c-final-verification.test.ts bajarilmoqda...");
+    console.log("[3/4] Barcha 4 ta HTTP test fayllari (11 ta test) bajarilmoqda...");
     const testRunner = spawn(
       isWindows ? "npx.cmd" : "npx",
       [
@@ -76,6 +76,9 @@ async function run() {
         "--conditions=react-server",
         "--env-file=.env.test",
         "--test",
+        "src/lib/auth/__tests__/logout-session-security.test.ts",
+        "src/lib/auth/__tests__/organization-creation.test.ts",
+        "src/lib/auth/__tests__/organizations-module.test.ts",
         "src/lib/auth/__tests__/sprint05c-final-verification.test.ts",
       ],
       {

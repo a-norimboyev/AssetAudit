@@ -66,7 +66,22 @@ jobs:
       - name: Toza bog'liqliklarni o'rnatish
         run: npm ci
 
-      - name: Drizzle SQL migratsiyalari va Testlar (npm test)
+      - name: Izolyatsiyalangan .env.test yaratish
+        run: |
+          cat << 'EOF' > .env.test
+          DATABASE_URL=postgresql://postgres:postgres_ci_test_password@127.0.0.1:5433/mulknazorat_sprint05b_test
+          BETTER_AUTH_SECRET=ci_test_better_auth_secret_with_more_than_32_characters_high_entropy
+          BETTER_AUTH_URL=http://localhost:3000
+          NODE_ENV=test
+          EOF
+
+      - name: Drizzle SQL migratsiyalarini qo'llash (run-production-migrations.ts)
+        env:
+          DATABASE_URL: postgresql://postgres:postgres_ci_test_password@127.0.0.1:5433/mulknazorat_sprint05b_test
+          NODE_ENV: test
+        run: npx tsx scripts/run-production-migrations.ts
+
+      - name: Testlarni bajarish (npm test)
         env:
           DATABASE_URL: postgresql://postgres:postgres_ci_test_password@127.0.0.1:5433/mulknazorat_sprint05b_test
           BETTER_AUTH_SECRET: ci_test_better_auth_secret_with_more_than_32_characters_high_entropy
@@ -82,4 +97,3 @@ jobs:
           NEXT_PUBLIC_APP_URL: https://assetaudit.uz
           NODE_ENV: production
         run: npm run build
-

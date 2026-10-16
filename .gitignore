@@ -48,6 +48,7 @@ yarn-error.log*
 # environment files (strictly secret - never commit)
 .env*
 !.env.example
+!.env.test.example
 !.env.production.template
 
 # local backups & database dumps

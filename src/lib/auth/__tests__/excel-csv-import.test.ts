@@ -1,15 +1,17 @@
 /**
  * AssetAudit — Sprint 14: Excel / CSV Import Mantig'i Sinovlari
  * Izolyatsiyalangan test bazasida (mulknazorat_sprint05b_test) tekshiriladi.
+ * exceljs orqali XLSX va CSV parserlari, limitlar va tranzaksiya yaxlitligi sinovdan o'tkaziladi.
  */
 
 import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { Pool } from "pg";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+import { Readable } from "node:stream";
 
 describe("AssetAudit — Sprint 14: Excel / CSV Import va Validatsiya Sinovlari", () => {
-  const PG_CONNECTION = "postgresql://postgres@127.0.0.1:5432/mulknazorat_sprint05b_test";
+  const PG_CONNECTION = process.env.DATABASE_URL || "postgresql://postgres@127.0.0.1:5432/mulknazorat_sprint05b_test";
   let pool: Pool;
   let orgId: string;
   let bldId: string;
@@ -65,14 +67,32 @@ describe("AssetAudit — Sprint 14: Excel / CSV Import va Validatsiya Sinovlari"
     }
   });
 
-  it("1. XLSX / CSV ma'lumotlarini o'qish: sheet_to_json to'g'ri qatorlarni ajratishi kerak", () => {
-    const csvContent = "Inventar raqami,Nomi,Bino,Xona,Kategoriya,Narxi\n" +
+  it("1. CSV ma'lumotlarini ExcelJS orqali o'qish: to'g'ri sarlavha va qatorlarni ajratishi kerak", async () => {
+    const csvContent =
+      "Inventar raqami,Nomi,Bino,Xona,Kategoriya,Narxi\n" +
       "INV-NEW-01,Stol,IMP_B1,101,furniture,500000\n" +
       "INV-NEW-02,Stul,IMP_B1,101,furniture,150000\n";
 
-    const workbook = XLSX.read(Buffer.from(csvContent), { type: "buffer" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json<Record<string, string | number>>(sheet);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.csv.read(Readable.from(Buffer.from(csvContent)));
+    const sheet = workbook.worksheets[0];
+    assert.ok(sheet, "Worksheet mavjud bo'lishi kerak");
+
+    const headers: Map<number, string> = new Map();
+    sheet.getRow(1).eachCell((cell, colNumber) => {
+      headers.set(colNumber, cell.text.trim());
+    });
+
+    const rows: Array<Record<string, string>> = [];
+    for (let r = 2; r <= sheet.rowCount; r++) {
+      const row = sheet.getRow(r);
+      if (!row || !row.hasValues) continue;
+      const rowObj: Record<string, string> = {};
+      headers.forEach((header, col) => {
+        rowObj[header] = row.getCell(col).text.trim();
+      });
+      rows.push(rowObj);
+    }
 
     assert.equal(rows.length, 2);
     assert.equal(rows[0]["Inventar raqami"], "INV-NEW-01");
@@ -80,7 +100,26 @@ describe("AssetAudit — Sprint 14: Excel / CSV Import va Validatsiya Sinovlari"
     assert.equal(rows[1]["Inventar raqami"], "INV-NEW-02");
   });
 
-  it("2. Takroriy inventar raqami tekshiruvi: bazada mavjud raqam rad etilishi kerak", async () => {
+  it("2. XLSX ma'lumotlarini ExcelJS orqali yaratish va o'qish: to'liq mos kelishi kerak", async () => {
+    const wbOut = new ExcelJS.Workbook();
+    const wsOut = wbOut.addWorksheet("Inventarlar");
+    wsOut.columns = [
+      { header: "Inventar raqami", key: "inv" },
+      { header: "Nomi", key: "name" },
+      { header: "Bino", key: "bld" },
+      { header: "Xona", key: "room" },
+    ];
+    wsOut.addRow({ inv: "INV-XLSX-01", name: "Monitor Dell", bld: "IMP_B1", room: "101" });
+    const buffer = await wbOut.xlsx.writeBuffer();
+
+    const wbIn = new ExcelJS.Workbook();
+    await wbIn.xlsx.load(Buffer.from(buffer) as unknown as Parameters<typeof wbIn.xlsx.load>[0]);
+    const wsIn = wbIn.worksheets[0];
+    assert.ok(wsIn, "XLSX varaq yuklanishi shart");
+    assert.equal(wsIn.rowCount, 2);
+  });
+
+  it("3. Takroriy inventar raqami tekshiruvi: bazada mavjud raqam rad etilishi kerak", async () => {
     const existingCheck = await pool.query(
       "SELECT id FROM items WHERE organization_id = $1 AND inventory_number = 'INV-EXISTING-1';",
       [orgId]
@@ -88,7 +127,7 @@ describe("AssetAudit — Sprint 14: Excel / CSV Import va Validatsiya Sinovlari"
     assert.equal(existingCheck.rows.length, 1, "Mavjud inventar bazada topilishi shart");
   });
 
-  it("3. Batch kiritish: yangi inventarlar to'g'ri organizationId bilan muhrlanishi kerak", async () => {
+  it("4. Batch kiritish: yangi inventarlar to'g'ri organizationId bilan muhrlanishi kerak", async () => {
     const newInvNum = `INV-BATCH-${Date.now()}`;
     await pool.query(
       `INSERT INTO items (organization_id, building_id, floor_id, room_id, name, inventory_number, category_id, qr_token)

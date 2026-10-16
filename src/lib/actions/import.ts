@@ -1,6 +1,7 @@
 "use server";
 
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+import { Readable } from "node:stream";
 import { revalidatePath } from "next/cache";
 import { requireAuthenticatedUser } from "@/lib/auth/authorization";
 import { canCreateNewItem } from "@/lib/auth/authorization-rules";
@@ -29,13 +30,35 @@ export interface ImportResult {
 export type ExcelCellValue = string | number | boolean | null | undefined;
 export type ExcelRow = Record<string, ExcelCellValue>;
 
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB limit
+const MAX_ROW_COUNT = 3000; // Maksimal 3000 qator
+const BATCH_CHUNK_SIZE = 50; // RAM optimalligi uchun 50 talik chunklar
+
+/**
+ * ExcelJS yacheyka qiymatini xavfsiz matnga o'girish
+ */
+function extractCellValue(cell: ExcelJS.Cell): string {
+  if (cell.value === null || cell.value === undefined) return "";
+  if (typeof cell.value === "object") {
+    if ("text" in cell.value && typeof cell.value.text === "string") {
+      return cell.value.text.trim();
+    }
+    if ("result" in cell.value && cell.value.result !== undefined && cell.value.result !== null) {
+      return String(cell.value.result).trim();
+    }
+  }
+  return String(cell.text || cell.value || "").trim();
+}
+
 /**
  * Excel (XLSX) va CSV fayldan inventarlarni ommaviy import qilish
  * QOIDALAR:
  * - Faqat organization_admin va registrar huquqiga ega foydalanuvchilar.
  * - Multi-tenant izolyatsiyasi: faqat joriy tashkilot bazasiga yozadi.
+ * - Fayl hajmi maksimum 5 MB, qatorlar soni maksimum 3000.
+ * - Bino va xonalar qat'iy tekshiriladi (hech qanday taxmin qilishga yo'l qo'yilmaydi).
+ * - Qisman yozilib qolish xavfini bartaraf etish uchun to'liq DB tranzaksiyasida bajariladi.
  * - Takroriy inventar raqamlari rad etiladi va xato hisobotida ko'rsatiladi.
- * - 1 GB RAM li VPS uchun batch-chunk (50 talab) rejimida xavfsiz ishlaydi.
  */
 export async function importInventoryAction(formData: FormData): Promise<ImportResult> {
   try {
@@ -75,13 +98,10 @@ export async function importInventoryAction(formData: FormData): Promise<ImportR
       };
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const workbook = XLSX.read(Buffer.from(arrayBuffer), { type: "buffer" });
-    const firstSheetName = workbook.SheetNames[0];
-    if (!firstSheetName) {
+    if (file.size > MAX_FILE_SIZE_BYTES) {
       return {
         success: false,
-        message: "Faylda varaqlar (sheets) topilmadi.",
+        message: "Fayl hajmi ruxsat etilgan 5 MB limitidan oshmasligi kerak.",
         totalRows: 0,
         importedCount: 0,
         skippedCount: 0,
@@ -89,14 +109,94 @@ export async function importInventoryAction(formData: FormData): Promise<ImportR
       };
     }
 
-    const worksheet = workbook.Sheets[firstSheetName];
-    const rawData: ExcelRow[] = XLSX.utils.sheet_to_json<ExcelRow>(worksheet, { defval: "" });
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const workbook = new ExcelJS.Workbook();
+    const isCsv = file.name.toLowerCase().endsWith(".csv") || file.type === "text/csv";
+
+    if (isCsv) {
+      await workbook.csv.read(Readable.from(buffer));
+    } else {
+      try {
+        await workbook.xlsx.load(buffer as unknown as Parameters<typeof workbook.xlsx.load>[0]);
+      } catch (xlsxErr) {
+        // Agar kengaytma noto'g'ri bo'lsa yoki CSV bo'lsa, CSV sifatida o'qishga harakat qilish
+        try {
+          await workbook.csv.read(Readable.from(buffer));
+        } catch {
+          throw xlsxErr;
+        }
+      }
+    }
+
+    const worksheet = workbook.worksheets[0];
+    if (!worksheet || worksheet.rowCount === 0) {
+      return {
+        success: false,
+        message: "Faylda ma'lumotlar varag'i (sheet) topilmadi yoki u bo'sh.",
+        totalRows: 0,
+        importedCount: 0,
+        skippedCount: 0,
+        errors: [],
+      };
+    }
+
+    const headers: Map<number, string> = new Map();
+    const headerRow = worksheet.getRow(1);
+    headerRow.eachCell((cell, colNumber) => {
+      const val = extractCellValue(cell);
+      if (val) {
+        headers.set(colNumber, val);
+      }
+    });
+
+    if (headers.size === 0) {
+      return {
+        success: false,
+        message: "Jadval sarlavhalari (headers) topilmadi.",
+        totalRows: 0,
+        importedCount: 0,
+        skippedCount: 0,
+        errors: [],
+      };
+    }
+
+    const rawData: ExcelRow[] = [];
+    for (let r = 2; r <= worksheet.rowCount; r++) {
+      const row = worksheet.getRow(r);
+      if (!row || !row.hasValues) continue;
+
+      const rowObj: ExcelRow = {};
+      let hasAnyContent = false;
+      headers.forEach((headerName, colNumber) => {
+        const cellVal = extractCellValue(row.getCell(colNumber));
+        if (cellVal) {
+          hasAnyContent = true;
+        }
+        rowObj[headerName] = cellVal;
+      });
+
+      if (hasAnyContent) {
+        rawData.push(rowObj);
+      }
+    }
 
     if (rawData.length === 0) {
       return {
         success: false,
         message: "Jadvalda ma'lumotlar qatori topilmadi.",
         totalRows: 0,
+        importedCount: 0,
+        skippedCount: 0,
+        errors: [],
+      };
+    }
+
+    if (rawData.length > MAX_ROW_COUNT) {
+      return {
+        success: false,
+        message: `Fayldagi qatorlar soni ruxsat etilgan limitdan (${MAX_ROW_COUNT}) oshib ketdi. Fayl: ${rawData.length} qator.`,
+        totalRows: rawData.length,
         importedCount: 0,
         skippedCount: 0,
         errors: [],
@@ -129,7 +229,7 @@ export async function importInventoryAction(formData: FormData): Promise<ImportR
     const existingInvSet = new Set(existingItems.map((i) => i.inventoryNumber.toUpperCase()));
 
     // Fayl ichidagi xonalarni tezkor qidirish uchun map: `buildingId:roomNumber` -> room
-    const roomKeyMap = new Map<string, typeof existingRooms[0]>();
+    const roomKeyMap = new Map<string, (typeof existingRooms)[0]>();
     for (const r of existingRooms) {
       roomKeyMap.set(`${r.buildingId}:${r.roomNumber.toUpperCase()}`, r);
     }
@@ -272,27 +372,27 @@ export async function importInventoryAction(formData: FormData): Promise<ImportR
         continue;
       }
 
-      // 3. Bino tekshiruvi (Qat'iy validatsiya)
-      if (!buildingKey && existingBuildings.length > 1) {
+      // 3. Bino tekshiruvi (Qat'iy validatsiya — tasodifiy bino taxmin qilish qat'iyan man etiladi)
+      if (!buildingKey) {
         errors.push({
           row: rowNum,
           inventoryNumber: invNum,
           name,
-          reason: "Bino ko'rsatilmadi. Tashkilotda bir nechta bino mavjud bo'lgani sababli bino ko'rsatilishi shart.",
+          reason: "Bino ko'rsatilmadi. Har bir inventar uchun bino kodi yoki nomi kiritilishi shart.",
         });
         continue;
       }
 
-      const matchedBuilding = buildingKey
-        ? buildingByCode.get(buildingKey.toUpperCase()) || buildingByName.get(buildingKey.toLowerCase())
-        : existingBuildings[0];
+      const matchedBuilding =
+        buildingByCode.get(buildingKey.toUpperCase()) ||
+        buildingByName.get(buildingKey.toLowerCase());
 
       if (!matchedBuilding) {
         errors.push({
           row: rowNum,
           inventoryNumber: invNum,
           name,
-          reason: `"${buildingKey}" nomli yoki kodli bino topilmadi.`,
+          reason: `"${buildingKey}" nomli yoki kodli faol bino topilmadi.`,
         });
         continue;
       }
@@ -303,7 +403,7 @@ export async function importInventoryAction(formData: FormData): Promise<ImportR
           row: rowNum,
           inventoryNumber: invNum,
           name,
-          reason: "Xona raqami ko'rsatilmadi.",
+          reason: "Xona raqami ko'rsatilmadi. Har bir inventar uchun xona kiritilishi shart.",
         });
         continue;
       }
@@ -349,14 +449,17 @@ export async function importInventoryAction(formData: FormData): Promise<ImportR
       });
     }
 
-    // 6. Xavfsiz batch kiritish (50 tadan chunk, RAM optimalligi)
-    const CHUNK_SIZE = 50;
+    // 6. Xavfsiz batch kiritish (Tranzaksiya ichida atomar 50 talik chunklar, qisman yozilish xavfi 0)
     let successfullyImported = 0;
 
-    for (let i = 0; i < validRowsToInsert.length; i += CHUNK_SIZE) {
-      const chunk = validRowsToInsert.slice(i, i + CHUNK_SIZE);
-      await db.insert(items).values(chunk);
-      successfullyImported += chunk.length;
+    if (validRowsToInsert.length > 0) {
+      await db.transaction(async (tx) => {
+        for (let i = 0; i < validRowsToInsert.length; i += BATCH_CHUNK_SIZE) {
+          const chunk = validRowsToInsert.slice(i, i + BATCH_CHUNK_SIZE);
+          await tx.insert(items).values(chunk);
+        }
+      });
+      successfullyImported = validRowsToInsert.length;
     }
 
     revalidatePath("/org/inventory");

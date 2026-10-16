@@ -34,7 +34,7 @@ export function OrgLogoutButton() {
       {logoutError && (
         <span
           role="alert"
-          className="inline-flex items-center gap-1 text-[11px] font-medium text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded-md"
+          className="inline-flex items-center gap-1 text-[11px] font-medium text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded-[3px]"
         >
           <AlertCircle className="w-3 h-3 shrink-0" />
           <span>{logoutError}</span>
@@ -43,7 +43,7 @@ export function OrgLogoutButton() {
       <button
         onClick={handleLogout}
         disabled={isLoggingOut}
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors disabled:opacity-60 cursor-pointer"
+        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[3px] border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors disabled:opacity-60 cursor-pointer"
         title="Tizimdan chiqish"
       >
         {isLoggingOut ? (

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireAuthenticatedUser } from "@/lib/auth/authorization";
 import { getInventoryList, getInventoryStats, getItemCategoriesList } from "@/lib/data/inventory";
+import { getBuildingsList } from "@/lib/data/locations";
+import { InventoryFilters } from "./inventory-filters";
 import {
   QrCode,
   Plus,
@@ -9,7 +11,6 @@ import {
   FileSpreadsheet,
   Building,
   DoorClosed,
-  Filter,
   CheckCircle2,
   AlertCircle,
   Wrench,
@@ -69,9 +70,10 @@ export default async function OrgInventoryPage({ searchParams }: PageProps) {
   const status = params.status || "all";
   const search = params.q?.trim() || "";
 
-  const [stats, categories, inventoryRes] = await Promise.all([
+  const [stats, categories, buildingsRes, inventoryRes] = await Promise.all([
     getInventoryStats(organization.id),
     getItemCategoriesList(),
+    getBuildingsList({ organizationId: organization.id, pageSize: 100 }),
     getInventoryList({
       organizationId: organization.id,
       categoryId,
@@ -174,34 +176,15 @@ export default async function OrgInventoryPage({ searchParams }: PageProps) {
         </div>
       </div>
 
-      {/* Filter Paneli */}
-      <div className="bg-white p-4 rounded-[4px] border border-slate-200/80 shadow-xs flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
-          <span className="text-xs font-semibold text-slate-500 flex items-center gap-1 mr-2">
-            <Filter className="w-3.5 h-3.5" />
-            Toifa:
-          </span>
-          <Link
-            href="/org/inventory"
-            className={`px-3 py-1.5 rounded-[3px] text-xs font-medium whitespace-nowrap transition-colors ${
-              categoryId === "all" ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            }`}
-          >
-            Barchasi
-          </Link>
-          {categories.map((c) => (
-            <Link
-              key={c.id}
-              href={`/org/inventory?categoryId=${c.id}`}
-              className={`px-3 py-1.5 rounded-[3px] text-xs font-medium whitespace-nowrap transition-colors ${
-                categoryId === c.id ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              {c.name}
-            </Link>
-          ))}
-        </div>
-      </div>
+      {/* Interaktiv Qidiruv, Filterlar va Eksport Paneli */}
+      <InventoryFilters
+        categories={categories}
+        buildings={buildingsRes.items.map((b) => ({ id: b.id, name: b.name, code: b.code }))}
+        currentCategoryId={categoryId}
+        currentBuildingId={buildingId}
+        currentStatus={status}
+        currentSearch={search}
+      />
 
       {/* Inventarlar Jadvali */}
       <div className="bg-white rounded-[4px] border border-slate-200/80 shadow-xs overflow-hidden">

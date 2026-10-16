@@ -8,6 +8,8 @@ import { inventoryCycles, roomAudits, scanEvents, cycleConflicts, cycleItems } f
 import { items } from "@/lib/db/schema/inventory";
 import { rooms } from "@/lib/db/schema/locations";
 import { and, or, eq, desc } from "drizzle-orm";
+import ExcelJS from "exceljs";
+import { getReconciliationReport } from "@/lib/data/audit";
 
 export interface ScanActionResult {
   success: boolean;
@@ -389,6 +391,118 @@ export async function createCycleAction(
     return {
       success: false,
       message: err instanceof Error ? err.message : "Sikl yaratishda xatolik yuz berdi.",
+    };
+  }
+}
+
+/**
+ * 6. Rekonsilyatsiya hisobotini Excel (.xlsx) formatida eksport qilish
+ */
+export async function exportReportExcelAction(cycleId: string): Promise<{
+  success: boolean;
+  base64?: string;
+  filename?: string;
+  message?: string;
+}> {
+  try {
+    const { profile, organization } = await requireAuthenticatedUser();
+    if (!organization) return { success: false, message: "Tashkilot aniqlanmadi." };
+    if (!canPerformAudit(profile.role) && profile.role !== "organization_admin") {
+      return { success: false, message: "Hisobotni eksport qilish huquqiga ega emassiz." };
+    }
+
+    const report = await getReconciliationReport({
+      organizationId: organization.id,
+      cycleId,
+    });
+
+    if (!report) {
+      return { success: false, message: "Tanlangan audit sikli hisoboti topilmadi." };
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = "AssetAudit Platform";
+    workbook.created = new Date();
+
+    // 1. Umumiy Xulosa varag'i
+    const summarySheet = workbook.addWorksheet("Umumiy Xulosa");
+    summarySheet.columns = [
+      { header: "Ko'rsatkich", key: "metric", width: 35 },
+      { header: "Qiymat", key: "value", width: 25 },
+    ];
+    const sumHeader = summarySheet.getRow(1);
+    sumHeader.font = { bold: true, color: { argb: "FF0F172A" } };
+    sumHeader.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF1F5F9" } };
+
+    summarySheet.addRow({ metric: "Audit Sikli", value: report.cycleTitle });
+    summarySheet.addRow({ metric: "Jami kutilgan mulklar", value: report.totalExpectedItems });
+    summarySheet.addRow({ metric: "Skanerlangan mulklar", value: report.totalScannedItems });
+    summarySheet.addRow({ metric: "Mos kelganlar (Match)", value: report.matchedItemsCount });
+    summarySheet.addRow({ metric: "Konfliktlar (Location mismatch)", value: report.conflictItemsCount });
+    summarySheet.addRow({ metric: "Topilmagan mulklar (Missing)", value: report.missingItemsCount });
+    summarySheet.addRow({ metric: "Tekshirilgan xonalar", value: `${report.completedRooms} / ${report.totalRooms}` });
+
+    // 2. Joylashuv Konfliktlari varag'i
+    const conflictSheet = workbook.addWorksheet("Joylashuv Konfliktlari");
+    conflictSheet.columns = [
+      { header: "Inventar Raqami", key: "inv", width: 20 },
+      { header: "Buyum Nomi", key: "name", width: 32 },
+      { header: "Kutilgan Joylashuv", key: "expected", width: 30 },
+      { header: "Amalda Topilgan Joylashuv", key: "scanned", width: 30 },
+      { header: "Tekshiruvchi", key: "scanner", width: 25 },
+      { header: "Skanerlangan Sana", key: "date", width: 20 },
+    ];
+    const confHeader = conflictSheet.getRow(1);
+    confHeader.font = { bold: true, color: { argb: "FF0F172A" } };
+    confHeader.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFEE2E2" } };
+
+    for (const c of report.conflicts) {
+      conflictSheet.addRow({
+        inv: c.inventoryNumber,
+        name: c.itemName,
+        expected: `${c.expectedBuildingName} / ${c.expectedRoomNumber}-xona`,
+        scanned: `${c.scannedBuildingName} / ${c.scannedRoomNumber}-xona`,
+        scanner: c.scannerName || "Inspektor",
+        date: new Date(c.scannedAt).toLocaleString("uz-UZ"),
+      });
+    }
+
+    // 3. Topilmagan mulklar varag'i
+    if (report.missingItems && report.missingItems.length > 0) {
+      const missingSheet = workbook.addWorksheet("Topilmagan Mulklar");
+      missingSheet.columns = [
+        { header: "Inventar Raqami", key: "inv", width: 20 },
+        { header: "Buyum Nomi", key: "name", width: 32 },
+        { header: "Kutilgan Joylashuv", key: "location", width: 30 },
+        { header: "Holati", key: "status", width: 20 },
+      ];
+      const missHeader = missingSheet.getRow(1);
+      missHeader.font = { bold: true, color: { argb: "FF0F172A" } };
+      missHeader.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFEF3C7" } };
+
+      for (const m of report.missingItems) {
+        missingSheet.addRow({
+          inv: m.inventoryNumber,
+          name: m.name,
+          location: `${m.buildingName} / ${m.roomNumber}-xona`,
+          status: "Topilmadi",
+        });
+      }
+    }
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const base64 = Buffer.from(buffer).toString("base64");
+    const sanitizedTitle = report.cycleTitle.toLowerCase().replace(/[^a-z0-9]/g, "_");
+
+    return {
+      success: true,
+      base64,
+      filename: `rekonsilyatsiya_${sanitizedTitle}.xlsx`,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "Excel hisobotini shakllantirishda xatolik yuz berdi.",
     };
   }
 }

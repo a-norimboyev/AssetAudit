@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireAuthenticatedUser, AuthError } from "@/lib/auth/authorization";
 import { ForceChangePasswordCard } from "@/components/auth/force-change-password-card";
+import { OrgLogoutButton } from "@/app/org/org-logout-button";
 import { canPerformAudit } from "@/lib/auth/authorization-rules";
 import { getActiveCycle, getRoomAuditsForCycle } from "@/lib/data/audit";
 import {
@@ -71,11 +72,12 @@ export default async function InspectorDashboardPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[3px] text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
               <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
               <span>Inspektor</span>
             </span>
+            <OrgLogoutButton />
           </div>
         </div>
       </header>

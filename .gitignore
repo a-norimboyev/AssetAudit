@@ -10,28 +10,51 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
+# testing & coverage
 /coverage
+test-results/
+playwright-report/
+blob-report/
+.last-run.json
 
 # next.js
 /.next/
 /out/
 
-# production
+# production & standalone releases
 /build
+release.zip
+release.tar.gz
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
 
-# misc
+# misc & OS
 .DS_Store
 *.pem
+*.key
+*.pub
+id_*
+known_hosts*
 
-# debug
+# debug & npm logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# environment files (strictly secret - never commit)
 .env*
+!.env.example
+!.env.production.template
+
+# local backups & database dumps
+/backups/
+*.dump
+*.sql.bak
+*.sql.gz
 
 # vercel
 .vercel
@@ -39,3 +62,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# persistent media & test uploads
+public/uploads/
+/uploads/
+
+# local machine scratch notes & diagnostics
+Lokal
+*diagnostics*.txt
+*_diagnostics*.txt
+
+# host-specific root batch & shell launchers (contains local Windows paths)
+/*.bat
+/DEPLOY_ASSETAUDIT.sh
+/FAST_TRACK_DEPLOY.sh
+/PROVISION_VPS.sh
+/SETUP_VPS.sh
+/OPEN_LOCAL_TUNNEL.sh

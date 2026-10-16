@@ -1,0 +1,9 @@
+# AssetAudit (assetaudit.uz) — Robots.txt
+User-agent: *
+Disallow: /admin/
+Disallow: /org/
+Disallow: /audit/
+Disallow: /api/
+Disallow: /uploads/
+Allow: /
+Allow: /qr/

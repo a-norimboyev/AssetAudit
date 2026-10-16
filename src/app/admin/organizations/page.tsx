@@ -6,6 +6,7 @@ import {
   getOrganizationsList,
 } from "@/lib/data/organizations";
 import { OrganizationFilters } from "./organization-filters";
+import { EditOrganizationModal } from "./edit-organization-modal";
 import {
   Building2,
   CheckCircle2,
@@ -195,6 +196,7 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
                     <th className="px-5 py-3.5">Tashkilot turi</th>
                     <th className="px-5 py-3.5">Holati</th>
                     <th className="px-5 py-3.5 text-right">Ro‘yxatga olingan</th>
+                    <th className="px-5 py-3.5 text-right">Amallar</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -234,9 +236,16 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
                             </span>
                           )}
                         </td>
-                        <td className="px-5 py-3.5 text-right text-slate-400 flex items-center justify-end gap-1.5">
-                          <Calendar className="w-3.5 h-3.5" />
-                          <span>{formattedDate}</span>
+                        <td className="px-5 py-3.5 text-right text-slate-400">
+                          <span className="inline-flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span>{formattedDate}</span>
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5 text-right">
+                          <div className="flex items-center justify-end">
+                            <EditOrganizationModal organization={org} types={types} />
+                          </div>
                         </td>
                       </tr>
                     );

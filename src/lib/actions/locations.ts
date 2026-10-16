@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { requireOrganizationAdmin } from "@/lib/auth/authorization";
 import { db } from "@/lib/db";
 import { buildings, floors, rooms, type RoomType, ROOM_TYPES } from "@/lib/db/schema/locations";
-import { and, eq } from "drizzle-orm";
+import { items } from "@/lib/db/schema/inventory";
+import { and, eq, sql } from "drizzle-orm";
 
 export interface ActionResponse {
   success: boolean;
@@ -358,6 +359,24 @@ export async function archiveBuildingAction(buildingId: string): Promise<ActionR
       return { success: false, message: "Bino topilmadi." };
     }
 
+    const [activeItemsRes] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(items)
+      .where(
+        and(
+          eq(items.buildingId, buildingId),
+          eq(items.organizationId, organization.id),
+          sql`${items.status} != 'written_off'`
+        )
+      );
+
+    if (activeItemsRes && activeItemsRes.count > 0) {
+      return {
+        success: false,
+        message: `Ushbu binoda ${activeItemsRes.count} ta faol inventar biriktirilgan. Binoni arxivlashdan oldin ularni boshqa binoga ko'chiring.`,
+      };
+    }
+
     await db
       .update(buildings)
       .set({ isActive: false, updatedAt: new Date() })
@@ -484,6 +503,24 @@ export async function archiveRoomAction(roomId: string): Promise<ActionResponse>
       .limit(1);
 
     if (!existing) return { success: false, message: "Xona topilmadi." };
+
+    const [activeItemsRes] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(items)
+      .where(
+        and(
+          eq(items.roomId, roomId),
+          eq(items.organizationId, organization.id),
+          sql`${items.status} != 'written_off'`
+        )
+      );
+
+    if (activeItemsRes && activeItemsRes.count > 0) {
+      return {
+        success: false,
+        message: `Ushbu xonada ${activeItemsRes.count} ta faol inventar biriktirilgan. Xonani arxivlashdan oldin ularni boshqa xonaga ko'chiring yoki hisobdan chiqaring.`,
+      };
+    }
 
     await db
       .update(rooms)

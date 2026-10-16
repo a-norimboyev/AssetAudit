@@ -272,30 +272,53 @@ export async function importInventoryAction(formData: FormData): Promise<ImportR
         continue;
       }
 
-      // 3. Bino tekshiruvi
-      const matchedBuilding =
-        buildingByCode.get(buildingKey.toUpperCase()) ||
-        buildingByName.get(buildingKey.toLowerCase()) ||
-        existingBuildings[0]; // agar ko'rsatilmagan bo'lsa default birinchi bino
-
-      if (!matchedBuilding) {
-        errors.push({ row: rowNum, inventoryNumber: invNum, name, reason: `"${buildingKey}" binosi topilmadi.` });
+      // 3. Bino tekshiruvi (Qat'iy validatsiya)
+      if (!buildingKey && existingBuildings.length > 1) {
+        errors.push({
+          row: rowNum,
+          inventoryNumber: invNum,
+          name,
+          reason: "Bino ko'rsatilmadi. Tashkilotda bir nechta bino mavjud bo'lgani sababli bino ko'rsatilishi shart.",
+        });
         continue;
       }
 
-      // 4. Xona tekshiruvi
+      const matchedBuilding = buildingKey
+        ? buildingByCode.get(buildingKey.toUpperCase()) || buildingByName.get(buildingKey.toLowerCase())
+        : existingBuildings[0];
+
+      if (!matchedBuilding) {
+        errors.push({
+          row: rowNum,
+          inventoryNumber: invNum,
+          name,
+          reason: `"${buildingKey}" nomli yoki kodli bino topilmadi.`,
+        });
+        continue;
+      }
+
+      // 4. Xona tekshiruvi (Qat'iy validatsiya — tasodifiy xonaga noo'rin biriktirish qat'iyan man etiladi)
+      if (!roomKey) {
+        errors.push({
+          row: rowNum,
+          inventoryNumber: invNum,
+          name,
+          reason: "Xona raqami ko'rsatilmadi.",
+        });
+        continue;
+      }
+
       const roomLookupKey = `${matchedBuilding.id}:${roomKey}`;
-      let matchedRoom = roomKeyMap.get(roomLookupKey);
+      const matchedRoom = roomKeyMap.get(roomLookupKey);
 
       if (!matchedRoom) {
-        // Agar aniq xona topilmasa, binodagi birinchi xona
-        const fallbackRoom = existingRooms.find((r) => r.buildingId === matchedBuilding.id);
-        if (fallbackRoom) {
-          matchedRoom = fallbackRoom;
-        } else {
-          errors.push({ row: rowNum, inventoryNumber: invNum, name, reason: `"${matchedBuilding.name}" binosida faol xonalar mavjud emas.` });
-          continue;
-        }
+        errors.push({
+          row: rowNum,
+          inventoryNumber: invNum,
+          name,
+          reason: `"${matchedBuilding.name}" (${matchedBuilding.code}) binosida "${roomKey}" raqamli faol xona topilmadi.`,
+        });
+        continue;
       }
 
       // 5. Qiymatlarni normalizatsiya qilish

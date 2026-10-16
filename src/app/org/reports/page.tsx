@@ -8,6 +8,7 @@ import {
   HelpCircle,
   DoorClosed,
   ChevronDown,
+  SearchX,
 } from "lucide-react";
 
 export const metadata = {
@@ -221,6 +222,59 @@ export default async function OrgReportsPage({ searchParams }: PageProps) {
               </div>
             )}
           </div>
+
+          {/* Topilmagan (Yetishmayotgan) Mulklar Ro'yxati */}
+          {report.missingItems.length > 0 && (
+            <div className="bg-white rounded-[4px] border border-slate-200/80 shadow-xs overflow-hidden space-y-4">
+              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <SearchX className="w-4 h-4 text-rose-600" />
+                  <h3 className="text-sm font-bold text-slate-900">
+                    Tekshirilgan Xonalarda Topilmagan Mulklar ({report.missingItems.length} ta)
+                  </h3>
+                </div>
+                <span className="text-xs text-rose-600 font-medium">Yetishmovchilik ro‘yxati</span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs sm:text-sm">
+                  <thead className="bg-slate-50/75 border-b border-slate-200/80 text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
+                    <tr>
+                      <th scope="col" className="px-4 py-3 sm:px-6">Inventar</th>
+                      <th scope="col" className="px-4 py-3 sm:px-6">Kutilgan joylashuv</th>
+                      <th scope="col" className="px-4 py-3 sm:px-6">Holati</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200/60 font-normal">
+                    {report.missingItems.map((m) => (
+                      <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="px-4 py-3 sm:px-6">
+                          <div className="font-semibold text-slate-900">{m.name}</div>
+                          <div className="text-[11px] font-mono text-rose-600 font-bold">
+                            {m.inventoryNumber}
+                          </div>
+                        </td>
+
+                        <td className="px-4 py-3 sm:px-6">
+                          <span className="inline-flex items-center gap-1 text-slate-700 font-medium">
+                            <DoorClosed className="w-3.5 h-3.5 text-slate-400" />
+                            <span>{m.roomNumber}-xona</span>
+                            <span className="text-slate-400 text-[11px]">({m.buildingName})</span>
+                          </span>
+                        </td>
+
+                        <td className="px-4 py-3 sm:px-6">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-[3px] border border-rose-200">
+                            <span>Topilmadi (Xona auditi yakunlangan)</span>
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

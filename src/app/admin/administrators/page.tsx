@@ -4,7 +4,9 @@ import {
   getOrganizationAdminsStats,
   getOrganizationAdminsList,
 } from "@/lib/data/administrators";
+import { getOrganizationsList } from "@/lib/data/organizations";
 import { AdminFilters } from "./admin-filters";
+import { AddAdminModal } from "./add-admin-modal";
 import {
   Users,
   ShieldCheck,
@@ -16,7 +18,6 @@ import {
   Mail,
   ChevronLeft,
   ChevronRight,
-  Info,
 } from "lucide-react";
 
 export const metadata = {
@@ -43,9 +44,10 @@ export default async function AdminAdministratorsPage({ searchParams }: PageProp
   const search = params.q?.trim() || "";
 
   // 3. PostgreSQL bazasidan haqiqiy ma'lumotlarni parallel yuklash
-  const [stats, data] = await Promise.all([
+  const [stats, data, orgs] = await Promise.all([
     getOrganizationAdminsStats(),
     getOrganizationAdminsList({ page, pageSize: 20, search }),
+    getOrganizationsList({ pageSize: 100 }),
   ]);
 
   const hasFilter = Boolean(search);
@@ -66,6 +68,10 @@ export default async function AdminAdministratorsPage({ searchParams }: PageProp
           <p className="mt-1 text-xs sm:text-sm text-slate-500">
             Tashkilotlarning asosiy ma&apos;murlari va rahbarlik akkauntlari ro&apos;yxati
           </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <AddAdminModal organizations={orgs.items} />
         </div>
       </div>
 
@@ -157,11 +163,8 @@ export default async function AdminAdministratorsPage({ searchParams }: PageProp
                   </code>
                 </div>
 
-                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-500">
-                  <Info className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                  <span>
-                    TATU uchun tashkilot kodi: <strong>TATU</strong>. Yaratilgandan so&apos;ng bu yerda avtomatik ko&apos;rinadi.
-                  </span>
+                <div className="mt-5 flex justify-center">
+                  <AddAdminModal organizations={orgs.items} />
                 </div>
               </div>
             )}

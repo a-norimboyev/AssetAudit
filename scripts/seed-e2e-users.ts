@@ -56,7 +56,7 @@ export async function seedE2EUsers(): Promise<{ orgAId: string; orgBId: string }
 
     // 1. Tashkilot A (TATU E2E)
     const orgACode = "TATU_E2E";
-    let orgARes = await pool.query(
+    const orgARes = await pool.query(
       `SELECT id FROM organizations WHERE code = $1`,
       [orgACode]
     );
@@ -74,7 +74,7 @@ export async function seedE2EUsers(): Promise<{ orgAId: string; orgBId: string }
 
     // 2. Tashkilot B (SAMDU E2E - Izolyatsiya uchun)
     const orgBCode = "SAMDU_E2E";
-    let orgBRes = await pool.query(
+    const orgBRes = await pool.query(
       `SELECT id FROM organizations WHERE code = $1`,
       [orgBCode]
     );

@@ -153,9 +153,10 @@ async function verify() {
 
     await pool.end();
     process.exit(0);
-  } catch (err: any) {
-    const errorMsg = err?.message || String(err);
-    const errorCode = err?.code;
+  } catch (err: unknown) {
+    const errorObj = err as { message?: string; code?: string } | null;
+    const errorMsg = errorObj?.message || String(err);
+    const errorCode = errorObj?.code;
 
     let reason = "UNKNOWN";
     if (errorCode === "ECONNREFUSED" || errorMsg.includes("ECONNREFUSED")) {

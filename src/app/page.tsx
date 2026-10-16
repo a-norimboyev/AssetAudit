@@ -27,9 +27,9 @@ export default function Home() {
             >
               Demo &rarr;
             </Link>
-            <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-[3px] text-[11px] sm:text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
-              <span className="hidden sm:inline">Bosqich 1C: </span>PostgreSQL & Auth
+            <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-[3px] text-[11px] sm:text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>v1.0 Production</span>
             </span>
           </div>
         </div>
@@ -37,8 +37,8 @@ export default function Home() {
 
       {/* Asosiy qism */}
       <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-20 flex flex-col items-center text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[3px] text-xs font-medium bg-slate-100 text-slate-700 mb-6 border border-slate-200">
-          TATU uchun inventarizatsiya platformasi
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[3px] text-xs font-medium bg-blue-50 text-blue-700 mb-6 border border-blue-200">
+          Raqamli aktivlar va mulk nazorati platformasi
         </div>
 
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-950 max-w-2xl">
@@ -59,7 +59,7 @@ export default function Home() {
             href="/preview/dashboard"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-[3px] bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-xs transition-colors"
           >
-            <span>Universitet Admini Dashboardini ko‘rish</span>
+            <span>Interaktiv Demoni ko‘rish</span>
             <span className="text-xs bg-blue-500/50 px-2 py-0.5 rounded-[3px] font-normal">
               Demo
             </span>

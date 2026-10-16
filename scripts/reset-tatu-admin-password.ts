@@ -16,11 +16,11 @@ import * as path from "node:path";
 import * as readline from "node:readline";
 import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { hashPassword } from "better-auth/crypto";
 import * as schema from "../src/lib/db/schema/index";
 
-const { user, account, session, profiles, organizations } = schema;
+const { user, account, session, profiles } = schema;
 
 /**
  * .env.local faylini yuklash

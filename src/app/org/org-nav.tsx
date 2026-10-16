@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   Shield,
+  FileSpreadsheet,
 } from "lucide-react";
 
 interface NavItem {
@@ -63,9 +64,15 @@ const NAV_ITEMS: NavItem[] = [
     exact: false,
   },
   {
-    name: "Audit va hisobot",
+    name: "Audit jarayoni",
     href: "/org/audits",
     icon: ClipboardCheck,
+    exact: false,
+  },
+  {
+    name: "Hisobotlar",
+    href: "/org/reports",
+    icon: FileSpreadsheet,
     exact: false,
   },
 ];

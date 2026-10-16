@@ -298,6 +298,95 @@ export async function resetStaffPasswordAction(formData: FormData): Promise<Staf
 }
 
 /**
+ * 2B. Xodim holatini o'zgartirish (Aktivlashtirish / Bloklash - Toggle Staff Status)
+ *
+ * Vakolat: Faqat Organization Admin ruxsat etilgan.
+ * Xavfsizlik:
+ * - Faqat o'z tashkilotiga tegishli inspector/registrar xodimi.
+ * - Bloklangan (isActive = false) xodimning barcha sessiyalari session jadvalidan darhol o'chiriladi (force logout).
+ * - Audit jurnali qayd etiladi.
+ */
+export async function toggleStaffStatusAction(
+  userId: string,
+  nextActiveState: boolean
+): Promise<{ success: boolean; message: string }> {
+  let actorUserId = "unknown";
+  try {
+    const { organization, profile: actorProfile } = await requireOrganizationAdmin();
+    actorUserId = actorProfile.userId;
+
+    if (!userId || typeof userId !== "string") {
+      return { success: false, message: "Foydalanuvchi identifikatori topilmadi." };
+    }
+
+    const [targetProfile] = await db
+      .select({
+        userId: profiles.userId,
+        fullName: profiles.fullName,
+        role: profiles.role,
+        organizationId: profiles.organizationId,
+        isActive: profiles.isActive,
+      })
+      .from(profiles)
+      .where(
+        and(
+          eq(profiles.userId, userId),
+          eq(profiles.organizationId, organization.id)
+        )
+      )
+      .limit(1);
+
+    if (!targetProfile) {
+      return { success: false, message: "Xodim topilmadi yoki ushbu tashkilotga tegishli emas." };
+    }
+
+    if (targetProfile.role !== "inspector" && targetProfile.role !== "registrar") {
+      return { success: false, message: "Faqat inspektor va moddiy javobgarlarning holatini o'zgartirish mumkin." };
+    }
+
+    await db.transaction(async (tx) => {
+      // 1. Profil holatini yangilash
+      await tx
+        .update(profiles)
+        .set({
+          isActive: nextActiveState,
+          updatedAt: new Date(),
+        })
+        .where(eq(profiles.userId, userId));
+
+      // 2. Agar nofaol qilinsa, foydalanuvchining barcha faol sessiyalarini bekor qilish (force logout)
+      if (!nextActiveState) {
+        await tx.delete(session).where(eq(session.userId, userId));
+      }
+    });
+
+    logSecurityAudit({
+      event: nextActiveState ? "STAFF_ACTIVATED" : "STAFF_DEACTIVATED",
+      actorUserId,
+      organizationId: organization.id,
+      metadata: {
+        targetUserId: userId,
+        targetFullName: targetProfile.fullName,
+        nextActiveState,
+      },
+    });
+
+    revalidatePath("/org/staff");
+    revalidatePath("/org");
+
+    return {
+      success: true,
+      message: `Xodim holati muvaffaqiyatli ${nextActiveState ? "faollashtirildi" : "to'xtatildi"}.`,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "Xodim holatini o'zgartirishda server xatosi yuz berdi.",
+    };
+  }
+}
+
+/**
  * 3. Tashkilot Administratorini yaratish (Create Organization Admin Action)
  *
  * Vakolat: Faqat Platforma Super Admini ruxsat etilgan.

@@ -2,9 +2,9 @@ import { requireOrganizationAdmin } from "@/lib/auth/authorization";
 import { getOrganizationStaffList, getOrganizationStaffStats } from "@/lib/data/staff";
 import { AddStaffModal } from "./add-staff-modal";
 import { ResetStaffPasswordModal } from "./reset-password-modal";
+import { ToggleStaffStatusButton } from "./toggle-staff-status-button";
 import {
   Users,
-  CheckCircle2,
   Calendar,
   User,
   UserCheck,
@@ -160,17 +160,12 @@ export default async function OrgStaffPage() {
                     </td>
 
                     <td className="px-4 py-3.5 sm:px-6">
-                      <div className="flex flex-col gap-1 items-start">
-                        {s.isActive ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[3px] text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                            <span>Faol</span>
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[3px] text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-                            <span>Nofaol</span>
-                          </span>
-                        )}
+                      <div className="flex flex-col gap-1.5 items-start">
+                        <ToggleStaffStatusButton
+                          userId={s.userId}
+                          fullName={s.fullName}
+                          isActive={s.isActive}
+                        />
 
                         {s.mustChangePassword && (
                           <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[3px] text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200" title="Birinchi kirishda parolni almashtirishi shart">

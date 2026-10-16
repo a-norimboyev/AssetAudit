@@ -10,6 +10,12 @@ import { randomUUID } from "node:crypto";
 const TEST_DB_URL = "postgresql://postgres@127.0.0.1:5432/mulknazorat_sprint05b_test";
 
 export const E2E_CREDENTIALS = {
+  superAdmin: {
+    username: "superadmin",
+    password: "SuperAdminPass123!",
+    fullName: "Bosh Super Admin",
+    role: "super_admin",
+  },
   admin: {
     username: "tatu.e2e.admin",
     password: "TestAdminPass123!",
@@ -91,7 +97,8 @@ export async function seedE2EUsers(): Promise<{ orgAId: string; orgBId: string }
     }
 
     // 3. Foydalanuvchilarni kiritish
-    const usersToSeed = [
+    const usersToSeed: Array<{ creds: (typeof E2E_CREDENTIALS)[keyof typeof E2E_CREDENTIALS]; orgId: string | null }> = [
+      { creds: E2E_CREDENTIALS.superAdmin, orgId: null },
       { creds: E2E_CREDENTIALS.admin, orgId: orgAId },
       { creds: E2E_CREDENTIALS.registrar, orgId: orgAId },
       { creds: E2E_CREDENTIALS.inspector, orgId: orgAId },

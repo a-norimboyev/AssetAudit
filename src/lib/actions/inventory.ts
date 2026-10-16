@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import ExcelJS from "exceljs";
 import { requireAuthenticatedUser } from "@/lib/auth/authorization";
 import { canCreateNewItem, canRelocateItem } from "@/lib/auth/authorization-rules";
 import { db } from "@/lib/db";
@@ -8,6 +9,7 @@ import { items, type ItemStatus, type ItemCondition, ITEM_STATUSES, ITEM_CONDITI
 import { rooms } from "@/lib/db/schema/locations";
 import { generateSecureQrToken } from "@/lib/qr";
 import { and, eq } from "drizzle-orm";
+import { getInventoryList } from "@/lib/data/inventory";
 
 export interface ActionResponse {
   success: boolean;
@@ -342,4 +344,178 @@ export async function archiveItemAction(itemId: string): Promise<ActionResponse>
     };
   }
 }
+
+export interface ExportInventoryRow {
+  inventoryNumber: string;
+  name: string;
+  categoryName: string;
+  buildingName: string;
+  roomNumber: string;
+  roomName: string;
+  status: string;
+  condition: string;
+  price: string | null;
+  description: string | null;
+  createdAt: string;
+}
+
+/**
+ * 5. Tashkilot inventarlarini xavfsiz eksport qilish (CSV / Excel)
+ * Multi-tenant himoyalangan, faqat joriy tashkilot ma'lumotlarini yuklaydi.
+ */
+export async function exportInventoryDataAction(filters?: {
+  categoryId?: string;
+  buildingId?: string;
+  roomId?: string;
+  status?: string;
+  search?: string;
+}): Promise<{ success: boolean; data?: ExportInventoryRow[]; message?: string }> {
+  try {
+    const { profile, organization } = await requireAuthenticatedUser();
+    if (!organization) return { success: false, message: "Tashkilot aniqlanmadi." };
+    if (!canCreateNewItem(profile.role)) {
+      return { success: false, message: "Inventarlarni eksport qilish huquqiga ega emassiz." };
+    }
+
+    const res = await getInventoryList({
+      organizationId: organization.id,
+      categoryId: filters?.categoryId,
+      buildingId: filters?.buildingId,
+      roomId: filters?.roomId,
+      status: filters?.status,
+      search: filters?.search,
+      page: 1,
+      pageSize: 5000,
+    });
+
+    const exportRows: ExportInventoryRow[] = res.items.map((i) => ({
+      inventoryNumber: i.inventoryNumber,
+      name: i.name,
+      categoryName: i.categoryName,
+      buildingName: i.buildingName,
+      roomNumber: i.roomNumber,
+      roomName: i.roomName,
+      status: i.status,
+      condition: i.condition,
+      price: i.price,
+      description: i.description,
+      createdAt: new Date(i.createdAt).toISOString().split("T")[0] || "",
+    }));
+
+    return {
+      success: true,
+      data: exportRows,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "Eksport ma'lumotlarini yuklashda xatolik yuz berdi.",
+    };
+  }
+}
+
+/**
+ * 6. Tashkilot inventarlarini to'liq Excel (.xlsx) formatida eksport qilish
+ * Serverda ExcelJS orqali hosil qilinadi va xavfsiz Base64 oqimida qaytariladi.
+ */
+export async function exportInventoryExcelAction(filters?: {
+  categoryId?: string;
+  buildingId?: string;
+  roomId?: string;
+  status?: string;
+  search?: string;
+}): Promise<{ success: boolean; base64?: string; filename?: string; message?: string }> {
+  try {
+    const { profile, organization } = await requireAuthenticatedUser();
+    if (!organization) return { success: false, message: "Tashkilot aniqlanmadi." };
+    if (!canCreateNewItem(profile.role)) {
+      return { success: false, message: "Inventarlarni eksport qilish huquqiga ega emassiz." };
+    }
+
+    const res = await getInventoryList({
+      organizationId: organization.id,
+      categoryId: filters?.categoryId,
+      buildingId: filters?.buildingId,
+      roomId: filters?.roomId,
+      status: filters?.status,
+      search: filters?.search,
+      page: 1,
+      pageSize: 5000,
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = "AssetAudit Platform";
+    workbook.created = new Date();
+
+    const sheet = workbook.addWorksheet("Inventarlar");
+    sheet.columns = [
+      { header: "Inventar Raqami", key: "inv", width: 22 },
+      { header: "Nomi", key: "name", width: 32 },
+      { header: "Toifasi", key: "cat", width: 20 },
+      { header: "Bino", key: "bld", width: 25 },
+      { header: "Xona", key: "room", width: 20 },
+      { header: "Holati", key: "status", width: 16 },
+      { header: "Sifati", key: "cond", width: 16 },
+      { header: "Narxi (so'm)", key: "price", width: 18 },
+      { header: "Tavsif", key: "desc", width: 30 },
+      { header: "Kiritilgan sana", key: "date", width: 16 },
+    ];
+
+    const headerRow = sheet.getRow(1);
+    headerRow.font = { bold: true, color: { argb: "FF0F172A" } };
+    headerRow.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFF1F5F9" },
+    };
+
+    const STATUS_MAP: Record<string, string> = {
+      active: "Faol",
+      repair: "Ta'mirda",
+      written_off: "Hisobdan chiqarilgan",
+      transferred: "Ko'chirilgan",
+      lost: "Yo'qolgan",
+    };
+
+    const COND_MAP: Record<string, string> = {
+      new: "Yangi",
+      good: "Yaxshi",
+      fair: "Qoniqarli",
+      poor: "Eskirgan",
+      broken: "Nosoz",
+    };
+
+    for (const item of res.items) {
+      sheet.addRow({
+        inv: item.inventoryNumber,
+        name: item.name,
+        cat: item.categoryName,
+        bld: item.buildingName,
+        room: `${item.roomNumber} (${item.roomName})`,
+        status: STATUS_MAP[item.status] || item.status,
+        cond: COND_MAP[item.condition] || item.condition,
+        price: item.price ? Number(item.price) : null,
+        desc: item.description || "",
+        date: new Date(item.createdAt).toISOString().split("T")[0],
+      });
+    }
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const base64 = Buffer.from(buffer).toString("base64");
+    const dateStr = new Date().toISOString().split("T")[0];
+    const filename = `inventarlar_${organization.code.toLowerCase()}_${dateStr}.xlsx`;
+
+    return {
+      success: true,
+      base64,
+      filename,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "Excel faylni shakllantirishda server xatosi yuz berdi.",
+    };
+  }
+}
+
 

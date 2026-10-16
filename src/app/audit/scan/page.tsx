@@ -6,6 +6,7 @@ import { canPerformAudit } from "@/lib/auth/authorization-rules";
 import { getRoomsList } from "@/lib/data/locations";
 import { getActiveCycle } from "@/lib/data/audit";
 import { ScanInterface } from "./scan-interface";
+import { OrgLogoutButton } from "@/app/org/org-logout-button";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 
 export const metadata = {
@@ -71,10 +72,13 @@ export default async function AuditScanPage({ searchParams }: PageProps) {
             <span>Portallga qaytish</span>
           </Link>
 
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[3px] text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-            <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-            <span>{organization.code} Auditi</span>
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[3px] text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+              <span>{organization.code} Auditi</span>
+            </span>
+            <OrgLogoutButton />
+          </div>
         </div>
       </header>
 

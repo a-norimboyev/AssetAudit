@@ -1,9 +1,12 @@
 "use client";
 
-import { Download, Printer } from "lucide-react";
+import { useState } from "react";
+import { Download, FileSpreadsheet, Loader2, Printer } from "lucide-react";
+import { exportReportExcelAction } from "@/lib/actions/audit";
 
 interface ExportReportButtonsProps {
   report: {
+    cycleId?: string;
     cycleTitle: string;
     totalExpectedItems: number;
     totalScannedItems: number;
@@ -33,6 +36,8 @@ interface ExportReportButtonsProps {
 }
 
 export function ExportReportButtons({ report }: ExportReportButtonsProps) {
+  const [isExportingExcel, setIsExportingExcel] = useState(false);
+
   function exportCsv() {
     let csv = `AUDIT REKONSILYATSIYA HISOBOTI - ${report.cycleTitle}\n`;
     csv += `Jami kutilgan mulklar,${report.totalExpectedItems}\n`;
@@ -57,7 +62,7 @@ export function ExportReportButtons({ report }: ExportReportButtonsProps) {
       }
     }
 
-    const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + encodeURIComponent(csv);
     const link = document.createElement("a");
     link.setAttribute("href", csvContent);
     link.setAttribute("download", `rekonsilyatsiya_${report.cycleTitle.toLowerCase().replace(/[^a-z0-9]/g, "_")}.csv`);
@@ -66,14 +71,67 @@ export function ExportReportButtons({ report }: ExportReportButtonsProps) {
     document.body.removeChild(link);
   }
 
+  async function exportExcel() {
+    if (!report.cycleId) {
+      alert("Audit sikli identifikatori topilmadi.");
+      return;
+    }
+
+    setIsExportingExcel(true);
+    try {
+      const res = await exportReportExcelAction(report.cycleId);
+      if (!res.success || !res.base64) {
+        alert(res.message || "Excel faylini shakllantirishda xatolik yuz berdi.");
+        return;
+      }
+
+      const byteCharacters = atob(res.base64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = res.filename || "rekonsilyatsiya_hisoboti.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Eksport jarayonida xatolik yuz berdi.");
+    } finally {
+      setIsExportingExcel(false);
+    }
+  }
+
   return (
     <div className="flex items-center gap-2 print:hidden">
+      <button
+        onClick={exportExcel}
+        disabled={isExportingExcel}
+        type="button"
+        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[3px] bg-emerald-50 border border-emerald-300 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold shadow-xs transition cursor-pointer disabled:opacity-50"
+      >
+        {isExportingExcel ? (
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-700" />
+        ) : (
+          <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-700" />
+        )}
+        <span>{isExportingExcel ? "Tayyorlanmoqda..." : "Excel (.xlsx)"}</span>
+      </button>
+
       <button
         onClick={exportCsv}
         type="button"
         className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[3px] bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition cursor-pointer"
       >
-        <Download className="w-3.5 h-3.5 text-emerald-600" />
+        <Download className="w-3.5 h-3.5 text-slate-600" />
         <span>CSV Eksport</span>
       </button>
 
@@ -88,3 +146,4 @@ export function ExportReportButtons({ report }: ExportReportButtonsProps) {
     </div>
   );
 }
+

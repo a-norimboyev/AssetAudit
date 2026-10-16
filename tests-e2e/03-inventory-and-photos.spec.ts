@@ -88,7 +88,7 @@ test.describe("3. Inventar, Xavfsiz Rasmlar, QR va Stikerlar", () => {
     await expect(page.locator("body")).toContainText(/muvaffaqiyatli yuklandi/i, { timeout: 10000 });
 
     // Sahifada rasm paydo bo'lishini tekshirish
-    const uploadedImg = page.locator('img[src*="/uploads/inventory/"], img[src*="blob:"]').first();
+    const uploadedImg = page.locator('img[src*="/api/media/items/"], img[src*="/uploads/inventory/"], img[src*="blob:"]').first();
     await expect(uploadedImg).toBeVisible({ timeout: 10000 });
   });
 

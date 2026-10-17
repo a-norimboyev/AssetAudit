@@ -396,6 +396,67 @@ export async function createCycleAction(
 }
 
 /**
+ * 4. Audit Siklini Yakunlash yoki Holatini O'zgartirish (Update/Complete Cycle Action)
+ * Faqat Organization Admin vakolati
+ */
+export async function updateCycleStatusAction(
+  cycleId: string,
+  status: "completed" | "cancelled" | "in_progress"
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const { profile, organization } = await requireAuthenticatedUser();
+
+    if (!organization || profile.role !== "organization_admin") {
+      return { success: false, message: "Faqat Tashkilot Administratori audit siklini yakunlay oladi." };
+    }
+
+    if (!cycleId) {
+      return { success: false, message: "Sikl identifikatori ko'rsatilmadi." };
+    }
+
+    const [existing] = await db
+      .select({ id: inventoryCycles.id, title: inventoryCycles.title, status: inventoryCycles.status })
+      .from(inventoryCycles)
+      .where(and(eq(inventoryCycles.id, cycleId), eq(inventoryCycles.organizationId, organization.id)))
+      .limit(1);
+
+    if (!existing) {
+      return { success: false, message: "Audit sikli topilmadi." };
+    }
+
+    await db
+      .update(inventoryCycles)
+      .set({
+        status,
+        endDate: status === "completed" || status === "cancelled" ? new Date() : null,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(inventoryCycles.id, cycleId), eq(inventoryCycles.organizationId, organization.id)));
+
+    revalidatePath("/org/audits");
+    revalidatePath("/org/reports");
+    revalidatePath("/audit");
+
+    const statusLabel =
+      status === "completed"
+        ? "muvaffaqiyatli yakunlandi"
+        : status === "cancelled"
+        ? "bekor qilindi"
+        : "jarayonda deb belgilandi";
+
+    return {
+      success: true,
+      message: `"${existing.title}" audit sikli ${statusLabel}.`,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "Sikl holatini o'zgartirishda xatolik yuz berdi.",
+    };
+  }
+}
+
+/**
  * 6. Rekonsilyatsiya hisobotini Excel (.xlsx) formatida eksport qilish
  */
 export async function exportReportExcelAction(cycleId: string): Promise<{

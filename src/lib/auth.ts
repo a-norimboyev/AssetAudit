@@ -41,12 +41,48 @@ function getAuthBaseUrl(): string {
 }
 
 /**
+ * CSRF xavfsizligi uchun ruxsat etilgan Origin manzillarini aniqlash.
+ * Qat'iy qoidalar:
+ * 1. Production'da faqat rasmiy https://assetaudit.uz va BETTER_AUTH_URL qabul qilinadi.
+ * 2. Localhost va 127.0.0.1 originlariga FAQAT development va test muhitida ruxsat beriladi.
+ * 3. Wildcard (*) yoki barcha originlarga ruxsat berish qat'iyan taqiqlangan.
+ */
+export function getTrustedOrigins(): string[] {
+  const isProduction = process.env.NODE_ENV === "production";
+  const baseUrl = process.env.BETTER_AUTH_URL;
+  const origins = new Set<string>();
+
+  if (isProduction) {
+    origins.add("https://assetaudit.uz");
+    origins.add("https://www.assetaudit.uz");
+    if (baseUrl && baseUrl.startsWith("https://")) {
+      origins.add(baseUrl.replace(/\/$/, ""));
+    }
+    return Array.from(origins);
+  }
+
+  // Development va Test muhiti
+  if (baseUrl) {
+    origins.add(baseUrl.replace(/\/$/, ""));
+  }
+  origins.add("http://localhost:3000");
+  origins.add("http://localhost:3001");
+  origins.add("http://localhost:3005");
+  origins.add("http://127.0.0.1:3000");
+  origins.add("http://127.0.0.1:3001");
+  origins.add("http://127.0.0.1:3005");
+
+  return Array.from(origins);
+}
+
+/**
  * AssetAudit — Better Auth ishlab chiqarish konfiguratsiyasi
  * Mustaqil PostgreSQL va Drizzle ORM adapteriga asoslangan.
  */
 export const auth = betterAuth({
   secret: getAuthSecret(),
   baseURL: getAuthBaseUrl(),
+  trustedOrigins: getTrustedOrigins(),
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {

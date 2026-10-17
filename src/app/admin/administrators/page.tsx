@@ -7,6 +7,8 @@ import {
 import { getOrganizationsList } from "@/lib/data/organizations";
 import { AdminFilters } from "./admin-filters";
 import { AddAdminModal } from "./add-admin-modal";
+import { ToggleAdminStatusButton } from "./toggle-admin-status-button";
+import { ResetAdminPasswordModal } from "./reset-admin-password-modal";
 import {
   Users,
   ShieldCheck,
@@ -179,6 +181,7 @@ export default async function AdminAdministratorsPage({ searchParams }: PageProp
                   <th scope="col" className="px-4 py-3.5 sm:px-6">Roli</th>
                   <th scope="col" className="px-4 py-3.5 sm:px-6">Holati</th>
                   <th scope="col" className="px-4 py-3.5 sm:px-6">Qo&apos;shilgan sana</th>
+                  <th scope="col" className="px-4 py-3.5 sm:px-6 text-right">Amallar</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200/60 font-normal">
@@ -267,6 +270,23 @@ export default async function AdminAdministratorsPage({ searchParams }: PageProp
                             day: "numeric",
                           })}
                         </span>
+                      </div>
+                    </td>
+
+                    {/* Amallar: Faollashtirish/Bloklash va Parol Reset */}
+                    <td className="px-4 py-3.5 sm:px-6 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <ToggleAdminStatusButton
+                          userId={admin.userId}
+                          fullName={admin.fullName}
+                          isActive={admin.isActive}
+                        />
+                        <ResetAdminPasswordModal
+                          userId={admin.userId}
+                          fullName={admin.fullName}
+                          username={admin.username}
+                          organizationName={admin.organizationName}
+                        />
                       </div>
                     </td>
                   </tr>

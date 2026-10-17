@@ -32,8 +32,8 @@ export default function InventoryImportPage() {
       return;
     }
 
-    if (selected.size > 10 * 1024 * 1024) {
-      setErrorMsg("Fayl hajmi 10 MB dan oshmasligi kerak.");
+    if (selected.size > 5 * 1024 * 1024) {
+      setErrorMsg("Fayl hajmi 5 MB dan oshmasligi kerak.");
       setFile(null);
       return;
     }
@@ -145,6 +145,7 @@ export default function InventoryImportPage() {
           <li><strong>Bino</strong> — tizimdagi bino kodi (masalan: BOSH, A, 1) yoki bino nomi.</li>
           <li><strong>Xona</strong> — bino ichidagi xona raqami (masalan: 101, 204).</li>
           <li><strong>Kategoriya, Sifat va Narx</strong> — ixtiyoriy maydonlar.</li>
+          <li><strong>Cheklovlar</strong> — fayl hajmi maksimum 5 MB, qatorlar soni maksimum 3000 ta.</li>
         </ul>
       </div>
 

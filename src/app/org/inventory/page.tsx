@@ -4,6 +4,7 @@ import { requireAuthenticatedUser } from "@/lib/auth/authorization";
 import { getInventoryList, getInventoryStats, getItemCategoriesList } from "@/lib/data/inventory";
 import { getBuildingsList } from "@/lib/data/locations";
 import { InventoryFilters } from "./inventory-filters";
+import { ExportInventoryButtons } from "./export-inventory-buttons";
 import {
   QrCode,
   Plus,
@@ -112,6 +113,15 @@ export default async function OrgInventoryPage({ searchParams }: PageProps) {
             <Printer className="w-4 h-4 text-blue-600" />
             <span>QR chop etish</span>
           </Link>
+          <ExportInventoryButtons
+            filters={{
+              categoryId: categoryId === "all" ? undefined : categoryId,
+              buildingId: buildingId === "all" ? undefined : buildingId,
+              roomId: roomId === "all" ? undefined : roomId,
+              status: status === "all" ? undefined : status,
+              search: search || undefined,
+            }}
+          />
           <Link
             href="/org/inventory/import"
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[3px] bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold shadow-xs transition"

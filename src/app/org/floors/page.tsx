@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireOrganizationAdmin } from "@/lib/auth/authorization";
 import { getFloorsList, getBuildingsList } from "@/lib/data/locations";
 import { AddFloorModal } from "./add-floor-modal";
+import { EditFloorModal } from "./edit-floor-modal";
 import {
   Layers,
   Building,
@@ -164,13 +165,23 @@ export default async function OrgFloorsPage({ searchParams }: PageProps) {
                     </td>
 
                     <td className="px-4 py-3.5 sm:px-6 text-right">
-                      <Link
-                        href={`/org/rooms?floorId=${f.id}`}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800"
-                      >
-                        <span>Xonalar</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
+                      <div className="flex items-center justify-end gap-2">
+                        <EditFloorModal
+                          floor={{
+                            id: f.id,
+                            name: f.name,
+                            floorNumber: f.floorNumber,
+                            buildingName: f.buildingName,
+                          }}
+                        />
+                        <Link
+                          href={`/org/rooms?floorId=${f.id}`}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800"
+                        >
+                          <span>Xonalar</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}

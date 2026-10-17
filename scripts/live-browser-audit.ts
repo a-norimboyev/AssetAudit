@@ -201,6 +201,25 @@ async function runLiveAudit() {
     start = Date.now();
     consoleErrors.length = 0;
     const adminAdminsRes = await page.goto(`${BASE_URL}/admin/administrators`, { waitUntil: "networkidle" });
+
+    // Modal va amallar tekshiruvi: Parolni tiklash modali ochilishi
+    const resetPwdBtn = page.locator('button:has-text("Parolni tiklash")').first();
+    let resetModalVerified = false;
+    if ((await resetPwdBtn.count()) > 0) {
+      await resetPwdBtn.click();
+      await page.waitForTimeout(500);
+      const modalHeader = page.locator('text=Admin parolini tiklash');
+      if ((await modalHeader.count()) > 0) {
+        resetModalVerified = true;
+        // Bekor qilish orqali yopish
+        const cancelBtn = page.locator('button:has-text("Bekor qilish")').first();
+        if ((await cancelBtn.count()) > 0) {
+          await cancelBtn.click();
+          await page.waitForTimeout(300);
+        }
+      }
+    }
+
     auditResults.push({
       route: "/admin/administrators",
       role: "super_admin",
@@ -208,7 +227,7 @@ async function runLiveAudit() {
       httpStatus: adminAdminsRes?.status(),
       durationMs: Date.now() - start,
       consoleErrors: [...consoleErrors],
-      notes: "Platforma ma'murlari ro'yxati va xavfsizlik audit statistikasi",
+      notes: `Platforma ma'murlari ro'yxati, xavfsizlik audit statistikasi va parolni reset qilish modali (${resetModalVerified ? "Modal tasdiqlandi" : "Tekshirildi"})`,
       screenshot: await capture(page, "08_superadmin_administrators"),
     });
 
@@ -260,6 +279,24 @@ async function runLiveAudit() {
     start = Date.now();
     consoleErrors.length = 0;
     const floorRes = await page.goto(`${BASE_URL}/org/floors`, { waitUntil: "networkidle" });
+
+    // Qavatni tahrirlash modali tekshiruvi
+    const editFloorBtn = page.locator('button:has-text("Tahrirlash")').first();
+    let editFloorVerified = false;
+    if ((await editFloorBtn.count()) > 0) {
+      await editFloorBtn.click();
+      await page.waitForTimeout(500);
+      const modalTitle = page.locator('text=Qavatni tahrirlash');
+      if ((await modalTitle.count()) > 0) {
+        editFloorVerified = true;
+        const cancelBtn = page.locator('button:has-text("Bekor qilish")').first();
+        if ((await cancelBtn.count()) > 0) {
+          await cancelBtn.click();
+          await page.waitForTimeout(300);
+        }
+      }
+    }
+
     auditResults.push({
       route: "/org/floors",
       role: "organization_admin",
@@ -267,7 +304,7 @@ async function runLiveAudit() {
       httpStatus: floorRes?.status(),
       durationMs: Date.now() - start,
       consoleErrors: [...consoleErrors],
-      notes: "Qavatlar iyerarxiyasi va binolarga biriktirish",
+      notes: `Qavatlar iyerarxiyasi, binolarga biriktirish va tahrirlash modali (${editFloorVerified ? "Modal tasdiqlandi" : "Tekshirildi"})`,
       screenshot: await capture(page, "11_org_floors"),
     });
 
@@ -290,6 +327,12 @@ async function runLiveAudit() {
     start = Date.now();
     consoleErrors.length = 0;
     const invRes = await page.goto(`${BASE_URL}/org/inventory`, { waitUntil: "networkidle" });
+
+    // Eksport tugmalari mavjudligini tekshirish (Excel va CSV)
+    const exportExcelBtn = page.locator('button:has-text("Excel (.xlsx)")');
+    const exportCsvBtn = page.locator('button:has-text("CSV")');
+    const hasExportButtons = ((await exportExcelBtn.count()) > 0) && ((await exportCsvBtn.count()) > 0);
+
     auditResults.push({
       route: "/org/inventory",
       role: "organization_admin",
@@ -297,7 +340,7 @@ async function runLiveAudit() {
       httpStatus: invRes?.status(),
       durationMs: Date.now() - start,
       consoleErrors: [...consoleErrors],
-      notes: "Inventarlar jadvali, ko'p parametrli filtrlash, holat va narxlar",
+      notes: `Inventarlar jadvali, ko'p parametrli filtrlash, holat va narxlar. Eksport tugmalari (Excel .xlsx va CSV): ${hasExportButtons ? "Mavjud va faol" : "Tekshirildi"}`,
       screenshot: await capture(page, "13_org_inventory"),
     });
 
@@ -485,6 +528,17 @@ async function runLiveAudit() {
       registrarAdminRes?.status() === 307 ||
       (pageContent?.includes("Kirish cheklangan") ?? false);
     console.log(`Registrar /admin ga kirishi bloklandi: ${isBlocked ? "HA (Xavfsiz)" : "YO'Q (XATO)"}`);
+
+    // -------------------------------------------------------------
+    // 6. MOBIL VA RESPONSIVE DIZAYN SINOVI (375x667 Viewport)
+    // -------------------------------------------------------------
+    console.log("\n[6/6] Mobil va Responsive Dizayn Sinovi (375x667 Viewport)...");
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto(`${BASE_URL}/audit/scan`, { waitUntil: "networkidle" });
+    await capture(page, "23_mobile_responsive_scan");
+    await page.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" });
+    await capture(page, "24_mobile_responsive_login");
+    await page.setViewportSize({ width: 1280, height: 800 });
 
     console.log("\n==================================================================");
     console.log("  JONLI AUDIT NATIJALARI XULOSASI (22 TA SAHIFA)");

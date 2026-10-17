@@ -6,8 +6,8 @@
 import { spawn, ChildProcess } from "node:child_process";
 import * as http from "node:http";
 
-const TEST_PORT = 3005;
-const TEST_BASE_URL = `http://127.0.0.1:${TEST_PORT}`;
+const TEST_PORT = parseInt(process.env.TEST_PORT || process.env.PORT || "3001", 10);
+const TEST_BASE_URL = process.env.TEST_SERVER_URL || `http://localhost:${TEST_PORT}`;
 const TEST_DB_URL = "postgresql://postgres@127.0.0.1:5432/mulknazorat_sprint05b_test";
 
 function waitForServer(url: string, timeoutMs = 25000): Promise<boolean> {
@@ -35,38 +35,44 @@ function waitForServer(url: string, timeoutMs = 25000): Promise<boolean> {
 async function run() {
   console.log("==================================================================");
   console.log("  ASSETAUDIT: IZOLYATSIYALANGAN NEXT.JS HTTP AUTH TEST");
-  console.log(`  Port: ${TEST_PORT} | DB: mulknazorat_sprint05b_test (Port 5432)`);
+  console.log(`  Target URL: ${TEST_BASE_URL} | DB: mulknazorat_sprint05b_test (Port 5432)`);
   console.log("==================================================================");
 
   let nextProc: ChildProcess | null = null;
 
   try {
-    console.log("[1/4] Alohida test Next.js serveri ishga tushirilmoqda...");
     const isWindows = process.platform === "win32";
-    const nextCmd = isWindows ? "npx.cmd" : "npx";
+    const alreadyRunning = await waitForServer(TEST_BASE_URL, 1500);
 
-    const env = {
-      ...process.env,
-      PORT: String(TEST_PORT),
-      DATABASE_URL: TEST_DB_URL,
-      BETTER_AUTH_URL: TEST_BASE_URL,
-      BETTER_AUTH_SECRET: "d58b4089ebc2d1b6a7d9c4707cfc960dfbd9f74c4b1356dbdb79a8652823f5b8",
-      NODE_ENV: "development" as const,
-    };
+    if (alreadyRunning) {
+      console.log(`[1/4] OK — Mavjud Next.js serveri (${TEST_BASE_URL}) aniqlandi va qayta ishlatiladi.`);
+    } else {
+      console.log("[1/4] Alohida test Next.js serveri ishga tushirilmoqda...");
+      const nextCmd = isWindows ? "npx.cmd" : "npx";
 
-    nextProc = spawn(nextCmd, ["next", "dev", "-p", String(TEST_PORT), "-H", "127.0.0.1"], {
-      env,
-      stdio: "pipe",
-      shell: true,
-    });
+      const env = {
+        ...process.env,
+        PORT: String(TEST_PORT),
+        DATABASE_URL: TEST_DB_URL,
+        BETTER_AUTH_URL: TEST_BASE_URL,
+        BETTER_AUTH_SECRET: "d58b4089ebc2d1b6a7d9c4707cfc960dfbd9f74c4b1356dbdb79a8652823f5b8",
+        NODE_ENV: "development" as const,
+      };
 
-    console.log("[2/4] Server tayyor bo'lishi kutilmoqda...");
-    const ready = await waitForServer(TEST_BASE_URL, 30000);
-    if (!ready) {
-      console.error("XATO: Test serveri 30 soniya ichida javob bermadi.");
-      process.exit(1);
+      nextProc = spawn(nextCmd, ["next", "dev", "-p", String(TEST_PORT), "-H", "127.0.0.1"], {
+        env,
+        stdio: "pipe",
+        shell: true,
+      });
+
+      console.log("[2/4] Server tayyor bo'lishi kutilmoqda...");
+      const ready = await waitForServer(TEST_BASE_URL, 30000);
+      if (!ready) {
+        console.error("XATO: Test serveri 30 soniya ichida javob bermadi.");
+        process.exit(1);
+      }
+      console.log(`      OK — Test serveri ${TEST_BASE_URL} da tayyor.`);
     }
-    console.log(`      OK — Test serveri ${TEST_BASE_URL} da tayyor.`);
 
     console.log("[3/4] Barcha 4 ta HTTP test fayllari (11 ta test) bajarilmoqda...");
     const testRunner = spawn(

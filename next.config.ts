@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* Production standalone output for minimal memory and zero-fat Docker/VPS deployments */
   output: "standalone",
+  allowedDevOrigins: ["127.0.0.1", "localhost"],
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

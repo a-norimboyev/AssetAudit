@@ -627,6 +627,81 @@ export async function resetOrganizationAdminPasswordAction(formData: FormData): 
 }
 
 /**
+ * 4.1. Tashkilot Administratori holatini o'zgartirish (Faollashtirish / Bloklash)
+ *
+ * Vakolat: Faqat Platforma Super Admini.
+ * Bloklangan (isActive = false) administratorning barcha sessiyalari session jadvalidan darhol o'chiriladi (force logout).
+ */
+export async function toggleOrganizationAdminStatusAction(
+  userId: string,
+  nextActiveState: boolean
+): Promise<{ success: boolean; message: string }> {
+  let actorUserId = "unknown";
+  try {
+    const authContext = await requirePlatformAdmin();
+    actorUserId = authContext.user.id;
+
+    if (!userId) {
+      return { success: false, message: "Foydalanuvchi identifikatori topilmadi." };
+    }
+
+    const [adminProfile] = await db
+      .select({
+        userId: profiles.userId,
+        fullName: profiles.fullName,
+        role: profiles.role,
+        organizationId: profiles.organizationId,
+        isActive: profiles.isActive,
+      })
+      .from(profiles)
+      .where(and(eq(profiles.userId, userId), eq(profiles.role, "organization_admin")))
+      .limit(1);
+
+    if (!adminProfile) {
+      return { success: false, message: "Tashkilot administratori topilmadi." };
+    }
+
+    await db.transaction(async (tx) => {
+      await tx
+        .update(profiles)
+        .set({
+          isActive: nextActiveState,
+          updatedAt: new Date(),
+        })
+        .where(eq(profiles.userId, userId));
+
+      if (!nextActiveState) {
+        await tx.delete(session).where(eq(session.userId, userId));
+      }
+    });
+
+    logSecurityAudit({
+      event: nextActiveState ? "ORGANIZATION_ADMIN_ACTIVATED" : "ORGANIZATION_ADMIN_DEACTIVATED",
+      actorUserId,
+      organizationId: adminProfile.organizationId,
+      metadata: {
+        targetUserId: userId,
+        targetFullName: adminProfile.fullName,
+        nextActiveState,
+      },
+    });
+
+    revalidatePath("/admin/administrators");
+    revalidatePath("/admin");
+
+    return {
+      success: true,
+      message: `"${adminProfile.fullName}" holati muvaffaqiyatli ${nextActiveState ? "faollashtirildi" : "bloklandi"}.`,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "Holatni o'zgartirishda xatolik yuz berdi.",
+    };
+  }
+}
+
+/**
  * 5. Vaqtinchalik parolni majburiy yangilash (Change Temporary Password Action)
  * Foydalanuvchi tizimga kirgan, lekin mustChangePassword = true bo'lgan holatda
  * yangi mustahkam parol o'rnatishi uchun xizmat qiladi.

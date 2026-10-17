@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireOrganizationAdmin } from "@/lib/auth/authorization";
 import { getInventoryCyclesList } from "@/lib/data/audit";
 import { AddCycleModal } from "./add-cycle-modal";
+import { CycleStatusManager } from "./cycle-status-manager";
 import {
   ClipboardCheck,
   CheckCircle2,
@@ -101,13 +102,20 @@ export default async function OrgAuditsPage() {
                     </div>
                   </div>
 
-                  <Link
-                    href={`/org/reports?cycleId=${c.id}`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[3px] bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-colors shrink-0"
-                  >
-                    <FileSpreadsheet className="w-3.5 h-3.5" />
-                    <span>Rekonsilyatsiya hisoboti</span>
-                  </Link>
+                  <div className="flex items-center gap-2 flex-wrap shrink-0">
+                    <CycleStatusManager
+                      cycleId={c.id}
+                      currentStatus={c.status}
+                      cycleTitle={c.title}
+                    />
+                    <Link
+                      href={`/org/reports?cycleId=${c.id}`}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[3px] bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-colors shrink-0"
+                    >
+                      <FileSpreadsheet className="w-3.5 h-3.5" />
+                      <span>Rekonsilyatsiya hisoboti</span>
+                    </Link>
+                  </div>
                 </div>
 
                 {/* Progress bari */}

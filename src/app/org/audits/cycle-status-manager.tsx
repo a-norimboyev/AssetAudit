@@ -45,18 +45,10 @@ export function CycleStatusManager({
   if (currentStatus === "completed") {
     return (
       <div className="flex items-center gap-2">
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[3px] text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
           <CheckCircle2 className="w-3.5 h-3.5" />
-          <span>Audit Yakunlangan</span>
+          <span>Audit Yakunlangan (Qulflangan)</span>
         </span>
-        <button
-          onClick={() => handleStatusChange("in_progress")}
-          disabled={isPending}
-          type="button"
-          className="text-[11px] text-slate-500 hover:text-blue-600 underline cursor-pointer disabled:opacity-50"
-        >
-          {isPending ? "Yangilanmoqda..." : "Qayta ochish"}
-        </button>
       </div>
     );
   }
@@ -64,18 +56,10 @@ export function CycleStatusManager({
   if (currentStatus === "cancelled") {
     return (
       <div className="flex items-center gap-2">
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[3px] text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
           <XCircle className="w-3.5 h-3.5" />
-          <span>Bekor qilingan</span>
+          <span>Bekor qilingan (Yopiq)</span>
         </span>
-        <button
-          onClick={() => handleStatusChange("in_progress")}
-          disabled={isPending}
-          type="button"
-          className="text-[11px] text-slate-500 hover:text-blue-600 underline cursor-pointer disabled:opacity-50"
-        >
-          {isPending ? "Yangilanmoqda..." : "Qayta faollashtirish"}
-        </button>
       </div>
     );
   }
@@ -86,7 +70,7 @@ export function CycleStatusManager({
         onClick={() => handleStatusChange("completed")}
         disabled={isPending}
         type="button"
-        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[3px] bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition cursor-pointer disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-2xs hover:shadow-xs transition cursor-pointer disabled:opacity-50"
         title="Audit sanog'ini rasman yakunlash va qulflash"
       >
         {isPending ? (
@@ -101,7 +85,7 @@ export function CycleStatusManager({
         onClick={() => handleStatusChange("cancelled")}
         disabled={isPending}
         type="button"
-        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-[3px] bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 text-xs font-medium border border-slate-200 hover:border-rose-200 transition cursor-pointer disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 text-xs font-medium border border-slate-200 hover:border-rose-200 transition cursor-pointer disabled:opacity-50 shadow-2xs hover:shadow-xs"
         title="Siklni bekor qilish"
       >
         <XCircle className="w-3.5 h-3.5" />

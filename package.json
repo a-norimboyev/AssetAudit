@@ -9,6 +9,7 @@
     "lint": "eslint",
     "package": "npm run build && tsx scripts/package-release.ts",
     "db:generate": "drizzle-kit generate",
+    "db:clean": "tsx scripts/reset-test-data.ts",
     "pretest": "node -e \"const fs=require('fs'); if (!fs.existsSync('.env.test') && fs.existsSync('.env.test.example')) { fs.copyFileSync('.env.test.example', '.env.test'); console.log('[pretest] .env.test yaratildi (.env.test.example asosida)'); }\"",
     "test": "tsx --conditions=react-server --env-file=.env.test --test src/lib/auth/__tests__/**/*.test.ts",
     "test:e2e": "playwright test"

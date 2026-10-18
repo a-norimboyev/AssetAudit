@@ -3,7 +3,11 @@ import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema/auth";
 import { profiles } from "@/lib/db/schema/profiles";
 import { organizations } from "@/lib/db/schema/organizations";
-import { and, or, ilike, eq, desc, sql } from "drizzle-orm";
+import { items } from "@/lib/db/schema/inventory";
+import { buildings, rooms } from "@/lib/db/schema/locations";
+import { inventoryCycles } from "@/lib/db/schema/audit";
+import { getOrgDashboardData, type DashboardData } from "@/lib/data/dashboard";
+import { and, or, ilike, eq, ne, desc, sql } from "drizzle-orm";
 
 export interface OrganizationAdminListItem {
   userId: string;
@@ -17,6 +21,8 @@ export interface OrganizationAdminListItem {
   organizationId: string | null;
   organizationName: string | null;
   organizationCode: string | null;
+  password?: string;
+  phone?: string;
 }
 
 export interface OrganizationAdminStats {
@@ -119,6 +125,7 @@ export async function getOrganizationAdminsList(
         organizationId: profiles.organizationId,
         organizationName: organizations.name,
         organizationCode: organizations.code,
+        settings: organizations.settings,
       })
       .from(profiles)
       .innerJoin(user, eq(profiles.userId, user.id))
@@ -132,11 +139,197 @@ export async function getOrganizationAdminsList(
   const totalCount = countRes[0]?.count ?? 0;
   const totalPages = Math.ceil(totalCount / pageSize);
 
+  const items: OrganizationAdminListItem[] = rows.map((r) => {
+    const settings = (r.settings as Record<string, unknown>) || {};
+    return {
+      userId: r.userId,
+      fullName: r.fullName,
+      username: r.username,
+      email: r.email,
+      role: r.role,
+      isActive: r.isActive,
+      mustChangePassword: r.mustChangePassword,
+      createdAt: r.createdAt,
+      organizationId: r.organizationId,
+      organizationName: r.organizationName,
+      organizationCode: r.organizationCode,
+      password: (settings.adminPassword as string) || undefined,
+      phone: (settings.adminPhone as string) || undefined,
+    };
+  });
+
   return {
-    items: rows,
+    items,
     totalCount,
     totalPages,
     currentPage: page,
     pageSize,
   };
 }
+
+export interface OrganizationAdminDetails extends OrganizationAdminListItem {
+  updatedAt?: Date;
+  dashboard?: DashboardData;
+  recentItems: Array<{
+    id: string;
+    name: string;
+    inventoryNumber: string;
+    status: string;
+    price: string | null;
+    createdAt: Date;
+    roomName: string | null;
+    roomNumber: string | null;
+    buildingName: string | null;
+  }>;
+  staffMembers: Array<{
+    userId: string;
+    fullName: string;
+    role: string;
+    isActive: boolean;
+    email: string;
+    createdAt: Date;
+  }>;
+  cyclesList: Array<{
+    id: string;
+    title: string;
+    status: string;
+    startDate: Date;
+    endDate: Date | null;
+    createdAt: Date;
+  }>;
+}
+
+/**
+ * 3. Muayyan tashkilot administratorining to'liq profili va tashkilot faoliyati
+ * (Super Admin kuzatuvi va monitoringi uchun)
+ */
+export async function getOrganizationAdminDetails(
+  userId: string
+): Promise<OrganizationAdminDetails | null> {
+  const [row] = await db
+    .select({
+      userId: profiles.userId,
+      fullName: profiles.fullName,
+      username: user.username,
+      email: user.email,
+      role: profiles.role,
+      isActive: profiles.isActive,
+      mustChangePassword: profiles.mustChangePassword,
+      createdAt: profiles.createdAt,
+      updatedAt: profiles.updatedAt,
+      organizationId: profiles.organizationId,
+      organizationName: organizations.name,
+      organizationCode: organizations.code,
+      settings: organizations.settings,
+    })
+    .from(profiles)
+    .innerJoin(user, eq(profiles.userId, user.id))
+    .leftJoin(organizations, eq(profiles.organizationId, organizations.id))
+    .where(and(eq(profiles.userId, userId), eq(profiles.role, "organization_admin")))
+    .limit(1);
+
+  if (!row) {
+    return null;
+  }
+
+  const settings = (row.settings as Record<string, unknown>) || {};
+  let dashboard: DashboardData | undefined;
+  let recentItems: OrganizationAdminDetails["recentItems"] = [];
+  let staffMembers: OrganizationAdminDetails["staffMembers"] = [];
+  let cyclesList: OrganizationAdminDetails["cyclesList"] = [];
+
+  if (row.organizationId) {
+    try {
+      dashboard = await getOrgDashboardData(row.organizationId);
+    } catch (e) {
+      console.warn("Failed to get org dashboard data for admin details:", e);
+    }
+
+    try {
+      recentItems = await db
+        .select({
+          id: items.id,
+          name: items.name,
+          inventoryNumber: items.inventoryNumber,
+          status: items.status,
+          price: items.price,
+          createdAt: items.createdAt,
+          roomName: rooms.name,
+          roomNumber: rooms.roomNumber,
+          buildingName: buildings.name,
+        })
+        .from(items)
+        .leftJoin(rooms, eq(items.roomId, rooms.id))
+        .leftJoin(buildings, eq(items.buildingId, buildings.id))
+        .where(eq(items.organizationId, row.organizationId))
+        .orderBy(desc(items.createdAt))
+        .limit(10);
+    } catch (e) {
+      console.warn("Failed to get recent items for admin details:", e);
+    }
+
+    try {
+      staffMembers = await db
+        .select({
+          userId: profiles.userId,
+          fullName: profiles.fullName,
+          role: profiles.role,
+          isActive: profiles.isActive,
+          email: user.email,
+          createdAt: profiles.createdAt,
+        })
+        .from(profiles)
+        .innerJoin(user, eq(user.id, profiles.userId))
+        .where(
+          and(
+            eq(profiles.organizationId, row.organizationId),
+            ne(profiles.userId, userId)
+          )
+        )
+        .orderBy(desc(profiles.createdAt))
+        .limit(10);
+    } catch (e) {
+      console.warn("Failed to get staff for admin details:", e);
+    }
+
+    try {
+      cyclesList = await db
+        .select({
+          id: inventoryCycles.id,
+          title: inventoryCycles.title,
+          status: inventoryCycles.status,
+          startDate: inventoryCycles.startDate,
+          endDate: inventoryCycles.endDate,
+          createdAt: inventoryCycles.createdAt,
+        })
+        .from(inventoryCycles)
+        .where(eq(inventoryCycles.organizationId, row.organizationId))
+        .orderBy(desc(inventoryCycles.createdAt))
+        .limit(5);
+    } catch (e) {
+      console.warn("Failed to get cycles for admin details:", e);
+    }
+  }
+
+  return {
+    userId: row.userId,
+    fullName: row.fullName,
+    username: row.username,
+    email: row.email,
+    role: row.role,
+    isActive: row.isActive,
+    mustChangePassword: row.mustChangePassword,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    organizationId: row.organizationId,
+    organizationName: row.organizationName,
+    organizationCode: row.organizationCode,
+    password: (settings.adminPassword as string) || undefined,
+    phone: (settings.adminPhone as string) || undefined,
+    dashboard,
+    recentItems,
+    staffMembers,
+    cyclesList,
+  };
+}
+

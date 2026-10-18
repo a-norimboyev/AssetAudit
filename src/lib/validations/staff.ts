@@ -137,12 +137,22 @@ export function validateStaffInput(
   let finalEmail = "";
 
   if (rawUsername) {
-    const userCheck = validateUsername(rawUsername);
-    if (!userCheck.valid) {
-      errors.username = userCheck.error!;
+    if (rawUsername.includes("@")) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(rawUsername)) {
+        errors.username = "To'g'ri email manzilini kiriting (masalan: xodim@gmail.com).";
+      } else {
+        finalEmail = rawUsername.toLowerCase();
+        finalUsername = finalEmail;
+      }
     } else {
-      finalUsername = orgCode ? formatStaffUsername(orgCode, rawUsername) : rawUsername.toLowerCase();
-      finalEmail = rawEmail || generateInternalSystemEmail(finalUsername);
+      const userCheck = validateUsername(rawUsername);
+      if (!userCheck.valid) {
+        errors.username = userCheck.error!;
+      } else {
+        finalUsername = orgCode ? formatStaffUsername(orgCode, rawUsername) : rawUsername.toLowerCase();
+        finalEmail = rawEmail || generateInternalSystemEmail(finalUsername);
+      }
     }
   } else if (rawEmail) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -153,7 +163,7 @@ export function validateStaffInput(
       finalUsername = rawEmail.split("@")[0].toLowerCase();
     }
   } else {
-    errors.username = "Xodim uchun login (foydalanuvchi nomi) kiritilishi shart.";
+    errors.username = "Xodim uchun kirish emaili kiritilishi shart.";
   }
 
   if (role !== "inspector" && role !== "registrar") {

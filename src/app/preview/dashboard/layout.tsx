@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { DashboardLayoutClient } from "@/components/dashboard/DashboardLayoutClient";
 
 export const metadata: Metadata = {
-  title: "Dashboard Demo — AssetAudit",
-  description: "Universitet Admini boshqaruv paneli demo ko‘rinishi",
+  title: "Boshqaruv Paneli — AssetAudit",
+  description: "Universitet Admini boshqaruv paneli",
 };
 
 export default function DashboardLayout({

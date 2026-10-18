@@ -36,10 +36,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
       {/* O'ng qism: Demo bildirishnomalar va Profil */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Demo Status belgisi */}
-        <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">
-          <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-          <span>Demo Ko‘rinish</span>
+        {/* SaaS Status belgisi */}
+        <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span>Faol SaaS Muhiti</span>
         </span>
 
         {/* Bildirishnomalar */}

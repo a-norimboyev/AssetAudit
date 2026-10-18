@@ -49,7 +49,7 @@ export function AddRoomModal({
       <button
         onClick={() => setIsOpen(true)}
         disabled={buildings.length === 0 || floors.length === 0}
-        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[3px] bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow transition-all disabled:opacity-50 cursor-pointer"
+        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-2xs hover:shadow-xs transition-all disabled:opacity-50 cursor-pointer"
         title={
           buildings.length === 0 || floors.length === 0
             ? "Avval bino va qavat qo'shing"
@@ -61,11 +61,11 @@ export function AddRoomModal({
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-lg bg-white rounded-[4px] shadow-xl border border-slate-200 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-[3px] bg-blue-50 text-blue-600 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                   <DoorClosed className="w-4 h-4" />
                 </div>
                 <div>
@@ -75,7 +75,7 @@ export function AddRoomModal({
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 rounded-[3px] text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -84,7 +84,7 @@ export function AddRoomModal({
             <form action={formAction} className="p-6 space-y-4">
               {state?.message && (
                 <div
-                  className={`p-3 rounded-[4px] text-xs flex items-center gap-2 ${
+                  className={`p-3.5 rounded-xl text-xs flex items-center gap-2 ${
                     state.success
                       ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
                       : "bg-rose-50 text-rose-800 border border-rose-200"
@@ -102,7 +102,7 @@ export function AddRoomModal({
               {/* Bino va Qavat selektori (Kaskad) */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                     Bino <span className="text-rose-500">*</span>
                   </label>
                   <select
@@ -110,7 +110,7 @@ export function AddRoomModal({
                     required
                     value={selectedBuildingId}
                     onChange={(e) => setSelectedBuildingId(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-[3px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
                   >
                     <option value="">Binoni tanlang...</option>
                     {buildings.map((b) => (
@@ -125,14 +125,14 @@ export function AddRoomModal({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                     Qavat <span className="text-rose-500">*</span>
                   </label>
                   <select
                     name="floorId"
                     required
                     disabled={!selectedBuildingId}
-                    className="w-full px-3.5 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-[3px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900 disabled:opacity-50"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 disabled:opacity-50 transition-all"
                   >
                     <option value="">Qavatni tanlang...</option>
                     {availableFloors.map((f) => (
@@ -150,7 +150,7 @@ export function AddRoomModal({
               {/* Xona raqami va Xona nomi */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                     Xona raqami <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -158,7 +158,7 @@ export function AddRoomModal({
                     name="roomNumber"
                     required
                     placeholder="Masalan: 101 yoki 204-A"
-                    className="w-full px-3.5 py-2 text-xs sm:text-sm font-mono bg-slate-50 border border-slate-200 rounded-[3px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm font-mono bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
                   />
                   {state?.fieldErrors?.roomNumber && (
                     <p className="mt-1 text-[11px] text-rose-600">{state.fieldErrors.roomNumber}</p>
@@ -166,7 +166,7 @@ export function AddRoomModal({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                     Xona nomi <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -174,7 +174,7 @@ export function AddRoomModal({
                     name="name"
                     required
                     placeholder="Masalan: Kafedra mudiri xonasi"
-                    className="w-full px-3.5 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-[3px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
                   />
                   {state?.fieldErrors?.name && (
                     <p className="mt-1 text-[11px] text-rose-600">{state.fieldErrors.name}</p>
@@ -185,14 +185,14 @@ export function AddRoomModal({
               {/* Xona turi va Sig'imi */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                     Xona turi <span className="text-rose-500">*</span>
                   </label>
                   <select
                     name="type"
                     defaultValue="office"
                     required
-                    className="w-full px-3.5 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-[3px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
                   >
                     <option value="classroom">O‘quv xonasi (Auditoriya)</option>
                     <option value="lab">Laboratoriya</option>
@@ -209,7 +209,7 @@ export function AddRoomModal({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                     O‘rinlar sig‘imi (ixtiyoriy)
                   </label>
                   <input
@@ -217,23 +217,23 @@ export function AddRoomModal({
                     name="capacity"
                     min={0}
                     placeholder="Masalan: 30"
-                    className="w-full px-3.5 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-[3px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
                   />
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-2">
+              <div className="pt-2 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="px-4 py-2 rounded-[3px] border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors"
                 >
                   Bekor qilish
                 </button>
                 <button
                   type="submit"
                   disabled={isPending || state?.success}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[3px] bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-2xs hover:shadow-xs disabled:opacity-50 transition-all cursor-pointer"
                 >
                   {isPending ? (
                     <>

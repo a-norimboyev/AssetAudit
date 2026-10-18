@@ -40,7 +40,7 @@ const statusConfig: Record<
     icon: AlertTriangle,
   },
   pending: {
-    bg: "bg-slate-50",
+    bg: "bg-slate-100",
     text: "text-slate-600",
     border: "border-slate-200",
     defaultLabel: "Kutilmoqda",
@@ -80,7 +80,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[3px] text-xs font-medium border ${config.bg} ${config.text} ${config.border} ${className}`}
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${config.bg} ${config.text} ${config.border} ${className}`}
     >
       <Icon className="w-3.5 h-3.5 shrink-0" />
       <span>{text}</span>

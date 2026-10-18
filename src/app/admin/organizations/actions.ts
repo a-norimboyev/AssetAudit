@@ -10,8 +10,27 @@ import {
   type CreateOrganizationInput,
   type UpdateOrganizationInput,
 } from "@/lib/data/organizations";
-import { validateOrganizationInput } from "@/lib/validations/organization";
+import { validateOrganizationInput, generateCodeFromName } from "@/lib/validations/organization";
 import { logSecurityAudit } from "@/lib/audit/logger";
+import { notifyTelegramNewTenant } from "@/lib/notifications/telegram";
+
+import { db } from "@/lib/db";
+import { user, account } from "@/lib/db/schema/auth";
+import { profiles } from "@/lib/db/schema/profiles";
+import { hashPassword } from "better-auth/crypto";
+import { generateId } from "better-auth";
+import { sql, or } from "drizzle-orm";
+import {
+  generateInternalSystemEmail,
+  generateSecureTemporaryPassword,
+} from "@/lib/validations/staff";
+
+export interface CreateOrganizationActionInput extends CreateOrganizationInput {
+  adminFullName?: string;
+  adminUsername?: string;
+  adminPassword?: string;
+  adminPhone?: string;
+}
 
 export interface CreateOrganizationActionResult {
   success: boolean;
@@ -21,6 +40,16 @@ export interface CreateOrganizationActionResult {
     name?: string;
     code?: string;
     typeId?: string;
+    adminFullName?: string;
+    adminUsername?: string;
+    adminPassword?: string;
+  };
+  credentials?: {
+    username: string;
+    email?: string;
+    temporaryPassword?: string;
+    fullName: string;
+    role: string;
   };
 }
 
@@ -34,17 +63,18 @@ export interface UpdateOrganizationActionResult {
 }
 
 /**
- * Server Action: Yangi tashkilot yaratish
+ * Server Action: Yangi tashkilot yaratish (va ixtiyoriy/boshlang'ich tashkilot administratorini biriktirish)
  *
  * Xavfsizlik kafolatlari:
  * 1. Server-side avtorizatsiya: requirePlatformAdmin() — faqat platforma Super Admini ruxsat etilgan.
  * 2. Qat'iy input validatsiyasi: nom, kod formati, tashkilot turi tekshiruvi.
- * 3. Unique constraint va error xaritalash: takroriy kod uchun aniq o'zbekcha xabar.
- * 4. Audit jurnali: actorUserId, organizationId va vaqt qayd etiladi.
- * 5. Kesh yangilanishi: /admin/organizations va /admin boshqaruv paneli darhol revalidatsiya qilinadi.
+ * 3. Atomik tranzaksiya: Tashkilot va Administrator yagona DB tranzaksiyasida yaratiladi.
+ * 4. Unique constraint va error xaritalash: takroriy kod yoki takroriy login uchun aniq o'zbekcha xabar.
+ * 5. Audit jurnali: actorUserId, organizationId va vaqt qayd etiladi.
+ * 6. Kesh yangilanishi: /admin/organizations, /admin/administrators va /admin boshqaruv paneli darhol revalidatsiya qilinadi.
  */
 export async function createOrganizationAction(
-  data: CreateOrganizationInput
+  data: CreateOrganizationActionInput
 ): Promise<CreateOrganizationActionResult> {
   let actorUserId = "unknown";
 
@@ -54,7 +84,8 @@ export async function createOrganizationAction(
     actorUserId = authContext.user.id;
 
     // 2. Input ma'lumotlarini qat'iy tekshirish va normalizatsiya qilish
-    const validation = validateOrganizationInput(data);
+    const effectiveCode = (data.code && data.code.trim()) ? data.code.trim() : generateCodeFromName(data.name);
+    const validation = validateOrganizationInput({ ...data, code: effectiveCode });
     if (!validation.valid) {
       logSecurityAudit({
         event: "ORGANIZATION_CREATE_FAILED",
@@ -70,17 +101,151 @@ export async function createOrganizationAction(
       };
     }
 
+    // 3. Administrator ma'lumotlarini tekshirish (agar taqdim etilgan bo'lsa)
+    const hasAdminInfo = Boolean(
+      (data.adminFullName && data.adminFullName.trim()) ||
+      (data.adminUsername && data.adminUsername.trim())
+    );
+
+    let finalAdminFullName = "";
+    let finalUsername = "";
+    let finalEmail = "";
+    let finalPassword = "";
+
+    if (hasAdminInfo) {
+      const adminFieldErrors: Record<string, string> = {};
+
+      const rawFullName = data.adminFullName?.trim() || "";
+      if (rawFullName && rawFullName.length >= 2) {
+        finalAdminFullName = rawFullName;
+      } else {
+        finalAdminFullName = `${validation.normalized.name} Administratori`;
+      }
+
+      const rawUsername = data.adminUsername?.trim() || "";
+      if (!rawUsername) {
+        // Avtomatik generatsiya: agar bo'sh qoldirilsa, tashkilot kodi asosida [code].admin
+        finalUsername = `${validation.normalized.code.toLowerCase()}.admin`;
+        finalEmail = generateInternalSystemEmail(finalUsername);
+      } else {
+        const cleanInput = rawUsername.toLowerCase().trim();
+        finalUsername = cleanInput;
+        finalEmail = cleanInput;
+      }
+
+      const rawPassword = data.adminPassword?.trim() || "";
+      if (rawPassword) {
+        if (rawPassword.length < 6) {
+          adminFieldErrors.adminPassword = "Parol uzunligi kamida 6 ta belgidan iborat bo'lishi kerak.";
+        } else {
+          finalPassword = rawPassword;
+        }
+      } else {
+        finalPassword = generateSecureTemporaryPassword();
+      }
+
+      if (Object.keys(adminFieldErrors).length > 0) {
+        return {
+          success: false,
+          error: "Administrator ma'lumotlarida xatolik mavjud. Iltimos, maydonlarni tekshiring.",
+          fieldErrors: {
+            ...validation.errors,
+            ...adminFieldErrors,
+          },
+        };
+      }
+
+      // Manzil takrorlanmasligini tekshirish
+      const [existingUser] = await db
+        .select({ id: user.id })
+        .from(user)
+        .where(
+          or(
+            sql`lower(${user.username}) = ${finalUsername.toLowerCase()}`,
+            sql`lower(${user.email}) = ${finalEmail.toLowerCase()}`,
+            sql`lower(${user.username}) = ${finalEmail.toLowerCase()}`,
+            sql`lower(${user.email}) = ${finalUsername.toLowerCase()}`
+          )
+        )
+        .limit(1);
+
+      if (existingUser) {
+        return {
+          success: false,
+          error: `Ushbu "${rawUsername}" manzili bilan foydalanuvchi allaqachon mavjud.`,
+          fieldErrors: { adminUsername: "Ushbu manzil band. Boshqa manzil tanlang." },
+        };
+      }
+    }
+
     logSecurityAudit({
       event: "ORGANIZATION_CREATE_ATTEMPT",
       actorUserId,
       organizationCode: validation.normalized.code,
-      metadata: { typeId: validation.normalized.typeId },
+      metadata: { typeId: validation.normalized.typeId, hasAdmin: hasAdminInfo },
     });
 
-    // 3. PostgreSQL bazasiga kiritish (Drizzle ORM)
-    const inserted = await createOrganization(validation.normalized);
+    // 4. Atomik PostgreSQL tranzaksiyasida yaratish
+    const inserted = await db.transaction(async (tx) => {
+      // 4.1. Tashkilotni yaratish
+      const org = await createOrganization(
+        {
+          ...validation.normalized,
+          subscriptionPlan: data.subscriptionPlan,
+          subscriptionExpiresAt: data.subscriptionExpiresAt,
+          subscriptionNotes: data.subscriptionNotes,
+          logoUrl: data.logoUrl,
+          adminPassword: finalPassword || undefined,
+          adminPhone: data.adminPhone?.trim() || undefined,
+        },
+        tx
+      );
 
-    // 4. Muvaffaqiyatli audit qaydi
+      // 4.2. Administrator hisobini yaratish (agar ma'lumotlar berilgan bo'lsa)
+      if (hasAdminInfo) {
+        const passwordHash = await hashPassword(finalPassword);
+        const userId = generateId();
+        const accountId = generateId();
+        const now = new Date();
+
+        await tx.insert(user).values({
+          id: userId,
+          name: finalAdminFullName,
+          email: finalEmail,
+          emailVerified: true,
+          image: null,
+          username: finalUsername,
+          displayUsername: finalUsername,
+          createdAt: now,
+          updatedAt: now,
+        });
+
+        await tx.insert(account).values({
+          id: accountId,
+          userId,
+          accountId: userId,
+          providerId: "credential",
+          password: passwordHash,
+          createdAt: now,
+          updatedAt: now,
+        });
+
+        await tx.insert(profiles).values({
+          userId,
+          organizationId: org.id,
+          role: "organization_admin",
+          fullName: finalAdminFullName,
+          isActive: true,
+          mustChangePassword: false,
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
+
+      return org;
+    });
+
+    // 5. Muvaffaqiyatli audit qaydlari
     logSecurityAudit({
       event: "ORGANIZATION_CREATED",
       actorUserId,
@@ -93,13 +258,42 @@ export async function createOrganizationAction(
       },
     });
 
-    // 5. Next.js keshini darhol yangilash (Statistika va ro'yxat)
+    if (hasAdminInfo) {
+      logSecurityAudit({
+        event: "ORGANIZATION_ADMIN_CREATED",
+        actorUserId,
+        organizationId: inserted.id,
+        metadata: {
+          username: finalUsername,
+          role: "organization_admin",
+        },
+      });
+    }
+
+    // 6. Next.js keshini darhol yangilash (Statistika va ro'yxatlar)
     revalidatePath("/admin/organizations");
+    revalidatePath("/admin/administrators");
     revalidatePath("/admin");
+
+    // 7. Telegram xabarnoma (sozlamalarda yoqilgan bo'lsa)
+    try {
+      await notifyTelegramNewTenant(inserted.name, inserted.code);
+    } catch (telegramErr) {
+      console.warn("[Telegram Notification Error]:", telegramErr);
+    }
 
     return {
       success: true,
       organizationId: inserted.id,
+      credentials: hasAdminInfo
+        ? {
+            username: finalUsername,
+            email: finalEmail,
+            temporaryPassword: finalPassword,
+            fullName: finalAdminFullName,
+            role: "Tashkilot Rahbari (Administrator)",
+          }
+        : undefined,
     };
   } catch (error: unknown) {
     // Domain xatoliklari (Unique violation, ruxsatlar, va h.k.)

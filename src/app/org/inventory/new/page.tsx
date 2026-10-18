@@ -15,7 +15,7 @@ export const metadata = {
 export const instant = false;
 
 export default async function NewInventoryPage() {
-  const { profile, organization } = await requireAuthenticatedUser();
+  const { profile, organization } = await requireAuthenticatedUser({ allowMustChangePassword: true });
 
   if (!organization || !canCreateNewItem(profile.role)) {
     redirect("/org");
@@ -53,7 +53,7 @@ export default async function NewInventoryPage() {
   const defaultPrefix = settings.inventoryPrefix || `${organization.code}-`;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       {/* Orqaga qaytish havolasi va Sarlavha */}
       <div>
         <Link
@@ -63,17 +63,9 @@ export default async function NewInventoryPage() {
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Inventarlar ro‘yxatiga qaytish</span>
         </Link>
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-            Yangi Inventar Qo‘shish
-          </h1>
-          <span className="px-2.5 py-0.5 rounded-[3px] text-xs font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200">
-            {organization.code}
-          </span>
-        </div>
-        <p className="mt-1 text-xs sm:text-sm text-slate-500">
-          Asosiy vositani ro‘yxatga oling, unga unikal QR identifikator generatsiya qilinadi va bino/xonaga biriktiriladi.
-        </p>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+          Yangi Inventar Qo‘shish
+        </h1>
       </div>
 
       <NewItemForm

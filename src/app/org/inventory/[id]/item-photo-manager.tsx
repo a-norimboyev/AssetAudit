@@ -70,16 +70,18 @@ export function ItemPhotoManager({ itemId, currentPhotoUrl, itemName }: ItemPhot
   const activeDisplay = previewUrl || photoUrl;
 
   return (
-    <div className="bg-white p-5 sm:p-6 rounded-[4px] border border-slate-200/80 shadow-xs space-y-4">
+    <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
       <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-        <div className="flex items-center gap-2">
-          <Camera className="w-4 h-4 text-blue-600" />
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+            <Camera className="w-4 h-4" />
+          </div>
           <h3 className="text-sm font-bold text-slate-900">
             Inventar Rasmi va Pasport Surati
           </h3>
         </div>
         {photoUrl && (
-          <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-[2px] border border-emerald-200">
+          <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/80">
             Biriktirilgan
           </span>
         )}
@@ -87,7 +89,7 @@ export function ItemPhotoManager({ itemId, currentPhotoUrl, itemName }: ItemPhot
 
       {message && (
         <div
-          className={`p-3 rounded-[3px] text-xs flex items-center gap-2 ${
+          className={`p-3.5 rounded-xl text-xs flex items-center gap-2 ${
             message.success
               ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
               : "bg-rose-50 text-rose-800 border border-rose-200"
@@ -103,7 +105,7 @@ export function ItemPhotoManager({ itemId, currentPhotoUrl, itemName }: ItemPhot
       )}
 
       {/* Rasm ko'rinishi / Placeholder */}
-      <div className="relative w-full aspect-16/9 rounded-[3px] overflow-hidden bg-slate-50 border border-slate-200 flex items-center justify-center">
+      <div className="relative w-full aspect-16/9 rounded-xl overflow-hidden bg-slate-50 border border-slate-200 flex items-center justify-center">
         {activeDisplay ? (
           <Image
             src={activeDisplay}
@@ -135,7 +137,7 @@ export function ItemPhotoManager({ itemId, currentPhotoUrl, itemName }: ItemPhot
         <div className="flex items-center gap-2">
           <label
             htmlFor={`photo-input-${itemId}`}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[3px] border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium cursor-pointer transition shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300/80 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold cursor-pointer transition-all shadow-2xs hover:shadow-xs"
           >
             <Upload className="w-3.5 h-3.5 text-blue-600" />
             <span>{activeDisplay ? "Suratni almashtirish" : "Fayl tanlash (Max 2MB)"}</span>
@@ -145,7 +147,7 @@ export function ItemPhotoManager({ itemId, currentPhotoUrl, itemName }: ItemPhot
             <button
               onClick={handleUpload}
               disabled={isUploading}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[3px] bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold cursor-pointer transition shadow-xs disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold cursor-pointer transition-all shadow-2xs hover:shadow-xs disabled:opacity-50"
             >
               {isUploading ? (
                 <>

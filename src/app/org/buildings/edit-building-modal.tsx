@@ -57,19 +57,19 @@ export function EditBuildingModal({ building }: EditBuildingModalProps) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="p-1.5 rounded-[3px] text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+        className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
         title="Tahrirlash"
       >
         <Edit2 className="w-3.5 h-3.5" />
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-lg bg-white rounded-[4px] shadow-xl border border-slate-200 overflow-hidden text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden text-left">
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-[3px] bg-blue-50 text-blue-600 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                   <Building className="w-4 h-4" />
                 </div>
                 <div>
@@ -79,7 +79,7 @@ export function EditBuildingModal({ building }: EditBuildingModalProps) {
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 rounded-[3px] text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -91,7 +91,7 @@ export function EditBuildingModal({ building }: EditBuildingModalProps) {
 
               {state?.message && (
                 <div
-                  className={`p-3 rounded-[3px] text-xs flex items-center gap-2 ${
+                  className={`p-3.5 rounded-xl text-xs flex items-center gap-2 ${
                     state.success
                       ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
                       : "bg-rose-50 text-rose-800 border border-rose-200"
@@ -107,14 +107,14 @@ export function EditBuildingModal({ building }: EditBuildingModalProps) {
               )}
 
               {archiveError && (
-                <div className="p-3 rounded-[3px] text-xs flex items-center gap-2 bg-rose-50 text-rose-800 border border-rose-200">
+                <div className="p-3.5 rounded-xl text-xs flex items-center gap-2 bg-rose-50 text-rose-800 border border-rose-200">
                   <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                   <span>{archiveError}</span>
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Bino nomi <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -122,12 +122,12 @@ export function EditBuildingModal({ building }: EditBuildingModalProps) {
                   name="name"
                   defaultValue={building.name}
                   required
-                  className="w-full px-3 py-2 text-xs rounded-[3px] border border-slate-300 focus:outline-hidden focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Manzil yoki korpus tavsifi
                 </label>
                 <input
@@ -135,7 +135,7 @@ export function EditBuildingModal({ building }: EditBuildingModalProps) {
                   name="address"
                   defaultValue={building.address || ""}
                   placeholder="Masalan: Amir Temur shox ko'chasi 108"
-                  className="w-full px-3 py-2 text-xs rounded-[3px] border border-slate-300 focus:outline-hidden focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
                 />
               </div>
 
@@ -146,9 +146,9 @@ export function EditBuildingModal({ building }: EditBuildingModalProps) {
                   name="isActive"
                   value="true"
                   defaultChecked={building.isActive}
-                  className="w-4 h-4 rounded-[2px] text-blue-600 border-slate-300 focus:ring-blue-500"
+                  className="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500"
                 />
-                <label htmlFor={`is-active-${building.id}`} className="text-xs text-slate-700">
+                <label htmlFor={`is-active-${building.id}`} className="text-xs text-slate-700 font-medium">
                   Faol holatda saqlash
                 </label>
               </div>
@@ -159,7 +159,7 @@ export function EditBuildingModal({ building }: EditBuildingModalProps) {
                   type="button"
                   onClick={handleArchive}
                   disabled={isArchiving || isPending}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[3px] text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all cursor-pointer shadow-2xs hover:shadow-xs"
                 >
                   <Archive className="w-3.5 h-3.5" />
                   <span>{isArchiving ? "Arxivlanmoqda..." : "Arxivlash"}</span>
@@ -169,14 +169,14 @@ export function EditBuildingModal({ building }: EditBuildingModalProps) {
                   <button
                     type="button"
                     onClick={() => setIsOpen(false)}
-                    className="px-3 py-2 rounded-[3px] text-xs font-medium text-slate-600 hover:bg-slate-100 border border-slate-200 transition cursor-pointer"
+                    className="px-4 py-2.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer"
                   >
                     Bekor qilish
                   </button>
                   <button
                     type="submit"
                     disabled={isPending || isArchiving}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[3px] bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer disabled:opacity-50"
                   >
                     {isPending ? (
                       <>

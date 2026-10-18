@@ -33,24 +33,24 @@ export function QrPrintCard({
       {/* Chop etiladigan Stiker Kartasi (50x30mm / 70x35mm nisbatga mos) */}
       <div
         id="printable-qr-sticker"
-        className="p-4 sm:p-5 rounded-[4px] bg-white border-2 border-slate-900 shadow-xs text-slate-900 max-w-sm mx-auto sm:mx-0"
+        className="p-4 sm:p-5 rounded-xl bg-white border-2 border-slate-900 shadow-2xs text-slate-900 max-w-sm mx-auto sm:mx-0"
       >
         <div className="flex items-center justify-between pb-2 border-b border-slate-200 text-[11px] font-bold">
           <div className="flex items-center gap-1.5 min-w-0">
-            <span className="w-4 h-4 rounded-[2px] bg-blue-600 text-white flex items-center justify-center text-[10px] shrink-0 font-bold">
+            <span className="w-4 h-4 rounded bg-blue-600 text-white flex items-center justify-center text-[10px] shrink-0 font-bold">
               A
             </span>
             <span className="tracking-tight truncate" title={organizationName}>
               {organizationName}
             </span>
           </div>
-          <span className="font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded-[2px] border border-blue-200">
+          <span className="font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
             {organizationCode}
           </span>
         </div>
 
         <div className="py-3 flex items-center gap-3">
-          <div className="shrink-0 p-1 bg-white border border-slate-200 rounded-[3px] shadow-xs">
+          <div className="shrink-0 p-1.5 bg-white border border-slate-200 rounded-lg shadow-2xs">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={qrDataUrl}
@@ -83,7 +83,7 @@ export function QrPrintCard({
       <div className="flex flex-wrap items-center gap-2">
         <button
           onClick={handlePrint}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[3px] bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer"
         >
           <Printer className="w-3.5 h-3.5" />
           <span>Yorliqni chop etish</span>
@@ -92,7 +92,7 @@ export function QrPrintCard({
         <a
           href={qrDataUrl}
           download={`QR_${inventoryNumber}.png`}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[3px] border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all"
         >
           <Download className="w-3.5 h-3.5 text-slate-500" />
           <span>PNG yuklab olish</span>
@@ -101,7 +101,7 @@ export function QrPrintCard({
         <Link
           href={publicUrl}
           target="_blank"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[3px] border border-slate-200 hover:bg-slate-50 text-blue-600 text-xs font-semibold transition-colors"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-blue-600 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all"
         >
           <ExternalLink className="w-3.5 h-3.5" />
           <span>Ommaviy sahifa</span>

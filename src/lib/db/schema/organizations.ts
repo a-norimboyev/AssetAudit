@@ -22,6 +22,13 @@ export interface OrganizationSettings {
   defaultQrVisibility?: "public" | "restricted" | "private";
   inventoryPrefix?: string;
   allowPublicScanLogs?: boolean;
+  subscriptionPlan?: "1_year" | "2_years" | "3_years" | "6_months" | "trial" | "custom" | string;
+  subscriptionStartsAt?: string; // ISO date string
+  subscriptionExpiresAt?: string; // ISO date string
+  subscriptionNotes?: string;
+  logoUrl?: string;
+  adminPassword?: string;
+  adminPhone?: string;
   [key: string]: unknown;
 }
 

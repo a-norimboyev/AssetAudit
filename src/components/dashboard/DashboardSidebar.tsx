@@ -7,9 +7,7 @@ import {
   LayoutDashboard,
   Building2,
   Package,
-  QrCode,
   ClipboardCheck,
-  AlertTriangle,
   FileBarChart,
   Users,
   Settings,
@@ -33,52 +31,37 @@ interface NavItem {
 const navItems: NavItem[] = [
   {
     name: "Dashboard",
-    href: "/preview/dashboard",
+    href: "/org",
     icon: LayoutDashboard,
   },
   {
     name: "Binolar va xonalar",
-    href: "/preview/dashboard#buildings",
+    href: "/org/buildings",
     icon: Building2,
-    badge: "5 bino",
   },
   {
     name: "Inventarlar",
-    href: "/preview/dashboard#items",
+    href: "/org/inventory",
     icon: Package,
   },
   {
-    name: "QR kodlar",
-    href: "/preview/dashboard#qr",
-    icon: QrCode,
-  },
-  {
     name: "Tekshiruvlar",
-    href: "/preview/dashboard#audits",
+    href: "/org/audits",
     icon: ClipboardCheck,
-    badge: "3 faol",
-    badgeVariant: "blue",
-  },
-  {
-    name: "Nomuvofiqliklar",
-    href: "/preview/dashboard#discrepancies",
-    icon: AlertTriangle,
-    badge: "Diqqat",
-    badgeVariant: "amber",
   },
   {
     name: "Hisobotlar",
-    href: "/preview/dashboard#reports",
+    href: "/org/reports",
     icon: FileBarChart,
   },
   {
-    name: "Tekshiruvchilar",
-    href: "/preview/dashboard#inspectors",
+    name: "Mas'ul xodimlar",
+    href: "/org/staff",
     icon: Users,
   },
   {
     name: "Sozlamalar",
-    href: "/preview/dashboard#settings",
+    href: "/org/settings",
     icon: Settings,
   },
 ];
@@ -136,63 +119,59 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
           </button>
         </div>
 
-        {/* Universitet identifikatori */}
-        <div className="p-3 mx-4 my-3 rounded-lg bg-slate-50 border border-slate-200/80">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-xs font-semibold text-slate-800 truncate">
-              TATU (Bosh kampus)
-            </span>
-          </div>
-          <p className="mt-1 text-[11px] text-slate-500 leading-tight">
-            5 ta bino &bull; 2026-yil 1-davr
-          </p>
-        </div>
-
         {/* Navigatsiya ro'yxati */}
         <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              pathname === item.href ||
-              (item.name === "Dashboard" && pathname.startsWith("/preview/dashboard"));
+          {(() => {
+            const activeItem = navItems
+              .filter((item) => {
+                if (item.name === "Dashboard") {
+                  return pathname === "/org" || pathname.startsWith("/preview/dashboard");
+                }
+                return pathname === item.href || pathname.startsWith(item.href + "/");
+              })
+              .sort((a, b) => b.href.length - a.href.length)[0];
 
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={() => onClose()}
-                className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-blue-50 text-blue-700 font-semibold shadow-2xs"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon
-                    className={`w-4 h-4 shrink-0 ${
-                      isActive ? "text-blue-600" : "text-slate-400"
-                    }`}
-                  />
-                  <span>{item.name}</span>
-                </div>
+            return navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeItem?.name === item.name;
 
-                {item.badge && (
-                  <span
-                    className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${
-                      item.badgeVariant === "amber"
-                        ? "bg-amber-50 text-amber-700 border-amber-200"
-                        : item.badgeVariant === "blue"
-                        ? "bg-blue-100/70 text-blue-700 border-blue-200"
-                        : "bg-slate-100 text-slate-600 border-slate-200"
-                    }`}
-                  >
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => onClose()}
+                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-blue-50 text-blue-700 font-semibold shadow-2xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon
+                      className={`w-4 h-4 shrink-0 ${
+                        isActive ? "text-blue-600" : "text-slate-400"
+                      }`}
+                    />
+                    <span>{item.name}</span>
+                  </div>
+
+                  {item.badge && (
+                    <span
+                      className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${
+                        item.badgeVariant === "amber"
+                          ? "bg-amber-50 text-amber-700 border-amber-200"
+                          : item.badgeVariant === "blue"
+                          ? "bg-blue-100/70 text-blue-700 border-blue-200"
+                          : "bg-slate-100 text-slate-600 border-slate-200"
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            });
+          })()}
         </nav>
 
         {/* Pastki xavfsizlik va rol bloki */}

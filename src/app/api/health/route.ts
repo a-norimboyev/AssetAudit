@@ -7,7 +7,7 @@ import { getPool } from "@/lib/db";
  * Production Server & Database Health Check Endpoint.
  * Xavfsizlik qoidasi: Hech qanday maxfiy connection string, IP, DB nomi yoki credential chiqmaydi.
  */
-export async function GET() {
+export async function GET(request?: Request) {
   const startTime = performance.now();
   const mem = process.memoryUsage();
 
@@ -15,8 +15,16 @@ export async function GET() {
     const pool = getPool();
     // 2 soniyali timeout bilan SELECT 1
     const client = await pool.connect();
+    let currentDbName: string | undefined;
     try {
-      await client.query("SELECT 1 AS health");
+      const res = await client.query("SELECT 1 AS health, current_database() AS db_name");
+      const probeHeader = request?.headers?.get("x-assetaudit-test-probe");
+      if (
+        process.env.NODE_ENV !== "production" &&
+        probeHeader === "mulknazorat-test-isolation-probe"
+      ) {
+        currentDbName = res.rows[0]?.db_name;
+      }
     } finally {
       client.release();
     }
@@ -31,6 +39,7 @@ export async function GET() {
         database: {
           status: "up",
           latencyMs,
+          ...(currentDbName ? { isolatedTestDb: currentDbName } : {}),
         },
         system: {
           nodeVersion: process.version,

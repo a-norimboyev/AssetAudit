@@ -26,6 +26,13 @@ export const CYCLE_STATUSES = [
 ] as const;
 export type CycleStatus = (typeof CYCLE_STATUSES)[number];
 
+export const VALID_CYCLE_TRANSITIONS: Record<CycleStatus, readonly CycleStatus[]> = {
+  planned: ["in_progress", "cancelled"],
+  in_progress: ["completed", "cancelled"],
+  completed: [], // Terminal & immutable
+  cancelled: [], // Terminal
+} as const;
+
 export const ROOM_AUDIT_STATUSES = [
   "pending",
   "in_progress",

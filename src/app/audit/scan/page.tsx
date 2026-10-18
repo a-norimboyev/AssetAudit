@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireAuthenticatedUser, AuthError } from "@/lib/auth/authorization";
-import { ForceChangePasswordCard } from "@/components/auth/force-change-password-card";
 import { canPerformAudit } from "@/lib/auth/authorization-rules";
 import { getRoomsList } from "@/lib/data/locations";
 import { getActiveCycle } from "@/lib/data/audit";
@@ -30,9 +29,6 @@ export default async function AuditScanPage({ searchParams }: PageProps) {
     if (error instanceof AuthError) {
       if (error.code === "AUTHENTICATION_REQUIRED") {
         redirect("/login");
-      }
-      if (error.code === "PASSWORD_CHANGE_REQUIRED") {
-        return <ForceChangePasswordCard />;
       }
     }
     redirect("/login");
@@ -63,17 +59,17 @@ export default async function AuditScanPage({ searchParams }: PageProps) {
     <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
       {/* Yuqori Header */}
       <header className="border-b border-slate-200/80 bg-white sticky top-0 z-30">
-        <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="w-full px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
           <Link
             href="/audit"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Portallga qaytish</span>
+            <span>Portalga qaytish</span>
           </Link>
 
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[3px] text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80">
               <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
               <span>{organization.code} Auditi</span>
             </span>
@@ -83,7 +79,7 @@ export default async function AuditScanPage({ searchParams }: PageProps) {
       </header>
 
       {/* Asosiy Skaner */}
-      <main className="flex-1 max-w-2xl w-full mx-auto p-4 sm:p-6 space-y-4">
+      <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 space-y-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
             Inventarlarni Skanerlash
@@ -94,7 +90,7 @@ export default async function AuditScanPage({ searchParams }: PageProps) {
         </div>
 
         {roomOptions.length === 0 ? (
-          <div className="bg-white p-8 rounded-[4px] border border-slate-200 text-center text-xs text-slate-500">
+          <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-2xs text-center text-xs text-slate-500">
             Hali xonalar kiritilmagan. Avval bino va xonalarni yarating.
           </div>
         ) : (

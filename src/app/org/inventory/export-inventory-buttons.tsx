@@ -6,6 +6,7 @@ import {
   exportInventoryExcelAction,
   exportInventoryDataAction,
 } from "@/lib/actions/inventory";
+import { buildCsvRow } from "@/lib/utils/csv";
 
 interface ExportInventoryButtonsProps {
   filters: {
@@ -31,10 +32,34 @@ export function ExportInventoryButtons({ filters }: ExportInventoryButtonsProps)
       }
 
       let csv = `ASSETAUDIT INVENTARLAR REESTRI\n`;
-      csv += `Inventar raqami,Nomi,Turkum,Bino,Xona raqami,Xona nomi,Holati,Texnik holati,Narxi (UZS),Tavsif,Yaratilgan sana\n`;
+      csv += buildCsvRow([
+        "Inventar raqami",
+        "Nomi",
+        "Turkum",
+        "Bino",
+        "Xona raqami",
+        "Xona nomi",
+        "Holati",
+        "Texnik holati",
+        "Narxi (UZS)",
+        "Tavsif",
+        "Yaratilgan sana",
+      ]) + "\n";
 
       for (const row of res.data) {
-        csv += `"${row.inventoryNumber}","${row.name}","${row.categoryName || ""}","${row.buildingName || ""}","${row.roomNumber || ""}","${row.roomName || ""}","${row.status}","${row.condition}","${row.price || 0}","${(row.description || "").replace(/"/g, '""')}","${row.createdAt}"\n`;
+        csv += buildCsvRow([
+          row.inventoryNumber,
+          row.name,
+          row.categoryName || "",
+          row.buildingName || "",
+          row.roomNumber || "",
+          row.roomName || "",
+          row.status,
+          row.condition,
+          row.price || 0,
+          row.description || "",
+          row.createdAt,
+        ]) + "\n";
       }
 
       const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + encodeURIComponent(csv);
@@ -86,12 +111,12 @@ export function ExportInventoryButtons({ filters }: ExportInventoryButtonsProps)
   }
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-2">
       <button
         onClick={handleExportExcel}
         disabled={isExportingExcel}
         type="button"
-        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[3px] bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold shadow-xs transition cursor-pointer disabled:opacity-50"
+        className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold shadow-2xs hover:shadow-xs transition cursor-pointer disabled:opacity-50"
         title="Joriy filtrlangan inventarlarni to'liq Excel (.xlsx) formatida yuklab olish"
       >
         {isExportingExcel ? (
@@ -106,7 +131,7 @@ export function ExportInventoryButtons({ filters }: ExportInventoryButtonsProps)
         onClick={handleExportCsv}
         disabled={isExportingCsv}
         type="button"
-        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[3px] bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold shadow-xs transition cursor-pointer disabled:opacity-50"
+        className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold shadow-2xs hover:shadow-xs transition cursor-pointer disabled:opacity-50"
         title="Joriy inventarlarni CSV formatida yuklab olish"
       >
         {isExportingCsv ? (

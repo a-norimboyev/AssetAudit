@@ -4,7 +4,15 @@ import { revalidatePath } from "next/cache";
 import { requireAuthenticatedUser } from "@/lib/auth/authorization";
 import { canPerformAudit } from "@/lib/auth/authorization-rules";
 import { db } from "@/lib/db";
-import { inventoryCycles, roomAudits, scanEvents, cycleConflicts, cycleItems } from "@/lib/db/schema/audit";
+import {
+  inventoryCycles,
+  roomAudits,
+  scanEvents,
+  cycleConflicts,
+  cycleItems,
+  VALID_CYCLE_TRANSITIONS,
+  type CycleStatus,
+} from "@/lib/db/schema/audit";
 import { items } from "@/lib/db/schema/inventory";
 import { rooms } from "@/lib/db/schema/locations";
 import { and, or, eq, desc } from "drizzle-orm";
@@ -65,7 +73,7 @@ export async function recordScanAction(
       return { success: false, message: "Skanerlanayotgan xona tanlanishi shart." };
     }
 
-    // 1. Skanerlanayotgan xonani tekshirish
+    // 1. Skanerlanayotgan xonani tekshirish (Tenant isolation)
     const [scannedRoom] = await db
       .select({ id: rooms.id, roomNumber: rooms.roomNumber, name: rooms.name })
       .from(rooms)
@@ -76,7 +84,63 @@ export async function recordScanAction(
       return { success: false, message: "Tanlangan xona topilmadi yoki boshqa tashkilotga tegishli." };
     }
 
-    // 2. Token yoki inventar raqamini normalizatsiya qilish (URL bo'lsa token ajratib olinadi)
+    // 2. Sikl tekshiruvi (Tenant isolation, Active status check, Immutability)
+    let validatedCycle: { id: string; status: string; title: string } | null = null;
+    if (cycleId) {
+      const [foundCycle] = await db
+        .select({
+          id: inventoryCycles.id,
+          status: inventoryCycles.status,
+          title: inventoryCycles.title,
+          organizationId: inventoryCycles.organizationId,
+        })
+        .from(inventoryCycles)
+        .where(
+          and(
+            eq(inventoryCycles.id, cycleId),
+            eq(inventoryCycles.organizationId, organization.id)
+          )
+        )
+        .limit(1);
+
+      if (!foundCycle) {
+        return {
+          success: false,
+          message: "Ko'rsatilgan audit sikli topilmadi yoki boshqa tashkilotga tegishli.",
+        };
+      }
+
+      if (foundCycle.status !== "in_progress") {
+        return {
+          success: false,
+          message: `Ushbu audit sikli faol emas (holati: ${foundCycle.status}). Faqat "in_progress" (jarayonda) bo'lgan sikllarda skanerlash mumkin.`,
+        };
+      }
+
+      // Xona audit holatini tekshirish: agar xona allaqachon yakunlangan bo'lsa, yangi skan bloklanadi
+      const [existingRoomAudit] = await db
+        .select({ id: roomAudits.id, status: roomAudits.status })
+        .from(roomAudits)
+        .where(
+          and(
+            eq(roomAudits.cycleId, cycleId),
+            eq(roomAudits.roomId, scannedRoomId),
+            eq(roomAudits.organizationId, organization.id)
+          )
+        )
+        .limit(1);
+
+      if (existingRoomAudit && existingRoomAudit.status === "completed") {
+        return {
+          success: false,
+          message: `Ushbu xona auditi allaqachon yakunlangan (${scannedRoom.roomNumber}-xona). Yakunlangan xonaga yangi skanlar kiritish bloklangan.`,
+        };
+      }
+
+      validatedCycle = foundCycle;
+    }
+
+    // 3. Token yoki inventar raqamini normalizatsiya qilish (URL bo'lsa token ajratib olinadi)
     let cleanToken = tokenOrCode.trim();
     if (cleanToken.includes("/qr/")) {
       const parts = cleanToken.split("/qr/");
@@ -109,25 +173,30 @@ export async function recordScanAction(
       };
     }
 
-    // 3. Kutilgan xona ma'lumotlari
+    // 4. Kutilgan xona ma'lumotlari (Tenant isolation)
     const [expectedRoom] = await db
       .select({ id: rooms.id, roomNumber: rooms.roomNumber, name: rooms.name })
       .from(rooms)
-      .where(eq(rooms.id, foundItem.roomId))
+      .where(
+        and(
+          eq(rooms.id, foundItem.roomId),
+          eq(rooms.organizationId, organization.id)
+        )
+      )
       .limit(1);
 
     const isMatch = foundItem.roomId === scannedRoomId;
     const isConflict = !isMatch;
 
-    // 4. Takroriy skanerni tekshirish (Idempotent Deduplication)
-    // Agar ushbu sikl va xonada aynan shu buyum allaqachon skan qilingan bo'lsa
-    if (cycleId) {
+    // 5. Takroriy skanerni tekshirish (Idempotent Deduplication)
+    if (validatedCycle) {
       const [recentScan] = await db
         .select({ id: scanEvents.id, scannedAt: scanEvents.scannedAt })
         .from(scanEvents)
         .where(
           and(
-            eq(scanEvents.cycleId, cycleId),
+            eq(scanEvents.organizationId, organization.id),
+            eq(scanEvents.cycleId, validatedCycle.id),
             eq(scanEvents.itemId, foundItem.id),
             eq(scanEvents.scannedRoomId, scannedRoomId)
           )
@@ -152,57 +221,60 @@ export async function recordScanAction(
       }
     }
 
-    // 5. Scan Events jadvaliga rasmiy qayd etish
-    const [insertedScan] = await db
-      .insert(scanEvents)
-      .values({
-        organizationId: organization.id,
-        cycleId,
-        itemId: foundItem.id,
-        expectedRoomId: foundItem.roomId,
-        scannedRoomId,
-        isMatch,
-        isConflict,
-        scannedBy: user.id,
-      })
-      .returning({ id: scanEvents.id });
-
-    // 5b. Agar konflikt yuz bersa va faol sikl bo'lsa, cycle_conflicts jadvaliga kiritish
-    if (isConflict && cycleId && insertedScan) {
-      await db
-        .insert(cycleConflicts)
+    // 6. DB tranzaksiyasi orqali yozish (scan_events, cycle_conflicts, room_audits)
+    await db.transaction(async (tx) => {
+      const [insertedScan] = await tx
+        .insert(scanEvents)
         .values({
           organizationId: organization.id,
-          cycleId,
+          cycleId: validatedCycle ? validatedCycle.id : null,
           itemId: foundItem.id,
-          scanEventId: insertedScan.id,
           expectedRoomId: foundItem.roomId,
           scannedRoomId,
-          status: "open",
+          isMatch,
+          isConflict,
+          scannedBy: user.id,
         })
-        .onConflictDoNothing({
-          target: [cycleConflicts.cycleId, cycleConflicts.itemId],
-        });
-    }
+        .returning({ id: scanEvents.id });
 
-    // 6. Xona audit holatini in_progress ga o'tkazish
-    if (cycleId) {
-      await db
-        .update(roomAudits)
-        .set({
-          status: "in_progress",
-          auditedBy: user.id,
-          auditedAt: new Date(),
-          updatedAt: new Date(),
-        })
-        .where(
-          and(
-            eq(roomAudits.cycleId, cycleId),
-            eq(roomAudits.roomId, scannedRoomId),
-            eq(roomAudits.status, "pending")
-          )
-        );
-    }
+      // 6b. Agar konflikt yuz bersa va faol sikl bo'lsa, cycle_conflicts jadvaliga kiritish
+      if (isConflict && validatedCycle && insertedScan) {
+        await tx
+          .insert(cycleConflicts)
+          .values({
+            organizationId: organization.id,
+            cycleId: validatedCycle.id,
+            itemId: foundItem.id,
+            scanEventId: insertedScan.id,
+            expectedRoomId: foundItem.roomId,
+            scannedRoomId,
+            status: "open",
+          })
+          .onConflictDoNothing({
+            target: [cycleConflicts.cycleId, cycleConflicts.itemId],
+          });
+      }
+
+      // 6c. Xona audit holatini in_progress ga o'tkazish (faqat pending bo'lsa)
+      if (validatedCycle) {
+        await tx
+          .update(roomAudits)
+          .set({
+            status: "in_progress",
+            auditedBy: user.id,
+            auditedAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(
+            and(
+              eq(roomAudits.cycleId, validatedCycle.id),
+              eq(roomAudits.roomId, scannedRoomId),
+              eq(roomAudits.organizationId, organization.id),
+              eq(roomAudits.status, "pending")
+            )
+          );
+      }
+    });
 
     revalidatePath("/audit");
     revalidatePath("/audit/scan");
@@ -268,6 +340,66 @@ export async function completeRoomAuditAction(
       return { success: false, message: "Sikl va xona ko'rsatilishi shart." };
     }
 
+    // 1. Sikl tekshiruvi (Tenant isolation va status)
+    const [cycle] = await db
+      .select({ id: inventoryCycles.id, status: inventoryCycles.status, title: inventoryCycles.title })
+      .from(inventoryCycles)
+      .where(
+        and(
+          eq(inventoryCycles.id, cycleId),
+          eq(inventoryCycles.organizationId, organization.id)
+        )
+      )
+      .limit(1);
+
+    if (!cycle) {
+      return { success: false, message: "Audit sikli topilmadi yoki boshqa tashkilotga tegishli." };
+    }
+
+    if (cycle.status !== "in_progress") {
+      return {
+        success: false,
+        message: `Ushbu audit sikli faol emas (holati: ${cycle.status}). Faqat "in_progress" sikldagi xona auditini yakunlash mumkin.`,
+      };
+    }
+
+    // 2. Xona tekshiruvi (Tenant isolation)
+    const [room] = await db
+      .select({ id: rooms.id, roomNumber: rooms.roomNumber })
+      .from(rooms)
+      .where(
+        and(
+          eq(rooms.id, roomId),
+          eq(rooms.organizationId, organization.id)
+        )
+      )
+      .limit(1);
+
+    if (!room) {
+      return { success: false, message: "Xona topilmadi yoki boshqa tashkilotga tegishli." };
+    }
+
+    // 3. Room audit yozuvini tekshirish
+    const [existingRoomAudit] = await db
+      .select({ id: roomAudits.id, status: roomAudits.status })
+      .from(roomAudits)
+      .where(
+        and(
+          eq(roomAudits.cycleId, cycleId),
+          eq(roomAudits.roomId, roomId),
+          eq(roomAudits.organizationId, organization.id)
+        )
+      )
+      .limit(1);
+
+    if (!existingRoomAudit) {
+      return { success: false, message: "Ushbu xona uchun ushbu siklda audit yozuvi mavjud emas." };
+    }
+
+    if (existingRoomAudit.status === "completed") {
+      return { success: true, message: `"${room.roomNumber}"-xona auditi allaqachon yakunlangan.` };
+    }
+
     await db
       .update(roomAudits)
       .set({
@@ -285,10 +417,11 @@ export async function completeRoomAuditAction(
       );
 
     revalidatePath("/audit");
+    revalidatePath("/audit/scan");
     revalidatePath("/org/audits");
     revalidatePath("/org/reports");
 
-    return { success: true, message: "Xona auditi muvaffaqiyatli yakunlandi." };
+    return { success: true, message: `"${room.roomNumber}"-xona auditi muvaffaqiyatli yakunlandi.` };
   } catch (err) {
     return {
       success: false,
@@ -395,10 +528,6 @@ export async function createCycleAction(
   }
 }
 
-/**
- * 4. Audit Siklini Yakunlash yoki Holatini O'zgartirish (Update/Complete Cycle Action)
- * Faqat Organization Admin vakolati
- */
 export async function updateCycleStatusAction(
   cycleId: string,
   status: "completed" | "cancelled" | "in_progress"
@@ -422,6 +551,33 @@ export async function updateCycleStatusAction(
 
     if (!existing) {
       return { success: false, message: "Audit sikli topilmadi." };
+    }
+
+    if (existing.status === status) {
+      return { success: true, message: `Audit sikli allaqachon "${status}" holatida.` };
+    }
+
+    // Immutability siyosati: completed va cancelled holatidagi sikllar terminal hisoblanadi
+    if (existing.status === "completed") {
+      return {
+        success: false,
+        message: "Yakunlangan audit sikli qulflangan (immutability siyosati). Rasmiy audit ma'lumotlari buzilmasligi uchun uning holatini o'zgartirib bo'lmaydi.",
+      };
+    }
+
+    if (existing.status === "cancelled") {
+      return {
+        success: false,
+        message: "Bekor qilingan audit sikli yopilgan. Uning holatini qayta o'zgartirish mumkin emas.",
+      };
+    }
+
+    const allowedNextStatuses = VALID_CYCLE_TRANSITIONS[existing.status] || [];
+    if (!allowedNextStatuses.includes(status)) {
+      return {
+        success: false,
+        message: `Noto'g'ri status o'tishi: "${existing.status}" holatidan "${status}" holatiga o'tib bo'lmaydi.`,
+      };
     }
 
     await db

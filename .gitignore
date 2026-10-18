@@ -53,6 +53,7 @@ yarn-error.log*
 
 # local backups & database dumps
 /backups/
+/data/backups/
 *.dump
 *.sql.bak
 *.sql.gz

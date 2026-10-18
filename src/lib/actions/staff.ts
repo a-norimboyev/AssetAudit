@@ -8,7 +8,7 @@ import { profiles, type UserRole } from "@/lib/db/schema/profiles";
 import { organizations } from "@/lib/db/schema/organizations";
 import { hashPassword, verifyPassword } from "better-auth/crypto";
 import { generateId } from "better-auth";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, or, sql } from "drizzle-orm";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { logSecurityAudit } from "@/lib/audit/logger";
@@ -150,14 +150,14 @@ export async function createStaffMemberAction(
         updatedAt: now,
       });
 
-      // 3. profiles jadvaliga biznes profilini kiritish (mustChangePassword = true bilan)
+      // 3. profiles jadvaliga biznes profilini kiritish (mustChangePassword = false)
       await tx.insert(profiles).values({
         userId,
         organizationId: organization.id,
         role,
         fullName,
         isActive: true,
-        mustChangePassword: true,
+        mustChangePassword: false,
         createdAt: now,
         updatedAt: now,
       });
@@ -255,10 +255,10 @@ export async function resetStaffPasswordAction(formData: FormData): Promise<Staf
         .set({ password: newHash, updatedAt: new Date() })
         .where(and(eq(account.userId, targetUserId), eq(account.providerId, "credential")));
 
-      // 2. profiles jadvalida mustChangePassword = true qilish
+      // 2. profiles jadvalida mustChangePassword = false qilish
       await tx
         .update(profiles)
-        .set({ mustChangePassword: true, updatedAt: new Date() })
+        .set({ mustChangePassword: false, updatedAt: new Date() })
         .where(eq(profiles.userId, targetUserId));
 
       // 3. Faol sessiyalarni bekor qilish (Immediate Session Invalidation)
@@ -406,6 +406,7 @@ export async function createOrganizationAdminAction(
     const fullName = (formData.get("fullName") as string)?.trim() || "";
     const rawUsername = (formData.get("username") as string)?.trim() || "";
     let password = (formData.get("password") as string)?.trim() || "";
+    const phone = (formData.get("phone") as string)?.trim() || "";
 
     const fieldErrors: Record<string, string> = {};
 
@@ -417,8 +418,19 @@ export async function createOrganizationAdminAction(
       fieldErrors.fullName = "To'liq ism kamida 3 ta belgidan iborat bo'lishi shart.";
     }
 
+    let finalUsername = "";
+    let finalEmail = "";
+
     if (!rawUsername) {
-      fieldErrors.username = "Administrator uchun login (foydalanuvchi nomi) kiritilishi shart.";
+      fieldErrors.username = "Administrator uchun kirish emaili kiritilishi shart.";
+    } else if (rawUsername.includes("@")) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(rawUsername)) {
+        fieldErrors.username = "To'g'ri email manzilini kiriting (masalan: nodir@gmail.com).";
+      } else {
+        finalEmail = rawUsername.toLowerCase().trim();
+        finalUsername = finalEmail;
+      }
     } else {
       const uCheck = validateUsername(rawUsername);
       if (!uCheck.valid) {
@@ -445,8 +457,10 @@ export async function createOrganizationAdminAction(
       return { success: false, message: "Nofaol tashkilot uchun administrator yaratib bo'lmaydi." };
     }
 
-    const finalUsername = formatStaffUsername(targetOrg.code, rawUsername);
-    const finalEmail = generateInternalSystemEmail(finalUsername);
+    if (!finalUsername) {
+      finalUsername = formatStaffUsername(targetOrg.code, rawUsername);
+      finalEmail = generateInternalSystemEmail(finalUsername);
+    }
 
     if (!password) {
       password = generateSecureTemporaryPassword();
@@ -457,18 +471,23 @@ export async function createOrganizationAdminAction(
       }
     }
 
-    // Login takrorlanmasligini tekshirish
+    // Login yoki email takrorlanmasligini tekshirish
     const [existingUser] = await db
       .select({ id: user.id })
       .from(user)
-      .where(sql`lower(${user.username}) = ${finalUsername.toLowerCase()}`)
+      .where(
+        or(
+          sql`lower(${user.username}) = ${finalUsername.toLowerCase()}`,
+          sql`lower(${user.email}) = ${finalEmail.toLowerCase()}`
+        )
+      )
       .limit(1);
 
     if (existingUser) {
       return {
         success: false,
-        message: `Ushbu "${finalUsername}" logini bilan foydalanuvchi allaqachon mavjud.`,
-        fieldErrors: { username: "Bu login band. Boshqa nom tanlang." },
+        message: `Ushbu "${finalEmail}" email/login bilan foydalanuvchi allaqachon mavjud.`,
+        fieldErrors: { username: "Bu email yoki login band. Boshqa nom tanlang." },
       };
     }
 
@@ -506,10 +525,24 @@ export async function createOrganizationAdminAction(
         role: "organization_admin",
         fullName,
         isActive: true,
-        mustChangePassword: true,
+        mustChangePassword: false,
         createdAt: now,
         updatedAt: now,
       });
+
+      if (password && phone) {
+        await tx.execute(
+          sql`UPDATE organizations SET settings = jsonb_set(jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPassword}', to_jsonb(${password}::text)), '{adminPhone}', to_jsonb(${phone}::text)) WHERE id = ${targetOrg.id}`
+        );
+      } else if (password) {
+        await tx.execute(
+          sql`UPDATE organizations SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPassword}', to_jsonb(${password}::text)) WHERE id = ${targetOrg.id}`
+        );
+      } else if (phone) {
+        await tx.execute(
+          sql`UPDATE organizations SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPhone}', to_jsonb(${phone}::text)) WHERE id = ${targetOrg.id}`
+        );
+      }
     });
 
     logSecurityAudit({
@@ -523,6 +556,7 @@ export async function createOrganizationAdminAction(
     });
 
     revalidatePath("/admin/administrators");
+    revalidatePath("/admin/organizations");
 
     return {
       success: true,
@@ -589,10 +623,16 @@ export async function resetOrganizationAdminPasswordAction(formData: FormData): 
 
       await tx
         .update(profiles)
-        .set({ mustChangePassword: true, updatedAt: new Date() })
+        .set({ mustChangePassword: false, updatedAt: new Date() })
         .where(eq(profiles.userId, targetUserId));
 
       await tx.delete(session).where(eq(session.userId, targetUserId));
+
+      if (adminProfile.organizationId) {
+        await tx.execute(
+          sql`UPDATE organizations SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPassword}', to_jsonb(${newTemporaryPassword}::text)) WHERE id = ${adminProfile.organizationId}`
+        );
+      }
     });
 
     logSecurityAudit({
@@ -606,6 +646,7 @@ export async function resetOrganizationAdminPasswordAction(formData: FormData): 
     });
 
     revalidatePath("/admin/administrators");
+    revalidatePath("/admin/organizations");
 
     return {
       success: true,
@@ -771,6 +812,16 @@ export async function changeTemporaryPasswordAction(
 
     const newHash = await hashPassword(newPassword);
 
+    // Foydalanuvchi profilini olish (tashkilot admini ekanligini tekshirish uchun)
+    const [userProfile] = await db
+      .select({
+        role: profiles.role,
+        organizationId: profiles.organizationId,
+      })
+      .from(profiles)
+      .where(eq(profiles.userId, authSession.user.id))
+      .limit(1);
+
     await db.transaction(async (tx) => {
       await tx
         .update(account)
@@ -781,6 +832,12 @@ export async function changeTemporaryPasswordAction(
         .update(profiles)
         .set({ mustChangePassword: false, updatedAt: new Date() })
         .where(eq(profiles.userId, authSession.user.id));
+
+      if (userProfile?.role === "organization_admin" && userProfile.organizationId) {
+        await tx.execute(
+          sql`UPDATE organizations SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPassword}', to_jsonb(${newPassword}::text)) WHERE id = ${userProfile.organizationId}`
+        );
+      }
     });
 
     logSecurityAudit({
@@ -789,9 +846,121 @@ export async function changeTemporaryPasswordAction(
       metadata: { reason: "TEMPORARY_PASSWORD_UPDATED" },
     });
 
+    revalidatePath("/admin/organizations");
+
     return {
       success: true,
       message: "Parol muvaffaqiyatli o'zgartirildi. Endi tizimdan to'liq foydalanishingiz mumkin.",
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "Parolni yangilashda xatolik yuz berdi.",
+    };
+  }
+}
+
+/**
+ * 6. Tashkilot Administratori o'z parolini mustaqil yangilashi (Change Admin Own Password Action)
+ *
+ * Vakolat: Faqat Organization Admin ruxsat etilgan.
+ * Xavfsizlik va integratsiya:
+ * - Joriy parol xavfsiz tekshiriladi.
+ * - Yangi parol kamida 6 ta belgidan iborat bo'lishi tekshiriladi.
+ * - account jadvalida xavfsiz shifrlangan yangi hesh saqlanadi.
+ * - Tashkilot sozlamalari (organizations.settings.adminPassword) da Super Admin uchun yangi parol yangilanadi.
+ * - /admin/organizations va /org/settings keshlari darhol revalidatsiya qilinadi.
+ */
+export async function changeAdminOwnPasswordAction(
+  _prevState: StaffActionResponse | null,
+  formData: FormData
+): Promise<StaffActionResponse> {
+  let actorUserId = "unknown";
+  try {
+    const { organization, profile, user: authUser } = await requireOrganizationAdmin();
+    actorUserId = profile.userId;
+
+    const currentPassword = (formData.get("currentPassword") as string)?.trim() || "";
+    const newPassword = (formData.get("newPassword") as string)?.trim() || "";
+    const confirmPassword = (formData.get("confirmPassword") as string)?.trim() || "";
+
+    const fieldErrors: Record<string, string> = {};
+
+    if (!currentPassword) {
+      fieldErrors.currentPassword = "Joriy parolingizni kiriting.";
+    }
+
+    if (!newPassword || newPassword.length < 6) {
+      fieldErrors.newPassword = "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak.";
+    }
+
+    if (newPassword !== confirmPassword) {
+      fieldErrors.confirmPassword = "Yangi parol va tasdiqlovchi parol bir xil bo'lishi shart.";
+    }
+
+    if (newPassword && newPassword === currentPassword) {
+      fieldErrors.newPassword = "Yangi parol joriy parol bilan bir xil bo'lishi mumkin emas.";
+    }
+
+    if (Object.keys(fieldErrors).length > 0) {
+      return { success: false, message: "Kiritilgan ma'lumotlarda xatolik bor.", fieldErrors };
+    }
+
+    // Foydalanuvchi hisobini olish
+    const [acc] = await db
+      .select({ id: account.id, password: account.password })
+      .from(account)
+      .where(and(eq(account.userId, authUser.id), eq(account.providerId, "credential")))
+      .limit(1);
+
+    if (!acc || !acc.password) {
+      return { success: false, message: "Parol bilan kirish hisobi topilmadi." };
+    }
+
+    const isCurrentValid = await verifyPassword({
+      hash: acc.password,
+      password: currentPassword,
+    });
+
+    if (!isCurrentValid) {
+      return {
+        success: false,
+        message: "Joriy parol noto'g'ri kiritildi.",
+        fieldErrors: { currentPassword: "Joriy parol noto'g'ri." },
+      };
+    }
+
+    const newHash = await hashPassword(newPassword);
+
+    await db.transaction(async (tx) => {
+      await tx
+        .update(account)
+        .set({ password: newHash, updatedAt: new Date() })
+        .where(eq(account.id, acc.id));
+
+      await tx
+        .update(profiles)
+        .set({ mustChangePassword: false, updatedAt: new Date() })
+        .where(eq(profiles.userId, authUser.id));
+
+      await tx.execute(
+        sql`UPDATE organizations SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPassword}', to_jsonb(${newPassword}::text)) WHERE id = ${organization.id}`
+      );
+    });
+
+    logSecurityAudit({
+      event: "PASSWORD_CHANGED",
+      actorUserId,
+      organizationId: organization.id,
+      metadata: { username: authUser.email, reason: "ADMIN_SELF_CHANGED" },
+    });
+
+    revalidatePath("/admin/organizations");
+    revalidatePath("/org/settings");
+
+    return {
+      success: true,
+      message: "Parolingiz muvaffaqiyatli o'zgartirildi! Super Admin boshqaruv panelida ham yangi parol aks etadi.",
     };
   } catch (err) {
     return {

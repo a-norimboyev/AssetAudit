@@ -65,7 +65,7 @@ export function RelocateForm({
 
       {state?.message && (
         <div
-          className={`p-3 rounded-[4px] text-xs flex items-center gap-2 ${
+          className={`p-3.5 rounded-xl text-xs flex items-center gap-2 ${
             state.success
               ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
               : "bg-rose-50 text-rose-800 border border-rose-200"
@@ -82,7 +82,7 @@ export function RelocateForm({
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
-          <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+          <label className="block text-[11px] font-semibold text-slate-700 mb-1.5">
             Yangi bino
           </label>
           <select
@@ -94,7 +94,7 @@ export function RelocateForm({
               setSelectedFloorId("");
               setSelectedRoomId("");
             }}
-            className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-[3px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900"
+            className="w-full px-3 py-2 text-xs bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
           >
             {buildings.map((b) => (
               <option key={b.id} value={b.id}>
@@ -105,7 +105,7 @@ export function RelocateForm({
         </div>
 
         <div>
-          <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+          <label className="block text-[11px] font-semibold text-slate-700 mb-1.5">
             Yangi qavat
           </label>
           <select
@@ -117,7 +117,7 @@ export function RelocateForm({
               setSelectedFloorId(e.target.value);
               setSelectedRoomId("");
             }}
-            className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-[3px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900 disabled:opacity-50"
+            className="w-full px-3 py-2 text-xs bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 disabled:opacity-50 transition-all"
           >
             <option value="">Qavatni tanlang...</option>
             {availableFloors.map((f) => (
@@ -129,7 +129,7 @@ export function RelocateForm({
         </div>
 
         <div>
-          <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+          <label className="block text-[11px] font-semibold text-slate-700 mb-1.5">
             Yangi xona
           </label>
           <select
@@ -138,7 +138,7 @@ export function RelocateForm({
             value={selectedRoomId}
             disabled={!selectedFloorId}
             onChange={(e) => setSelectedRoomId(e.target.value)}
-            className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-[3px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900 disabled:opacity-50"
+            className="w-full px-3 py-2 text-xs bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 disabled:opacity-50 transition-all"
           >
             <option value="">Xonani tanlang...</option>
             {availableRooms.map((r) => (
@@ -154,7 +154,7 @@ export function RelocateForm({
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[3px] bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs disabled:opacity-50 cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-2xs hover:shadow-xs disabled:opacity-50 transition-all cursor-pointer"
         >
           {isPending ? (
             <>

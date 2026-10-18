@@ -32,15 +32,18 @@ describe("AssetAudit — 10X Final Verification Sprint: To'liq Xavfsizlik va Mig
     let testEmail = `${testUsername}@auth.assetaudit.uz`;
     let superAdminEmail = `superadmin-${Date.now()}@assetaudit.uz`;
     const superAdminPassword = "SuperAdmin_Pass_2026!";
+    let adminUserId: string;
+    let staffUserId: string;
+    let testOrgId: string;
 
     before(async () => {
       shadowPool = new Pool({ connectionString: SHADOW_CONNECTION, max: 2 });
       const ts = Date.now() + Math.floor(Math.random() * 100000);
       superAdminEmail = `superadmin-${ts}@assetaudit.uz`;
-      const adminUserId = `usr-admin-${ts}`;
+      adminUserId = `usr-admin-${ts}`;
       testUsername = `tatu.http.${ts}`;
       testEmail = `${testUsername}@auth.assetaudit.uz`;
-      const staffUserId = `usr-staff-${ts}`;
+      staffUserId = `usr-staff-${ts}`;
 
       // Super Admin foydalanuvchisi yaratish (eski email login tekshiruvi uchun)
       const adminPassHash = await hashPassword(superAdminPassword);
@@ -78,7 +81,17 @@ describe("AssetAudit — 10X Final Verification Sprint: To'liq Xavfsizlik va Mig
         [`acc-${staffUserId}`, staffUserId, staffUserId, staffPassHash]
       );
       const orgRes = await shadowPool.query(`SELECT id FROM organizations LIMIT 1`);
-      const testOrgId = orgRes.rows[0]?.id || "a0000000-0000-0000-0000-000000000001";
+      if (orgRes.rows.length > 0) {
+        testOrgId = orgRes.rows[0].id;
+      } else {
+        const createOrgRes = await shadowPool.query(
+          `INSERT INTO organizations (name, code, type_id, is_active)
+           VALUES ('TATU HTTP Test Org', $1, 'university', true)
+           RETURNING id;`,
+          [`HTTP_${ts}`]
+        );
+        testOrgId = createOrgRes.rows[0].id;
+      }
 
       await shadowPool.query(
         `INSERT INTO profiles (user_id, organization_id, role, full_name, is_active, must_change_password, created_at, updated_at)
@@ -89,7 +102,21 @@ describe("AssetAudit — 10X Final Verification Sprint: To'liq Xavfsizlik va Mig
     });
 
     after(async () => {
-      await shadowPool.end();
+      if (shadowPool) {
+        try {
+          await shadowPool.query(`DELETE FROM session WHERE user_id IN ($1, $2);`, [adminUserId, staffUserId]);
+          await shadowPool.query(`DELETE FROM profiles WHERE user_id IN ($1, $2);`, [adminUserId, staffUserId]);
+          await shadowPool.query(`DELETE FROM account WHERE user_id IN ($1, $2);`, [adminUserId, staffUserId]);
+          await shadowPool.query(`DELETE FROM "user" WHERE id IN ($1, $2);`, [adminUserId, staffUserId]);
+          if (testOrgId) {
+            await shadowPool.query(`DELETE FROM organizations WHERE id = $1;`, [testOrgId]);
+          }
+        } catch (e) {
+          console.error("Cleanup error in sprint05c-final-verification section 1:", e);
+        } finally {
+          await shadowPool.end();
+        }
+      }
     });
 
     it("1.1. Super Admin: mavjud email + parol orqali HTTP /api/auth/sign-in/email muvaffaqiyatli kirishi shart", async (t) => {
@@ -367,7 +394,19 @@ describe("AssetAudit — 10X Final Verification Sprint: To'liq Xavfsizlik va Mig
     });
 
     after(async () => {
-      await shadowPool.end();
+      if (shadowPool) {
+        try {
+          await shadowPool.query(`DELETE FROM items WHERE organization_id IN ($1, $2);`, [orgAId, orgBId]);
+          await shadowPool.query(`DELETE FROM rooms WHERE organization_id IN ($1, $2);`, [orgAId, orgBId]);
+          await shadowPool.query(`DELETE FROM floors WHERE organization_id IN ($1, $2);`, [orgAId, orgBId]);
+          await shadowPool.query(`DELETE FROM buildings WHERE organization_id IN ($1, $2);`, [orgAId, orgBId]);
+          await shadowPool.query(`DELETE FROM organizations WHERE id IN ($1, $2);`, [orgAId, orgBId]);
+        } catch (e) {
+          console.error("Cleanup error in sprint05c-final-verification section 3:", e);
+        } finally {
+          await shadowPool.end();
+        }
+      }
     });
 
     it("3.1. DB Qat'iy Himoya: Org B inventarini Org A ning xonasiga joylashtirish FK orqali bloklanishi shart (23503)", async () => {

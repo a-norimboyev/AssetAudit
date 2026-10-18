@@ -35,18 +35,18 @@ export function EditFloorModal({ floor }: EditFloorModalProps) {
       <button
         onClick={() => setIsOpen(true)}
         type="button"
-        className="p-1.5 rounded-[3px] text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+        className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
         title="Qavat nomini tahrirlash"
       >
         <Edit2 className="w-3.5 h-3.5" />
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-md bg-white rounded-[4px] shadow-xl border border-slate-200 overflow-hidden text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden text-left">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-[3px] bg-blue-50 text-blue-600 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                   <Layers className="w-4 h-4" />
                 </div>
                 <div>
@@ -59,7 +59,7 @@ export function EditFloorModal({ floor }: EditFloorModalProps) {
               <button
                 onClick={() => setIsOpen(false)}
                 type="button"
-                className="p-1 rounded-[3px] text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -70,7 +70,7 @@ export function EditFloorModal({ floor }: EditFloorModalProps) {
 
               {state?.message && (
                 <div
-                  className={`p-3 rounded-[4px] text-xs flex items-center gap-2 ${
+                  className={`p-3.5 rounded-xl text-xs flex items-center gap-2 ${
                     state.success
                       ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
                       : "bg-rose-50 text-rose-800 border border-rose-200"
@@ -86,7 +86,7 @@ export function EditFloorModal({ floor }: EditFloorModalProps) {
               )}
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Qavat nomi <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -95,8 +95,8 @@ export function EditFloorModal({ floor }: EditFloorModalProps) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  placeholder="Masalan: 3-qavat yoki IT Fakulteti qavati"
-                  className="w-full px-3.5 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-[3px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900"
+                  placeholder="Masalan: 1-qavat yoki IT Fakulteti qavati"
+                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
                 />
               </div>
 
@@ -105,14 +105,14 @@ export function EditFloorModal({ floor }: EditFloorModalProps) {
                   type="button"
                   onClick={() => setIsOpen(false)}
                   disabled={isPending}
-                  className="px-4 py-2 rounded-[3px] border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-all cursor-pointer disabled:opacity-50"
                 >
                   Bekor qilish
                 </button>
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[3px] bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs hover:shadow transition-all cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer disabled:opacity-50"
                 >
                   {isPending ? (
                     <>

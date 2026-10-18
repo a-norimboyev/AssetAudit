@@ -99,8 +99,9 @@ export const auth = betterAuth({
   plugins: [
     username({
       minUsernameLength: 3,
-      maxUsernameLength: 30,
+      maxUsernameLength: 60,
       displayUsername: true,
+      usernameValidator: (u: string) => /^[a-zA-Z0-9_.@-]{3,60}$/.test(u),
     }),
   ],
   session: {

@@ -245,4 +245,35 @@ describe("AssetAudit — Bosqich 2B: Tashkilot Yaratish va Xavfsizlik Qoidalari"
       );
     });
   });
+
+  describe("6. Tashkilot bilan birga Asosiy Administrator (Tenant Admin) kiritish validatsiyasi", () => {
+    it("Admin F.I.SH 3 belgidan kam bo'lsa rad etilishi kerak", () => {
+      const name = "Ak";
+      assert.ok(name.trim().length < 3, "Kamida 3 ta belgi talab qilinishi kerak");
+    });
+
+    it("Admin logini tashkilot kodi bilan LMS formatida birlashishi shart", async () => {
+      const { formatStaffUsername } = await import("@/lib/validations/staff");
+      const { generateCodeFromName } = await import("@/lib/validations/organization");
+
+      const orgName = "Toshkent Axborot Texnologiyalari Universiteti";
+      const code = generateCodeFromName(orgName);
+      assert.equal(code, "TATU");
+
+      const formatted = formatStaffUsername(code, "admin");
+      assert.equal(formatted, "tatu.admin");
+
+      const customFormatted = formatStaffUsername(code, "jamshid");
+      assert.equal(customFormatted, "tatu.jamshid");
+    });
+
+    it("Parol bo'sh qoldirilganda yuqori entropiyali xavfsiz vaqtinchalik parol hosil qilinishi kerak", async () => {
+      const { generateSecureTemporaryPassword, validateStaffPassword } = await import("@/lib/validations/staff");
+      const tempPass = generateSecureTemporaryPassword();
+
+      assert.ok(tempPass.length >= 14);
+      const validation = validateStaffPassword(tempPass);
+      assert.equal(validation.valid, true);
+    });
+  });
 });

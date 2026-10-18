@@ -108,7 +108,27 @@ describe("AssetAudit — Sprint 10: TATU To'liq Inventarizatsiya Oqimi", () => {
 
   after(async () => {
     if (pool) {
-      await pool.end();
+      try {
+        await pool.query("DELETE FROM scan_events WHERE organization_id = $1;", [testOrgId]);
+        await pool.query("DELETE FROM cycle_conflicts WHERE organization_id = $1;", [testOrgId]);
+        await pool.query("DELETE FROM cycle_items WHERE organization_id = $1;", [testOrgId]);
+        await pool.query("DELETE FROM room_audits WHERE organization_id = $1;", [testOrgId]);
+        await pool.query("DELETE FROM inventory_cycles WHERE organization_id = $1;", [testOrgId]);
+        await pool.query("DELETE FROM items WHERE organization_id = $1;", [testOrgId]);
+        if (categoryId) {
+          await pool.query("DELETE FROM item_categories WHERE id = $1;", [categoryId]);
+        }
+        await pool.query("DELETE FROM rooms WHERE organization_id = $1;", [testOrgId]);
+        await pool.query("DELETE FROM floors WHERE organization_id = $1;", [testOrgId]);
+        await pool.query("DELETE FROM buildings WHERE organization_id = $1;", [testOrgId]);
+        await pool.query("DELETE FROM profiles WHERE organization_id = $1;", [testOrgId]);
+        await pool.query("DELETE FROM organizations WHERE id = $1;", [testOrgId]);
+        await pool.query('DELETE FROM "user" WHERE id = $1;', [testUserId]);
+      } catch (e) {
+        console.error("Cleanup error in tatu-inventory-flow:", e);
+      } finally {
+        await pool.end();
+      }
     }
   });
 

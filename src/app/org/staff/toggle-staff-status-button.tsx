@@ -40,23 +40,23 @@ export function ToggleStaffStatusButton({
       onClick={handleToggle}
       disabled={isPending}
       type="button"
-      className={`inline-flex items-center gap-1 px-2 py-1 rounded-[3px] text-[11px] font-semibold border transition cursor-pointer disabled:opacity-50 ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer disabled:opacity-50 ${
         isActive
-          ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200"
-          : "bg-rose-50 text-rose-700 border-rose-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200"
+          ? "bg-emerald-50 text-emerald-700 border-emerald-200/80 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200"
+          : "bg-rose-50 text-rose-700 border-rose-200/80 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200"
       }`}
       title={isActive ? "Bloklash / Nofaol qilish" : "Faollashtirish"}
     >
       {isPending ? (
-        <Loader2 className="w-3 h-3 animate-spin" />
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
       ) : isActive ? (
         <>
-          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
           <span>Faol</span>
         </>
       ) : (
         <>
-          <XCircle className="w-3 h-3 text-rose-600" />
+          <XCircle className="w-3.5 h-3.5 text-rose-600" />
           <span>Nofaol</span>
         </>
       )}

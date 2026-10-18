@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import Link from "next/link";
 import { useState, useTransition, type FormEvent } from "react";
-import { Search, Filter, X, Loader2 } from "lucide-react";
+import { Search, Filter, X, Loader2, Plus } from "lucide-react";
 import type { OrganizationTypeOption } from "@/lib/data/organizations";
 
 interface Props {
@@ -68,7 +69,7 @@ export function OrganizationFilters({ types, currentSearch = "", currentType = "
   );
 
   return (
-    <div className="bg-white p-4 rounded-[4px] border border-slate-200/80 shadow-xs mb-6">
+    <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs">
       <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         {/* Qidiruv Inputi */}
         <div className="relative flex-1">
@@ -84,7 +85,7 @@ export function OrganizationFilters({ types, currentSearch = "", currentType = "
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Tashkilot nomi yoki kodi bo‘yicha qidirish..."
-            className="w-full pl-10 pr-9 py-2.5 rounded-[3px] border border-slate-200 bg-slate-50/50 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:bg-white transition-all"
+            className="w-full pl-10 pr-9 py-2.5 rounded-lg border border-slate-200 bg-slate-50/60 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all"
           />
           {searchTerm && (
             <button
@@ -93,10 +94,10 @@ export function OrganizationFilters({ types, currentSearch = "", currentType = "
                 setSearchTerm("");
                 applyFilters("", selectedType);
               }}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
               title="Qidiruvni tozalash"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
             </button>
           )}
         </div>
@@ -110,7 +111,7 @@ export function OrganizationFilters({ types, currentSearch = "", currentType = "
             value={selectedType}
             onChange={handleTypeChange}
             aria-label="Tashkilot turi bo'yicha filtrlash"
-            className="w-full pl-9 pr-8 py-2.5 rounded-[3px] border border-slate-200 bg-slate-50/50 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:bg-white transition-all cursor-pointer appearance-none"
+            className="w-full pl-9 pr-8 py-2.5 rounded-lg border border-slate-200 bg-slate-50/60 text-xs sm:text-sm font-medium text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all cursor-pointer appearance-none"
           >
             <option value="all">Barcha tashkilot turlari</option>
             {types.map((t) => (
@@ -124,14 +125,14 @@ export function OrganizationFilters({ types, currentSearch = "", currentType = "
           </div>
         </div>
 
-        {/* Qidirish tugmasi */}
-        <button
-          type="submit"
-          disabled={isPending}
-          className="px-4 py-2.5 rounded-[3px] bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors shrink-0 disabled:opacity-60 cursor-pointer"
+        {/* Yangi tashkilot qo'shish tugmasi (Qidirish o'rnida) */}
+        <Link
+          href="/admin/organizations/new"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors shrink-0"
         >
-          Qidirish
-        </button>
+          <Plus className="w-4 h-4" />
+          <span>Yangi tashkilot qo‘shish</span>
+        </Link>
 
         {/* Filtrlarni tozalash */}
         {hasActiveFilters && (
@@ -139,7 +140,7 @@ export function OrganizationFilters({ types, currentSearch = "", currentType = "
             type="button"
             onClick={handleClear}
             disabled={isPending}
-            className="px-3 py-2.5 rounded-[3px] border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold transition-colors shrink-0 cursor-pointer"
+            className="px-4 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs sm:text-sm font-semibold transition-colors shrink-0 cursor-pointer"
             title="Barcha filtrlarni tozalash"
           >
             Tozalash

@@ -32,7 +32,7 @@ const badgeVariants = {
   success: "bg-emerald-50 text-emerald-700 border-emerald-200",
   warning: "bg-amber-50 text-amber-700 border-amber-200",
   error: "bg-rose-50 text-rose-700 border-rose-200",
-  neutral: "bg-slate-50 text-slate-600 border-slate-200",
+  neutral: "bg-slate-100 text-slate-600 border-slate-200",
 };
 
 export const StatCard: React.FC<StatCardProps> = ({
@@ -47,13 +47,13 @@ export const StatCard: React.FC<StatCardProps> = ({
   const color = colorVariants[colorVariant];
 
   return (
-    <div className="bg-white rounded-[4px] border border-slate-200 p-5 shadow-xs transition-shadow hover:shadow-sm">
+    <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-2xs transition-all hover:shadow-xs hover:border-slate-300">
       <div className="flex items-start justify-between">
-        <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
           {title}
         </span>
         <div
-          className={`w-9 h-9 rounded-[3px] border flex items-center justify-center shrink-0 ${color.bgIcon}`}
+          className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${color.bgIcon}`}
         >
           <Icon className="w-4 h-4" />
         </div>
@@ -65,7 +65,7 @@ export const StatCard: React.FC<StatCardProps> = ({
         </span>
         {badgeText && (
           <span
-            className={`text-xs font-medium px-2 py-0.5 rounded-[3px] border ${badgeVariants[badgeVariant]}`}
+            className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${badgeVariants[badgeVariant]}`}
           >
             {badgeText}
           </span>
@@ -73,7 +73,7 @@ export const StatCard: React.FC<StatCardProps> = ({
       </div>
 
       {subtitle && (
-        <p className="mt-2 text-xs text-slate-500 leading-normal">{subtitle}</p>
+        <p className="mt-2 text-xs text-slate-500 leading-normal font-medium">{subtitle}</p>
       )}
     </div>
   );

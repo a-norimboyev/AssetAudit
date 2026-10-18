@@ -28,10 +28,27 @@ export interface OrganizationValidationResult {
 }
 
 /**
- * Tashkilot kodi formati:
- * Kamida 2 ta, ko'pi bilan 50 ta belgi.
- * Faqat lotin harflari (A-Z, a-z), raqamlar (0-9), defis (-) va tagchiziq (_) qabul qilinadi.
+ * Tashkilot nomidan avtomatik qisqa kod yasash
  */
+export function generateCodeFromName(name: string): string {
+  if (!name || !name.trim()) return "ORG";
+  const clean = name
+    .trim()
+    .replace(/[‘'`"ʻ’]/g, "")
+    .replace(/[^a-zA-Z0-9\s-]/g, " ")
+    .trim();
+  const words = clean.split(/\s+/).filter(Boolean);
+  if (words.length >= 2) {
+    const acronym = words.map((w) => w[0]).join("").toUpperCase();
+    if (acronym.length >= 2) return acronym.slice(0, 10);
+  }
+  if (words.length === 1) {
+    const w = words[0].toUpperCase();
+    if (w.length >= 2) return w.slice(0, 10);
+  }
+  return `ORG-${Math.floor(100 + Math.random() * 900)}`;
+}
+
 const CODE_REGEX = /^[A-Za-z0-9_-]{2,50}$/;
 
 export function validateOrganizationInput(input: Partial<OrganizationInput>): OrganizationValidationResult {
@@ -55,13 +72,13 @@ export function validateOrganizationInput(input: Partial<OrganizationInput>): Or
   const normalizedCode = trimmedCode.toUpperCase();
 
   if (!trimmedCode) {
-    errors.code = "Tashkilot kodi kiritilishi shart (masalan: TATU).";
+    errors.code = "Tashkilot kodi kiritilishi shart.";
   } else if (trimmedCode.length < 2) {
     errors.code = "Tashkilot kodi kamida 2 ta belgidan iborat bo'lishi kerak.";
   } else if (trimmedCode.length > 50) {
     errors.code = "Tashkilot kodi 50 belgidan oshmasligi kerak.";
   } else if (!CODE_REGEX.test(trimmedCode)) {
-    errors.code = "Tashkilot kodi faqat lotin harflari, raqamlar va defisdan iborat bo'lishi kerak (masalan: TATU, SAM-DU, TDTU_01).";
+    errors.code = "Tashkilot kodi faqat lotin harflari, raqamlar va defisdan iborat bo'lishi kerak.";
   }
 
   // 3. Tashkilot turi tekshiruvi

@@ -360,5 +360,21 @@ describe("AssetAudit — Sprint 05B-1: Bino → Qavat → Xona → Inventar Iera
       assert.ok(errorThrown, "Cross-tenant inventar kiritilishi bloklanishi shart");
       assert.equal(errorThrown.code, "23503");
     });
+
+    after(async () => {
+      if (pgClient && isDbAvailable) {
+        try {
+          await pgClient.query(`DELETE FROM items WHERE organization_id IN ('${testOrgId}', '${testOrgBId}');`);
+          await pgClient.query(`DELETE FROM rooms WHERE organization_id IN ('${testOrgId}', '${testOrgBId}');`);
+          await pgClient.query(`DELETE FROM floors WHERE organization_id IN ('${testOrgId}', '${testOrgBId}');`);
+          await pgClient.query(`DELETE FROM buildings WHERE organization_id IN ('${testOrgId}', '${testOrgBId}');`);
+          await pgClient.query(`DELETE FROM organizations WHERE id IN ('${testOrgId}', '${testOrgBId}');`);
+        } catch (e) {
+          console.error("Cleanup error in sprint05b-hierarchy-constraints:", e);
+        } finally {
+          await pgClient.end();
+        }
+      }
+    });
   });
 });

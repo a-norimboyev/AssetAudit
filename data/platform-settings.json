@@ -1,0 +1,48 @@
+{
+  "system": {
+    "platformName": "AssetAudit — Mulk Nazorati",
+    "supportPhone": "+998 (71) 200-00-00",
+    "supportEmail": "support@assetaudit.uz",
+    "baseUrl": "http://localhost:3000",
+    "defaultQrSize": "50x30",
+    "qrErrorCorrection": "M",
+    "hideRoomAddressOnPublicScan": true
+  },
+  "security": {
+    "minPasswordLength": 8,
+    "sessionDurationDays": 30,
+    "maxFailedAttempts": 5,
+    "lockoutDurationMinutes": 15,
+    "enforceStrongPassword": true,
+    "requirePasswordChangeDays": 90
+  },
+  "maintenance": {
+    "enabled": false,
+    "message": "Hozirda AssetAudit platformasida rejaviy profilaktika ishlari olib borilmoqda. Tizim tez orada to'liq qayta ishga tushiriladi.",
+    "allowedIps": [
+      "127.0.0.1",
+      "::1"
+    ]
+  },
+  "integrations": {
+    "telegramBotEnabled": true,
+    "telegramBotUsername": "@AssetAuditBot",
+    "telegramAlertChatId": "-100234567890",
+    "notifyOnCriticalConflict": true,
+    "notifyOnNewTenant": true,
+    "smsGatewayEnabled": false,
+    "smsProvider": "eskiz"
+  },
+  "quotas": {
+    "defaultMaxItems": 10000,
+    "defaultMaxStorageMb": 2048,
+    "defaultMaxConcurrentAudits": 5
+  },
+  "backup": {
+    "lastBackupTime": "",
+    "backupStatus": "success",
+    "backupSizeBytes": 0,
+    "autoBackupEnabled": true,
+    "frequency": "daily"
+  }
+}

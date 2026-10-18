@@ -20,10 +20,13 @@ describe("AssetAudit — Sprint 13: Bino, Qavat, Xona va Inventar Update / Soft-
     pool = new Pool({ connectionString: PG_CONNECTION, max: 2 });
     const ts = Date.now();
 
-    // 1. Tashkilot olish
-    const orgRes = await pool.query("SELECT id FROM organizations LIMIT 1;");
-    orgId = orgRes.rows[0]?.id;
-    assert.ok(orgId, "Tashkilot mavjud bo'lishi shart");
+    // 1. Yangi test tashkilotini yaratish
+    const orgRes = await pool.query(
+      "INSERT INTO organizations (name, code, type_id, is_active) VALUES ('TATU Test 13', $1, 'university', true) RETURNING id;",
+      [`TATU_${ts}`]
+    );
+    orgId = orgRes.rows[0].id;
+    assert.ok(orgId, "Tashkilot yaratilishi shart");
 
     // 2. Test Binosi
     const bRes = await pool.query(
@@ -60,10 +63,11 @@ describe("AssetAudit — Sprint 13: Bino, Qavat, Xona va Inventar Update / Soft-
 
   after(async () => {
     if (pool) {
-      await pool.query("DELETE FROM items WHERE id = $1;", [itemId]);
-      await pool.query("DELETE FROM rooms WHERE id = $1;", [roomId]);
-      await pool.query("DELETE FROM floors WHERE id = $1;", [floorId]);
-      await pool.query("DELETE FROM buildings WHERE id = $1;", [buildingId]);
+      await pool.query("DELETE FROM items WHERE organization_id = $1;", [orgId]);
+      await pool.query("DELETE FROM rooms WHERE organization_id = $1;", [orgId]);
+      await pool.query("DELETE FROM floors WHERE organization_id = $1;", [orgId]);
+      await pool.query("DELETE FROM buildings WHERE organization_id = $1;", [orgId]);
+      await pool.query("DELETE FROM organizations WHERE id = $1;", [orgId]);
       await pool.end();
     }
   });

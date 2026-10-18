@@ -221,7 +221,7 @@ export function ScanInterface({
   return (
     <div className="space-y-6">
       {/* 1. Xonani tanlash bloki */}
-      <div className="bg-white p-5 rounded-[4px] border border-slate-200/80 shadow-xs space-y-3">
+      <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
         <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
           <DoorClosed className="w-4 h-4 text-blue-600" />
           <span>Hozir siz turgan xona:</span>
@@ -233,7 +233,7 @@ export function ScanInterface({
             setSelectedRoomId(e.target.value);
             setCompleteMessage(null);
           }}
-          className="w-full px-3.5 py-2.5 text-xs sm:text-sm font-semibold bg-slate-50 border border-slate-200 rounded-[3px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900"
+          className="w-full px-3.5 py-2.5 text-xs sm:text-sm font-semibold bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
         >
           {rooms.map((r) => (
             <option key={r.id} value={r.id}>
@@ -244,10 +244,12 @@ export function ScanInterface({
       </div>
 
       {/* 2. QR Kod / Barkod Skaneri va Kiritish */}
-      <div className="bg-white p-5 sm:p-6 rounded-[4px] border border-slate-200/80 shadow-xs space-y-4">
+      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <Scan className="w-4 h-4 text-blue-600" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+              <Scan className="w-4 h-4" />
+            </div>
             <h3 className="text-sm font-bold text-slate-900">QR Skanerlash</h3>
           </div>
           <div className="flex items-center gap-2">
@@ -257,7 +259,7 @@ export function ScanInterface({
             <button
               type="button"
               onClick={toggleCamera}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] text-xs font-semibold border transition cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
                 isCameraActive
                   ? "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100"
                   : "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
@@ -280,7 +282,7 @@ export function ScanInterface({
 
         {/* BarcodeDetector qo'llab-quvvatlanmagan holat uchun tushunarli Fallback xabari */}
         {supportsBarcodeDetector === false && (
-          <div className="p-3.5 rounded-[4px] text-xs bg-slate-50 text-slate-700 border border-slate-200 flex items-start gap-2.5">
+          <div className="p-4 rounded-xl text-xs bg-slate-50 text-slate-700 border border-slate-200/80 flex items-start gap-2.5">
             <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
             <div className="space-y-1">
               <span className="font-semibold text-slate-900">Qurilma / Brauzer ma&apos;lumoti:</span>
@@ -303,7 +305,7 @@ export function ScanInterface({
 
         {/* Live Camera Scanner Box */}
         {isCameraActive && (
-          <div className="relative rounded-[4px] overflow-hidden bg-slate-950 border border-slate-800 aspect-video max-w-md mx-auto flex items-center justify-center">
+          <div className="relative rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 aspect-video max-w-md mx-auto flex items-center justify-center shadow-inner">
             <video
               ref={(el) => {
                 videoRef.current = el;
@@ -319,8 +321,8 @@ export function ScanInterface({
             />
             {/* Viewfinder Overlay */}
             <div className="absolute inset-0 border-2 border-blue-500/40 pointer-events-none flex items-center justify-center">
-              <div className="w-48 h-48 border-2 border-blue-400 rounded-[4px] shadow-sm animate-pulse flex items-center justify-center">
-                <span className="text-[10px] text-white/80 bg-slate-900/80 px-2 py-0.5 rounded-[2px]">
+              <div className="w-48 h-48 border-2 border-blue-400 rounded-2xl shadow-sm animate-pulse flex items-center justify-center">
+                <span className="text-[10px] text-white/80 bg-slate-900/80 px-2.5 py-1 rounded-full backdrop-blur-xs">
                   QR kodni nishonga oling
                 </span>
               </div>
@@ -329,7 +331,7 @@ export function ScanInterface({
         )}
 
         {cameraError && (
-          <div className="p-3 rounded-[3px] text-xs bg-amber-50 text-amber-900 border border-amber-200 flex items-center gap-2">
+          <div className="p-3.5 rounded-xl text-xs bg-amber-50 text-amber-900 border border-amber-200 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
             <span>{cameraError}</span>
           </div>
@@ -338,12 +340,12 @@ export function ScanInterface({
         {/* Natija / Xabar Banneri */}
         {state?.message && (
           <div
-            className={`p-4 rounded-[4px] text-xs sm:text-sm flex items-start gap-3 ${
+            className={`p-4 rounded-xl text-xs sm:text-sm flex items-start gap-3 ${
               state.isConflict
-                ? "bg-amber-50 text-amber-900 border border-amber-200"
+                ? "bg-amber-50 text-amber-900 border border-amber-200/80"
                 : state.success
-                  ? "bg-emerald-50 text-emerald-900 border border-emerald-200"
-                  : "bg-rose-50 text-rose-900 border border-rose-200"
+                  ? "bg-emerald-50 text-emerald-900 border border-emerald-200/80"
+                  : "bg-rose-50 text-rose-900 border border-rose-200/80"
             }`}
           >
             {state.isConflict ? (
@@ -370,7 +372,7 @@ export function ScanInterface({
           {cycleId && <input type="hidden" name="cycleId" value={cycleId} />}
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               QR Token yoki Inventar Raqami (Skaner / Klaviatura)
             </label>
             <div className="flex gap-2">
@@ -383,12 +385,12 @@ export function ScanInterface({
                 autoFocus
                 required
                 placeholder="QR token yoki TATU-2026-0001..."
-                className="flex-1 px-3.5 py-2.5 text-xs sm:text-sm font-mono bg-slate-50 border border-slate-200 rounded-[3px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900"
+                className="flex-1 px-3.5 py-2.5 text-xs sm:text-sm font-mono bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
               />
               <button
                 type="submit"
                 disabled={isPending || !tokenOrCode.trim()}
-                className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-[3px] bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-xs disabled:opacity-50 transition-all cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-2xs hover:shadow-xs disabled:opacity-50 transition-all cursor-pointer"
               >
                 {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Scan className="w-4 h-4" />}
                 <span>Qayd etish</span>
@@ -399,12 +401,12 @@ export function ScanInterface({
 
         {/* Xona tekshiruvini yakunlash tugmasi */}
         {cycleId && (
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+          <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between">
             <span className="text-[11px] text-slate-500">Ushbu xonadagi barcha mulklar skanerlandi-mi?</span>
             <button
               onClick={handleCompleteRoom}
               disabled={isCompleting}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[3px] bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold border border-emerald-200 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold border border-emerald-200 transition-all cursor-pointer shadow-2xs"
             >
               {isCompleting ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -417,7 +419,7 @@ export function ScanInterface({
         )}
 
         {completeMessage && (
-          <div className="p-3 rounded-[4px] bg-emerald-50 text-emerald-800 text-xs flex items-center gap-2 border border-emerald-200">
+          <div className="p-3.5 rounded-xl bg-emerald-50 text-emerald-800 text-xs flex items-center gap-2 border border-emerald-200">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{completeMessage}</span>
           </div>
@@ -425,20 +427,20 @@ export function ScanInterface({
       </div>
 
       {/* 3. Ushbu sessiyadagi skanlar jurnali */}
-      <div className="bg-white rounded-[4px] border border-slate-200/80 shadow-xs overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
           <span className="text-xs font-bold text-slate-900">Joriy sessiyada skanerlangan buyumlar</span>
-          <span className="text-[11px] text-slate-500 font-medium">{scanHistory.length} ta skan</span>
+          <span className="text-xs text-slate-500 font-medium">{scanHistory.length} ta skan</span>
         </div>
 
         {scanHistory.length === 0 ? (
-          <div className="p-6 text-center text-xs text-slate-500">
+          <div className="p-8 text-center text-xs text-slate-500">
             Hali birorta inventar skanerlanmadi. Yuqoridagi maydonga QR yoki raqamni kiriting.
           </div>
         ) : (
           <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto">
             {scanHistory.map((h, idx) => (
-              <div key={idx} className="p-3 sm:px-5 flex items-center justify-between text-xs hover:bg-slate-50">
+              <div key={idx} className="p-3.5 sm:px-5 flex items-center justify-between text-xs hover:bg-slate-50 transition-colors">
                 <div>
                   <div className="font-semibold text-slate-900">{h.name}</div>
                   <div className="text-[11px] font-mono text-slate-500">{h.invNumber}</div>
@@ -446,17 +448,17 @@ export function ScanInterface({
 
                 <div className="flex items-center gap-3">
                   {h.isMatch ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[3px] text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
                       <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                       <span>O‘z xonasida</span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[3px] text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/80">
                       <AlertCircle className="w-3 h-3 text-amber-600" />
                       <span>Konflikt</span>
                     </span>
                   )}
-                  <span className="text-[10px] text-slate-500 font-mono">{h.time}</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{h.time}</span>
                 </div>
               </div>
             ))}

@@ -1,5 +1,5 @@
-import { DashboardView } from "@/components/dashboard/DashboardView";
+import { redirect } from "next/navigation";
 
 export default function PreviewDashboardPage() {
-  return <DashboardView />;
+  redirect("/org");
 }

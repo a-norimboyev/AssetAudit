@@ -20,17 +20,17 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   return (
     <div
-      className={`flex flex-col items-center justify-center text-center p-8 sm:p-12 rounded-[4px] border border-dashed border-slate-200 bg-slate-50/50 ${className}`}
+      className={`flex flex-col items-center justify-center text-center p-8 sm:p-14 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 ${className}`}
     >
-      <div className="w-12 h-12 rounded-[4px] bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 mb-4">
-        <Icon className="w-6 h-6" />
+      <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 mb-4 shadow-2xs">
+        <Icon className="w-7 h-7" />
       </div>
 
-      <h3 className="text-sm sm:text-base font-semibold text-slate-900 tracking-tight mb-1">
+      <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight mb-1.5">
         {title}
       </h3>
 
-      <p className="text-xs sm:text-sm text-slate-500 max-w-sm mb-5 leading-relaxed">
+      <p className="text-xs sm:text-sm text-slate-500 max-w-sm mb-6 leading-relaxed">
         {description}
       </p>
 
@@ -38,7 +38,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         <button
           type="button"
           onClick={onAction}
-          className="inline-flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-medium rounded-[3px] bg-white border border-slate-200 text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-semibold rounded-xl bg-blue-600 text-white shadow-xs hover:bg-blue-700 transition-all cursor-pointer"
         >
           {actionText}
         </button>

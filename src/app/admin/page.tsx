@@ -22,7 +22,7 @@ import { OrganizationDetailsModal } from "./organizations/organization-details-m
 
 export const metadata = {
   title: "Platforma Boshqaruvi — AssetAudit",
-  description: "AssetAudit SaaS platformasining boshqaruv paneli (Faqat Super Admin)",
+  description: "AssetAudit SaaS platformasining boshqaruv paneli",
 };
 
 export const instant = false;
@@ -140,7 +140,7 @@ export default async function AdminPage() {
             ) : (
               <>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span>Barchasi faol (0 ta xavf)</span>
+                <span>Barchasi faol</span>
               </>
             )}
           </div>
@@ -323,7 +323,7 @@ export default async function AdminPage() {
               <thead>
                 <tr className="bg-slate-50/75 border-b border-slate-200/80 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                   <th className="px-5 py-3.5">Tashkilot</th>
-                  <th className="px-5 py-3.5">Admin (Gmail)</th>
+                  <th className="px-5 py-3.5">Admin</th>
                   <th className="px-5 py-3.5">O‘rnatilgan sana</th>
                   <th className="px-5 py-3.5">Dostup muddati</th>
                   <th className="px-5 py-3.5">Holati & Qolgan kunlar</th>

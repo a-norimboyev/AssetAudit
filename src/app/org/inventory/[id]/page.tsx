@@ -34,7 +34,7 @@ interface PageProps {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof CheckCircle2 }> = {
-  active: { label: "Faol (Foydalanishda)", color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle2 },
+  active: { label: "Faol", color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle2 },
   repair: { label: "Ta’mirda", color: "bg-amber-50 text-amber-700 border-amber-200", icon: Wrench },
   written_off: { label: "Hisobdan chiqarilgan", color: "bg-rose-50 text-rose-700 border-rose-200", icon: XCircle },
   transferred: { label: "Ko‘chirilgan", color: "bg-blue-50 text-blue-700 border-blue-200", icon: AlertCircle },
@@ -253,11 +253,11 @@ export default async function ItemDetailPage({ params }: PageProps) {
                 <dd className="font-semibold text-slate-900 mt-1 capitalize">{item.condition}</dd>
               </div>
               <div>
-                <dt className="text-slate-500">Baza ID (UUID)</dt>
+                <dt className="text-slate-500">Baza ID</dt>
                 <dd className="font-mono text-[11px] text-slate-600 mt-1 truncate">{item.id}</dd>
               </div>
               <div>
-                <dt className="text-slate-500">QR Token (Unikal)</dt>
+                <dt className="text-slate-500">QR Token</dt>
                 <dd className="font-mono text-[11px] text-blue-600 mt-1 truncate">{item.qrToken}</dd>
               </div>
               <div>

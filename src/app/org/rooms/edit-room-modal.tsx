@@ -3,32 +3,26 @@
 import { useState, useActionState, useEffect } from "react";
 import { Edit2, X, DoorClosed, Loader2, CheckCircle2, AlertCircle, Archive } from "lucide-react";
 import { updateRoomAction, archiveRoomAction, type ActionResponse } from "@/lib/actions/locations";
-import { type RoomType } from "@/lib/db/schema/locations";
+import { type RoomTypeOption } from "@/lib/constants/room-types";
+import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
 
 interface EditRoomModalProps {
   room: {
     id: string;
     roomNumber: string;
     name: string;
-    type: RoomType;
+    type: string;
     capacity: number | null;
     isActive: boolean;
     buildingName: string;
     floorName: string;
   };
+  roomTypes?: RoomTypeOption[];
 }
-
-const ROOM_TYPE_OPTIONS: { value: RoomType; label: string }[] = [
-  { value: "office", label: "Xizmat xonasi / Kabinet" },
-  { value: "classroom", label: "O‘quv auditoriyasi" },
-  { value: "lab", label: "Laboratoriya" },
-  { value: "warehouse", label: "Omborxona" },
-  { value: "conference", label: "Majlislar zali" },
-  { value: "other", label: "Boshqa xona" },
-];
 
 export function EditRoomModal({ room }: EditRoomModalProps) {
   const [isOpen, setIsOpen] = useState(false);
+  useBodyScrollLock(isOpen);
   const [isArchiving, setIsArchiving] = useState(false);
   const [archiveError, setArchiveError] = useState<string | null>(null);
 
@@ -77,8 +71,8 @@ export function EditRoomModal({ room }: EditRoomModalProps) {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in overscroll-contain">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden text-left overscroll-contain">
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -141,38 +135,8 @@ export function EditRoomModal({ room }: EditRoomModalProps) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                    Xona turi
-                  </label>
-                  <select
-                    name="type"
-                    defaultValue={room.type}
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
-                  >
-                    {ROOM_TYPE_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                    Sig&apos;imi (o&apos;rin)
-                  </label>
-                  <input
-                    type="number"
-                    name="capacity"
-                    defaultValue={room.capacity || ""}
-                    placeholder="Masalan: 30"
-                    min="1"
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
-                  />
-                </div>
-              </div>
+              {/* Xona turi hozircha talab qilinmaydi, keyinchalik qayta qo'shiladi */}
+              <input type="hidden" name="type" value={room.type || "lecture_hall"} />
 
               <div className="flex items-center gap-2 pt-1">
                 <input

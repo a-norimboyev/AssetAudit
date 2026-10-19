@@ -153,7 +153,7 @@ export async function getOrganizationAdminsList(
       organizationId: r.organizationId,
       organizationName: r.organizationName,
       organizationCode: r.organizationCode,
-      password: (settings.adminPassword as string) || undefined,
+      password: undefined,
       phone: (settings.adminPhone as string) || undefined,
     };
   });
@@ -324,7 +324,7 @@ export async function getOrganizationAdminDetails(
     organizationId: row.organizationId,
     organizationName: row.organizationName,
     organizationCode: row.organizationCode,
-    password: (settings.adminPassword as string) || undefined,
+    password: undefined,
     phone: (settings.adminPhone as string) || undefined,
     dashboard,
     recentItems,

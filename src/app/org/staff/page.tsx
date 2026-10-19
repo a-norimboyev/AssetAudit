@@ -6,12 +6,10 @@ import { ToggleStaffStatusButton } from "./toggle-staff-status-button";
 import {
   Users,
   Calendar,
-  User,
   Mail,
   UserCheck,
   Tag,
   QrCode,
-  AlertTriangle,
 } from "lucide-react";
 
 export const metadata = {
@@ -150,12 +148,12 @@ export default async function OrgStaffPage() {
                       {s.role === "inspector" ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200/80">
                           <QrCode className="w-3 h-3 text-purple-600" />
-                          <span>Inspektor (Tekshiruvchi)</span>
+                          <span>Inspektor</span>
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
                           <Tag className="w-3 h-3 text-emerald-600" />
-                          <span>Moddiy Javobgar (Registrar)</span>
+                          <span>Moddiy Javobgar</span>
                         </span>
                       )}
                     </td>

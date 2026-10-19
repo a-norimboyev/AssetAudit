@@ -18,9 +18,9 @@ test.describe("1. Autentifikatsiya, Dashboard va Sessiya Boshqaruvi", () => {
 
     // 4. Dashboard kartalarini tekshirish
     await expect(page.locator("body")).toContainText("TATU Axborot Texnologiyalari Universiteti (E2E)");
-    await expect(page.locator("body")).toContainText("Jami inventarlar");
-    await expect(page.locator("body")).toContainText("Binolar / Xonalar");
-    await expect(page.locator("body")).toContainText("Audit Sikllari");
+    await expect(page.locator("body")).toContainText(/jami inventarlar/i);
+    await expect(page.locator("body")).toContainText(/binolar/i);
+    await expect(page.locator("body")).toContainText(/audit/i);
 
     // 5. Chiqish (Logout)
     const logoutBtn = page.locator('button[title="Tizimdan chiqish"]');

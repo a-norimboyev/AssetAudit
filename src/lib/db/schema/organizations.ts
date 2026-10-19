@@ -27,7 +27,6 @@ export interface OrganizationSettings {
   subscriptionExpiresAt?: string; // ISO date string
   subscriptionNotes?: string;
   logoUrl?: string;
-  adminPassword?: string;
   adminPhone?: string;
   [key: string]: unknown;
 }

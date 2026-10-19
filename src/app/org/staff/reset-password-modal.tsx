@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { KeyRound, X, Loader2, CheckCircle2, AlertCircle, Copy, Check, ShieldAlert } from "lucide-react";
 import { resetStaffPasswordAction, type StaffActionResponse } from "@/lib/actions/staff";
+import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
 
 interface ResetStaffPasswordModalProps {
   userId: string;
@@ -18,6 +19,7 @@ export function ResetStaffPasswordModal({
   role,
 }: ResetStaffPasswordModalProps) {
   const [isOpen, setIsOpen] = useState(false);
+  useBodyScrollLock(isOpen);
   const [isPending, setIsPending] = useState(false);
   const [result, setResult] = useState<StaffActionResponse | null>(null);
   const [copied, setCopied] = useState(false);
@@ -59,8 +61,8 @@ export function ResetStaffPasswordModal({
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in overscroll-contain">
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden overscroll-contain">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -164,7 +166,7 @@ export function ResetStaffPasswordModal({
                     <code className="text-blue-600 font-mono font-semibold bg-blue-50 px-1.5 py-0.5 rounded">{username || "—"}</code>
                   </div>
                   <div>
-                    <span className="font-semibold text-slate-700">Roli:</span> {role === "inspector" ? "Inspektor" : "Moddiy Javobgar (Registrar)"}
+                    <span className="font-semibold text-slate-700">Roli:</span> {role === "inspector" ? "Inspektor" : "Moddiy Javobgar"}
                   </div>
                 </div>
 

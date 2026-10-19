@@ -178,9 +178,16 @@ describe("AssetAudit — Sprint 05B-1: Bino → Qavat → Xona → Inventar Iera
 
     before(async () => {
       try {
+        const testConnStr =
+          process.env.DATABASE_URL ||
+          process.env.TEST_DATABASE_URL ||
+          "postgresql://postgres@127.0.0.1:5432/mulknazorat_sprint05b_test";
+        if (!testConnStr.toLowerCase().includes("test")) {
+          throw new Error("FAIL-CLOSED: Testlar faqat nomida 'test' bo'lgan izolyatsiyalangan test bazasida bajarilishi shart.");
+        }
         pgClient = new Client({
-          connectionString: "postgresql://postgres@127.0.0.1:5432/mulknazorat_sprint05b_test",
-          connectionTimeoutMillis: 3000,
+          connectionString: testConnStr,
+          connectionTimeoutMillis: 5000,
         });
         await pgClient.connect();
         isDbAvailable = true;

@@ -13,7 +13,6 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
-  MapPin,
 } from "lucide-react";
 
 export const metadata = {
@@ -131,8 +130,7 @@ export default async function OrgBuildingsPage({ searchParams }: PageProps) {
             <table className="w-full text-left text-xs sm:text-sm">
               <thead className="bg-slate-50/75 border-b border-slate-200/80 text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
                 <tr>
-                  <th scope="col" className="px-5 py-3.5">Bino nomi & Kodi</th>
-                  <th scope="col" className="px-5 py-3.5">Manzil</th>
+                  <th scope="col" className="px-5 py-3.5">Bino nomi</th>
                   <th scope="col" className="px-5 py-3.5">Qavatlar</th>
                   <th scope="col" className="px-5 py-3.5">Xonalar</th>
                   <th scope="col" className="px-5 py-3.5">Holati</th>
@@ -142,29 +140,14 @@ export default async function OrgBuildingsPage({ searchParams }: PageProps) {
               <tbody className="divide-y divide-slate-100 font-normal">
                 {data.items.map((b) => (
                   <tr key={b.id} className="hover:bg-slate-50/70 transition-colors">
-                    {/* Bino nomi va kodi */}
+                    {/* Bino nomi */}
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 font-bold flex items-center justify-center text-xs shrink-0 font-mono border border-blue-100">
-                          {b.code}
+                        <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100/60">
+                          <Building className="w-4 h-4" />
                         </div>
-                        <div>
-                          <div className="font-semibold text-slate-900">{b.name}</div>
-                          <div className="text-[11px] text-slate-400 font-mono">Kod: {b.code}</div>
-                        </div>
+                        <div className="font-semibold text-slate-900">{b.name}</div>
                       </div>
-                    </td>
-
-                    {/* Manzil */}
-                    <td className="px-5 py-3.5 text-slate-500 text-xs">
-                      {b.address ? (
-                        <div className="flex items-center gap-1.5 truncate max-w-xs" title={b.address}>
-                          <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span>{b.address}</span>
-                        </div>
-                      ) : (
-                        <span className="text-slate-400 italic">—</span>
-                      )}
                     </td>
 
                     {/* Qavatlar soni */}

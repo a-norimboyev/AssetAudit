@@ -1,7 +1,7 @@
 {
   "system": {
     "platformName": "AssetAudit — Mulk Nazorati",
-    "supportPhone": "+998 (71) 200-00-00",
+    "supportPhone": "+998 (93) 364-20-30",
     "supportEmail": "support@assetaudit.uz",
     "baseUrl": "http://localhost:3000",
     "defaultQrSize": "50x30",
@@ -39,9 +39,9 @@
     "defaultMaxConcurrentAudits": 5
   },
   "backup": {
-    "lastBackupTime": "",
+    "lastBackupTime": "2026-10-19T09:45:02.886Z",
     "backupStatus": "success",
-    "backupSizeBytes": 0,
+    "backupSizeBytes": 10474,
     "autoBackupEnabled": true,
     "frequency": "daily"
   }

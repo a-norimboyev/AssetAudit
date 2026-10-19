@@ -3,6 +3,7 @@
 import { useState, useActionState, useEffect } from "react";
 import { Plus, X, Layers, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { createFloorAction, type ActionResponse } from "@/lib/actions/locations";
+import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
 
 interface BuildingOption {
   id: string;
@@ -12,6 +13,7 @@ interface BuildingOption {
 
 export function AddFloorModal({ buildings }: { buildings: BuildingOption[] }) {
   const [isOpen, setIsOpen] = useState(false);
+  useBodyScrollLock(isOpen);
   const [state, formAction, isPending] = useActionState<ActionResponse | null, FormData>(
     createFloorAction,
     null
@@ -39,8 +41,8 @@ export function AddFloorModal({ buildings }: { buildings: BuildingOption[] }) {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in overscroll-contain">
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden overscroll-contain">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -89,7 +91,7 @@ export function AddFloorModal({ buildings }: { buildings: BuildingOption[] }) {
                   <option value="">Binoni tanlang...</option>
                   {buildings.map((b) => (
                     <option key={b.id} value={b.id}>
-                      {b.name} ({b.code})
+                      {b.name}
                     </option>
                   ))}
                 </select>

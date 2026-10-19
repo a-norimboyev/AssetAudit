@@ -4,12 +4,10 @@ import { requireAuthenticatedUser } from "@/lib/auth/authorization";
 import { getInventoryList, getInventoryStats, getItemCategoriesList } from "@/lib/data/inventory";
 import { getBuildingsList } from "@/lib/data/locations";
 import { InventoryFilters } from "./inventory-filters";
-import { ExportInventoryButtons } from "./export-inventory-buttons";
 import {
   QrCode,
   Plus,
   Printer,
-  FileSpreadsheet,
   Building,
   DoorClosed,
   CheckCircle2,
@@ -104,22 +102,6 @@ export default async function OrgInventoryPage({ searchParams }: PageProps) {
           >
             <Printer className="w-4 h-4 text-blue-600" />
             <span>QR chop etish</span>
-          </Link>
-          <ExportInventoryButtons
-            filters={{
-              categoryId: categoryId === "all" ? undefined : categoryId,
-              buildingId: buildingId === "all" ? undefined : buildingId,
-              roomId: roomId === "all" ? undefined : roomId,
-              status: status === "all" ? undefined : status,
-              search: search || undefined,
-            }}
-          />
-          <Link
-            href="/org/inventory/import"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold shadow-2xs transition-all"
-          >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-            <span>Excel / CSV Import</span>
           </Link>
           <Link
             href="/org/inventory/new"
@@ -272,7 +254,7 @@ export default async function OrgInventoryPage({ searchParams }: PageProps) {
                         </div>
                         <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
                           <DoorClosed className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span>{item.roomNumber} ({item.roomName})</span>
+                          <span>{item.roomNumber} — {item.roomName}</span>
                         </div>
                       </td>
 

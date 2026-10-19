@@ -62,7 +62,7 @@ test.describe("5. Audit Sikli, Skanerlash va Rekonsilyatsiya Hisobotlari", () =>
     await expect(csvExportBtn).toBeVisible();
 
     // Chop etish tugmasi
-    const printBtn = page.locator('button:has-text("Chop etish (Print)")');
+    const printBtn = page.locator('button:has-text("Chop etish")');
     await expect(printBtn).toBeVisible();
   });
 });

@@ -4,6 +4,7 @@ import { useState, useActionState, useEffect } from "react";
 import { Edit2, X, Tag, Loader2, CheckCircle2, AlertCircle, Archive } from "lucide-react";
 import { updateItemAction, archiveItemAction, type ActionResponse } from "@/lib/actions/inventory";
 import { ITEM_STATUSES, ITEM_CONDITIONS, type ItemStatus, type ItemCondition } from "@/lib/db/schema/inventory";
+import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
 
 interface EditItemModalProps {
   item: {
@@ -20,9 +21,9 @@ interface EditItemModalProps {
 }
 
 const STATUS_LABELS: Record<ItemStatus, string> = {
-  active: "Faol (Foydalanishda)",
+  active: "Faol",
   repair: "Ta’mirda",
-  written_off: "Hisobdan chiqarilgan (Arxiv)",
+  written_off: "Hisobdan chiqarilgan",
   transferred: "Ko‘chirilgan",
   lost: "Yo‘qolgan",
 };
@@ -37,6 +38,7 @@ const CONDITION_LABELS: Record<ItemCondition, string> = {
 
 export function EditItemModal({ item, categories }: EditItemModalProps) {
   const [isOpen, setIsOpen] = useState(false);
+  useBodyScrollLock(isOpen);
   const [isArchiving, setIsArchiving] = useState(false);
   const [archiveError, setArchiveError] = useState<string | null>(null);
 
@@ -89,8 +91,8 @@ export function EditItemModal({ item, categories }: EditItemModalProps) {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in overscroll-contain">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden text-left overscroll-contain">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">

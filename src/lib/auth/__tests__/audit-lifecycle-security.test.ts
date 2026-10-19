@@ -10,7 +10,10 @@ import { Pool } from "pg";
 import { VALID_CYCLE_TRANSITIONS } from "@/lib/db/schema/audit";
 
 describe("AssetAudit — PR #4: Audit Sikli Holatlari, Immutability va Skan Xavfsizligi", () => {
-  const PG_CONNECTION = "postgresql://postgres@127.0.0.1:5432/mulknazorat_sprint05b_test";
+  const PG_CONNECTION =
+    process.env.DATABASE_URL ||
+    process.env.TEST_DATABASE_URL ||
+    "postgresql://postgres@127.0.0.1:5432/mulknazorat_sprint05b_test";
   let pool: Pool;
 
   let orgAId: string;
@@ -24,6 +27,9 @@ describe("AssetAudit — PR #4: Audit Sikli Holatlari, Immutability va Skan Xavf
   let cycleBId: string;
 
   before(async () => {
+    if (!PG_CONNECTION.toLowerCase().includes("test")) {
+      throw new Error("FAIL-CLOSED: Testlar faqat nomida 'test' bo'lgan izolyatsiyalangan test bazasida bajarilishi shart.");
+    }
     pool = new Pool({ connectionString: PG_CONNECTION, max: 2 });
     const ts = Date.now();
 

@@ -33,10 +33,10 @@ export default async function AdminLayout({
               <ShieldAlert className="w-7 h-7" />
             </div>
             <h1 className="text-xl font-bold tracking-tight text-slate-950">
-              Kirish cheklangan (403)
+              Kirish cheklangan
             </h1>
             <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-              Ushbu bo‘lim faqat <strong>Platforma Bosh Administratori (Super Admin)</strong> uchun ruxsat etilgan. Sizning rolingiz ushbu panelga kirish huquqiga ega emas.
+              Ushbu bo‘lim faqat <strong>Platforma Bosh Administratori</strong> uchun ruxsat etilgan. Sizning rolingiz ushbu panelga kirish huquqiga ega emas.
             </p>
             <div className="mt-6">
               <Link

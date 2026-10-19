@@ -47,7 +47,7 @@ export function CycleStatusManager({
       <div className="flex items-center gap-2">
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
           <CheckCircle2 className="w-3.5 h-3.5" />
-          <span>Audit Yakunlangan (Qulflangan)</span>
+          <span>Audit Yakunlangan</span>
         </span>
       </div>
     );
@@ -58,7 +58,7 @@ export function CycleStatusManager({
       <div className="flex items-center gap-2">
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
           <XCircle className="w-3.5 h-3.5" />
-          <span>Bekor qilingan (Yopiq)</span>
+          <span>Bekor qilingan</span>
         </span>
       </div>
     );

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, X, UserPlus, Loader2, CheckCircle2, AlertCircle, Copy, Check } from "lucide-react";
 import { createOrganizationAdminAction, type StaffActionResponse } from "@/lib/actions/staff";
+import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
 
 interface AddAdminModalProps {
   organizations: Array<{ id: string; name: string; code: string; isActive: boolean }>;
@@ -10,6 +11,7 @@ interface AddAdminModalProps {
 
 export function AddAdminModal({ organizations }: AddAdminModalProps) {
   const [isOpen, setIsOpen] = useState(false);
+  useBodyScrollLock(isOpen);
   const [isPending, setIsPending] = useState(false);
   const [copied, setCopied] = useState(false);
   const [result, setResult] = useState<StaffActionResponse | null>(null);
@@ -83,8 +85,8 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in overscroll-contain">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden text-left overscroll-contain">
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-3">

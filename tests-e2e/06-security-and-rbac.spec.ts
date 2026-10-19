@@ -50,7 +50,7 @@ test.describe("6. Xavfsizlik, Multi-Tenant Izolyatsiyasi va RBAC Cheklovlari", (
 
     // Platforma /admin boshqaruviga urinish 403 bilan cheklanishi shart
     await page.goto("/admin");
-    await expect(page.locator("body")).toContainText("Kirish cheklangan (403)");
+    await expect(page.locator("body")).toContainText("Kirish cheklangan");
   });
 
   test("6.4. RBAC: Inspektor /org boshqaruviga yoki /admin ga kira olmasligi shart", async ({ page }) => {

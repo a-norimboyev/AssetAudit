@@ -297,6 +297,8 @@ export async function seedE2EUsers(): Promise<{ orgAId: string; orgBId: string }
   }
 }
 
+export default seedE2EUsers;
+
 if (process.argv[1]?.endsWith("seed-e2e-users.ts")) {
   seedE2EUsers()
     .then(() => process.exit(0))

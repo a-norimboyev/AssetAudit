@@ -7,8 +7,6 @@ import {
   createRealDatabaseBackup,
 } from "@/lib/data/backup-service";
 
-export const dynamic = "force-dynamic";
-export const instant = false;
 
 export async function GET(request: NextRequest) {
   try {

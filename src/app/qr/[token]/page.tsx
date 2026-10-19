@@ -126,7 +126,7 @@ export default async function PublicQrPage({ params }: PageProps) {
             <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 text-amber-900 space-y-2">
               <div className="flex items-center gap-2 font-semibold text-xs text-amber-950">
                 <Lock className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-                <span>Cheklangan Kirish (Restricted Siyosati)</span>
+                <span>Cheklangan Kirish</span>
               </div>
               <p className="text-[11px] text-amber-800 leading-relaxed">
                 Tashkilot maxfiylik siyosatiga ko‘ra aniq joylashuv (bino, qavat, xona) va ichki ko‘rsatkichlar faqat tizimga kirgan vakolatli xodimlarga ko‘rsatiladi.

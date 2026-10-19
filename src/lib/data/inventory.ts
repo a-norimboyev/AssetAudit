@@ -140,7 +140,8 @@ export async function getInventoryList(options: {
   pageSize?: number;
 }): Promise<PaginatedInventoryResult> {
   const page = Math.max(1, options.page || 1);
-  const pageSize = Math.min(100, Math.max(1, options.pageSize || 20));
+  const maxAllowed = options.pageSize && options.pageSize > 100 ? 10000 : 100;
+  const pageSize = Math.min(maxAllowed, Math.max(1, options.pageSize || 20));
   const offset = (page - 1) * pageSize;
 
   const conditions = [eq(items.organizationId, options.organizationId)];

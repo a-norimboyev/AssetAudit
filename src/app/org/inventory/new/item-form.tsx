@@ -171,7 +171,7 @@ export function NewItemForm({
               defaultValue="active"
               className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/50 border border-slate-200 rounded-lg focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 cursor-pointer transition-all"
             >
-              <option value="active">Faol (Foydalanishda)</option>
+              <option value="active">Faol</option>
               <option value="repair">Ta’mirda</option>
               <option value="written_off">Hisobdan chiqarilgan</option>
             </select>

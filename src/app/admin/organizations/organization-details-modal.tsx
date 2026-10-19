@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   Calendar,
@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import type { OrganizationListItem, OrganizationTypeOption } from "@/lib/data/organizations";
 import { EditOrganizationModal } from "./edit-organization-modal";
+import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
 
 const UZ_MONTHS = [
   "yanvar", "fevral", "mart", "aprel", "may", "iyun",
@@ -54,6 +55,7 @@ export function OrganizationDetailsModal({
   trigger,
 }: OrganizationDetailsModalProps) {
   const [isOpen, setIsOpen] = useState(false);
+  useBodyScrollLock(isOpen);
   const [copiedId, setCopiedId] = useState(false);
   const [copiedLogin, setCopiedLogin] = useState(false);
   const [copiedPassword, setCopiedPassword] = useState(false);
@@ -63,12 +65,7 @@ export function OrganizationDetailsModal({
   const org = organization;
   const admin = org.admin;
   const sub = org.subscription;
-
-  const [adminPassword, setAdminPassword] = useState<string | undefined>(admin?.password);
-
-  useEffect(() => {
-    setAdminPassword(admin?.password);
-  }, [admin?.password]);
+  const adminPassword = admin?.password;
 
   const formattedCreatedDate = formatUzbekDate(org.createdAt, true);
   const formattedStartDate = formatUzbekDate(sub.startsAt);
@@ -120,9 +117,9 @@ export function OrganizationDetailsModal({
       )}
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in overscroll-contain">
           <div
-            className="w-full max-w-2xl bg-white rounded-2xl border border-slate-200/80 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]"
+            className="w-full max-w-2xl bg-white rounded-2xl border border-slate-200/80 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[90vh] overscroll-contain"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -178,7 +175,7 @@ export function OrganizationDetailsModal({
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 space-y-6 overflow-y-auto flex-1">
+            <div className="p-6 space-y-6 overflow-y-auto flex-1 overscroll-contain">
               {/* 1. Dostup muddati va Litsenziya Bloki */}
               <div className="p-5 rounded-xl border border-slate-200/80 bg-gradient-to-br from-blue-50/40 via-white to-slate-50">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-200/60 mb-4">
@@ -210,7 +207,7 @@ export function OrganizationDetailsModal({
                   </div>
 
                   <div>
-                    <div className="text-[11px] font-medium text-slate-400">O‘rnatilgan (Boshlangan)</div>
+                    <div className="text-[11px] font-medium text-slate-400">O‘rnatilgan sana</div>
                     <div className="text-sm font-semibold text-slate-900 mt-0.5 flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5 text-slate-400" />
                       <span>{formattedStartDate}</span>

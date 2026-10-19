@@ -148,7 +148,7 @@ export function ExportReportButtons({ report }: ExportReportButtonsProps) {
         ) : (
           <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-700" />
         )}
-        <span>{isExportingExcel ? "Tayyorlanmoqda..." : "Excel (.xlsx)"}</span>
+        <span>{isExportingExcel ? "Tayyorlanmoqda..." : "Excel"}</span>
       </button>
 
       <button
@@ -166,7 +166,7 @@ export function ExportReportButtons({ report }: ExportReportButtonsProps) {
         className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer"
       >
         <Printer className="w-3.5 h-3.5 text-white" />
-        <span>Chop etish (Print)</span>
+        <span>Chop etish</span>
       </button>
     </div>
   );

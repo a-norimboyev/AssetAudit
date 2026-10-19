@@ -14,6 +14,7 @@ import {
   X,
   ShieldCheck,
 } from "lucide-react";
+import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
 
 interface DashboardSidebarProps {
   isOpen: boolean;
@@ -71,6 +72,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   onClose,
 }) => {
   const pathname = usePathname();
+  useBodyScrollLock(isOpen);
 
   return (
     <>
@@ -78,14 +80,14 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-xs lg:hidden transition-opacity"
+          className="fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-xs lg:hidden transition-opacity overscroll-contain"
           aria-hidden="true"
         />
       )}
 
       {/* Asosiy Sidebar paneli */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 overscroll-contain ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

@@ -11,7 +11,6 @@ import {
   Phone,
   Building2,
   CheckCircle2,
-  AlertTriangle,
   Calendar,
   ArrowLeft,
   ExternalLink,
@@ -214,7 +213,7 @@ export default async function AdminDetailsProfilePage({ params }: PageProps) {
             {/* Jami mulklar */}
             <div className="p-4 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-slate-500">Mulklar (Inventar)</span>
+                <span className="text-[11px] font-semibold text-slate-500">Mulklar</span>
                 <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
                   <Package className="w-3.5 h-3.5" />
                 </div>

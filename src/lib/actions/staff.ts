@@ -157,7 +157,7 @@ export async function createStaffMemberAction(
         role,
         fullName,
         isActive: true,
-        mustChangePassword: false,
+        mustChangePassword: true,
         createdAt: now,
         updatedAt: now,
       });
@@ -255,10 +255,10 @@ export async function resetStaffPasswordAction(formData: FormData): Promise<Staf
         .set({ password: newHash, updatedAt: new Date() })
         .where(and(eq(account.userId, targetUserId), eq(account.providerId, "credential")));
 
-      // 2. profiles jadvalida mustChangePassword = false qilish
+      // 2. profiles jadvalida mustChangePassword = true qilish
       await tx
         .update(profiles)
-        .set({ mustChangePassword: false, updatedAt: new Date() })
+        .set({ mustChangePassword: true, updatedAt: new Date() })
         .where(eq(profiles.userId, targetUserId));
 
       // 3. Faol sessiyalarni bekor qilish (Immediate Session Invalidation)
@@ -525,20 +525,12 @@ export async function createOrganizationAdminAction(
         role: "organization_admin",
         fullName,
         isActive: true,
-        mustChangePassword: false,
+        mustChangePassword: true,
         createdAt: now,
         updatedAt: now,
       });
 
-      if (password && phone) {
-        await tx.execute(
-          sql`UPDATE organizations SET settings = jsonb_set(jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPassword}', to_jsonb(${password}::text)), '{adminPhone}', to_jsonb(${phone}::text)) WHERE id = ${targetOrg.id}`
-        );
-      } else if (password) {
-        await tx.execute(
-          sql`UPDATE organizations SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPassword}', to_jsonb(${password}::text)) WHERE id = ${targetOrg.id}`
-        );
-      } else if (phone) {
+      if (phone) {
         await tx.execute(
           sql`UPDATE organizations SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPhone}', to_jsonb(${phone}::text)) WHERE id = ${targetOrg.id}`
         );
@@ -623,16 +615,10 @@ export async function resetOrganizationAdminPasswordAction(formData: FormData): 
 
       await tx
         .update(profiles)
-        .set({ mustChangePassword: false, updatedAt: new Date() })
+        .set({ mustChangePassword: true, updatedAt: new Date() })
         .where(eq(profiles.userId, targetUserId));
 
       await tx.delete(session).where(eq(session.userId, targetUserId));
-
-      if (adminProfile.organizationId) {
-        await tx.execute(
-          sql`UPDATE organizations SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPassword}', to_jsonb(${newTemporaryPassword}::text)) WHERE id = ${adminProfile.organizationId}`
-        );
-      }
     });
 
     logSecurityAudit({
@@ -812,16 +798,6 @@ export async function changeTemporaryPasswordAction(
 
     const newHash = await hashPassword(newPassword);
 
-    // Foydalanuvchi profilini olish (tashkilot admini ekanligini tekshirish uchun)
-    const [userProfile] = await db
-      .select({
-        role: profiles.role,
-        organizationId: profiles.organizationId,
-      })
-      .from(profiles)
-      .where(eq(profiles.userId, authSession.user.id))
-      .limit(1);
-
     await db.transaction(async (tx) => {
       await tx
         .update(account)
@@ -833,11 +809,6 @@ export async function changeTemporaryPasswordAction(
         .set({ mustChangePassword: false, updatedAt: new Date() })
         .where(eq(profiles.userId, authSession.user.id));
 
-      if (userProfile?.role === "organization_admin" && userProfile.organizationId) {
-        await tx.execute(
-          sql`UPDATE organizations SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPassword}', to_jsonb(${newPassword}::text)) WHERE id = ${userProfile.organizationId}`
-        );
-      }
     });
 
     logSecurityAudit({
@@ -942,10 +913,6 @@ export async function changeAdminOwnPasswordAction(
         .update(profiles)
         .set({ mustChangePassword: false, updatedAt: new Date() })
         .where(eq(profiles.userId, authUser.id));
-
-      await tx.execute(
-        sql`UPDATE organizations SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPassword}', to_jsonb(${newPassword}::text)) WHERE id = ${organization.id}`
-      );
     });
 
     logSecurityAudit({
@@ -960,7 +927,7 @@ export async function changeAdminOwnPasswordAction(
 
     return {
       success: true,
-      message: "Parolingiz muvaffaqiyatli o'zgartirildi! Super Admin boshqaruv panelida ham yangi parol aks etadi.",
+      message: "Parolingiz muvaffaqiyatli o'zgartirildi!",
     };
   } catch (err) {
     return {

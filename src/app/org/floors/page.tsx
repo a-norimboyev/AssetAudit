@@ -84,7 +84,7 @@ export default async function OrgFloorsPage({ searchParams }: PageProps) {
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
               >
-                {b.name} ({b.code})
+                {b.name}
               </Link>
             ))}
           </div>
@@ -141,8 +141,8 @@ export default async function OrgFloorsPage({ searchParams }: PageProps) {
                         {f.floorNumber > 0
                           ? `${f.floorNumber}-qavat`
                           : f.floorNumber === 0
-                          ? "0 (Zamin qavat)"
-                          : `${f.floorNumber} (Yerto‘la)`}
+                          ? "Zamin qavat"
+                          : `${f.floorNumber}-qavat, Yerto‘la`}
                       </span>
                     </td>
 

@@ -52,8 +52,8 @@ test.describe("07. Super Admin 5-Bo'lim To'liq va Mukammal Auditi", () => {
     const testAdminLogin = `ftk_admin_${suffix}@gmail.com`;
 
     await page.fill("#name", testOrgName);
-    await page.fill("#adminUsername", testAdminLogin);
-    await page.fill("#adminPassword", "SecurePass123!@#");
+    await page.fill("#adminGmail", testAdminLogin);
+    await page.fill("#orgAdminPassword", "SecurePass123!@#");
 
     // Yaratish tugmasini bosish
     await page.click('button[type="submit"]');
@@ -111,9 +111,9 @@ test.describe("07. Super Admin 5-Bo'lim To'liq va Mukammal Auditi", () => {
     const adminFullName = `Nodirbek Salimov ${suffix}`;
     const adminEmail = `nodir_${suffix}@gmail.com`;
 
-    await page.fill('input[placeholder="Administrator F.I.SH"]', adminFullName);
-    await page.fill('input[placeholder="Emailni kiriting"]', adminEmail);
-    await page.fill('input[type="password"]', "NodirPass123!@#");
+    await page.fill('input[placeholder="Abdullayev Nodirbek"]', adminFullName);
+    await page.fill('input[placeholder="Gmail manzilini kiriting"]', adminEmail);
+    await page.fill('input[placeholder="Parolni kiriting"]', "NodirPass123!@#");
 
     // Yaratish tugmasini bosish ("Admin yaratish")
     await page.click('button:has-text("Admin yaratish")');

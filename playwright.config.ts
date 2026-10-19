@@ -2,6 +2,7 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests-e2e",
+  globalSetup: "./scripts/seed-e2e-users.ts",
   timeout: 60000,
   expect: {
     timeout: 10000,

@@ -45,7 +45,10 @@ export default async function OrgSettingsPage() {
             <div>
               <label className="text-slate-500 font-medium block mb-1">Kirish emaili</label>
               <div className="font-mono font-semibold text-slate-800 bg-slate-50/70 p-3 rounded-xl border border-slate-200">
-                {(user as any).email || (user as any).username || (user as any).displayUsername || "superadmin"}
+                {(user as { email?: string; username?: string; displayUsername?: string }).email ||
+                  (user as { email?: string; username?: string; displayUsername?: string }).username ||
+                  (user as { email?: string; username?: string; displayUsername?: string }).displayUsername ||
+                  "superadmin"}
               </div>
             </div>
 

@@ -3,7 +3,6 @@
 import { useState, useTransition, useEffect } from "react";
 import {
   Sliders,
-  ShieldCheck,
   QrCode,
   Lock,
   Wrench,
@@ -14,14 +13,10 @@ import {
   CheckCircle2,
   AlertTriangle,
   RefreshCw,
-  ExternalLink,
   ShieldAlert,
   Info,
   Download,
-  HardDrive,
-  MessageSquare,
   Smartphone,
-  Eye,
 } from "lucide-react";
 import {
   updatePlatformSettingsAction,
@@ -364,15 +359,15 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                       }
                       className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
                     >
-                      <option value="50x30">50 x 30 mm (Standart Termo Etiketka)</option>
-                      <option value="40x25">40 x 25 mm (Ixcham Etiketka)</option>
-                      <option value="60x40">60 x 40 mm (Katta Jihozlar Uchun)</option>
+                      <option value="50x30">50 x 30 mm — Standart Termo Etiketka</option>
+                      <option value="40x25">40 x 25 mm — Ixcham Etiketka</option>
+                      <option value="60x40">60 x 40 mm — Katta Jihozlar Uchun</option>
                     </select>
                   </div>
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-slate-700">
-                      QR Xatolikni Tiklash Darajasi (ECC Level)
+                      QR Xatolikni Tiklash Darajasi
                     </label>
                     <select
                       value={settings.system.qrErrorCorrection}
@@ -387,10 +382,10 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                       }
                       className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
                     >
-                      <option value="M">M — Standart (15% shikastlanishda o&apos;qiladi)</option>
-                      <option value="Q">Q — Yuqori (25% shikastlanishda o&apos;qiladi)</option>
-                      <option value="H">H — Maksimal (30% shikastlanishda o&apos;qiladi)</option>
-                      <option value="L">L — Past (7% tiklash, zichroq)</option>
+                      <option value="M">M — Standart</option>
+                      <option value="Q">Q — Yuqori</option>
+                      <option value="H">H — Maksimal</option>
+                      <option value="L">L — Past</option>
                     </select>
                   </div>
                 </div>
@@ -1107,8 +1102,8 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                         }
                         className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 cursor-pointer"
                       >
-                        <option value="daily">Kunlik (Daily)</option>
-                        <option value="weekly">Haftalik (Weekly)</option>
+                        <option value="daily">Kunlik</option>
+                        <option value="weekly">Haftalik</option>
                       </select>
                     </div>
                   </div>

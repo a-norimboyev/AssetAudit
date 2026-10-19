@@ -307,13 +307,18 @@ export async function getOrganizationsList(
     const admin = rawAdmin
       ? {
           ...rawAdmin,
-          password: (org.settings?.adminPassword as string) || undefined,
+          password: undefined,
           phone: (org.settings?.adminPhone as string) || undefined,
         }
       : null;
-    const subscription = computeSubscriptionInfo(org.createdAt, org.settings);
+    const safeSettings = org.settings ? { ...org.settings } : {};
+    delete safeSettings.adminPassword;
+    delete (safeSettings as Record<string, unknown>).password;
+
+    const subscription = computeSubscriptionInfo(org.createdAt, safeSettings);
     return {
       ...org,
+      settings: safeSettings,
       admin,
       subscription,
     };
@@ -351,7 +356,6 @@ export interface CreateOrganizationInput {
   subscriptionExpiresAt?: string;
   subscriptionNotes?: string;
   logoUrl?: string;
-  adminPassword?: string;
   adminPhone?: string;
 }
 
@@ -423,7 +427,6 @@ export async function createOrganization(
           subscriptionExpiresAt: expiresAtStr,
           subscriptionNotes: input.subscriptionNotes,
           logoUrl: input.logoUrl?.trim() || undefined,
-          adminPassword: input.adminPassword?.trim() || undefined,
           adminPhone: input.adminPhone?.trim() || undefined,
         },
       })

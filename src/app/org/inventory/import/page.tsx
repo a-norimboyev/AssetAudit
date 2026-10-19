@@ -71,7 +71,7 @@ export default function InventoryImportPage() {
     const csvContent =
       "data:text/csv;charset=utf-8," +
       encodeURIComponent(
-        "Inventar raqami,Nomi,Bino,Xona,Kategoriya,Holati (Sifat),Narxi,Tavsif\n" +
+        "Inventar raqami,Nomi,Bino,Xona,Kategoriya,Holati,Narxi,Tavsif\n" +
           "TATU-INV-001,Monoblok HP ProOne 440,BOSH,101,computer_equipment,good,8500000,O'quv xonasi kompyuteri\n" +
           "TATU-INV-002,Ofis stoli yog'och,BOSH,101,furniture,good,1200000,O'qituvchi stoli\n" +
           "TATU-INV-003,Konditsioner Artel 18,BOSH,102,appliances,new,6200000,Konditsioner invertor\n"
@@ -202,7 +202,7 @@ export default function InventoryImportPage() {
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Import qilinmoqda (Chunked)...</span>
+                <span>Import qilinmoqda...</span>
               </>
             ) : (
               <>

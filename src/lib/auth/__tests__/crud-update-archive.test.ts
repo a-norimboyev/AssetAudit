@@ -8,7 +8,10 @@ import assert from "node:assert/strict";
 import { Pool } from "pg";
 
 describe("AssetAudit — Sprint 13: Bino, Qavat, Xona va Inventar Update / Soft-Archive Sinovlari", () => {
-  const PG_CONNECTION = "postgresql://postgres@127.0.0.1:5432/mulknazorat_sprint05b_test";
+  const PG_CONNECTION =
+    process.env.DATABASE_URL ||
+    process.env.TEST_DATABASE_URL ||
+    "postgresql://postgres@127.0.0.1:5432/mulknazorat_sprint05b_test";
   let pool: Pool;
   let orgId: string;
   let buildingId: string;
@@ -17,6 +20,9 @@ describe("AssetAudit — Sprint 13: Bino, Qavat, Xona va Inventar Update / Soft-
   let itemId: string;
 
   before(async () => {
+    if (!PG_CONNECTION.toLowerCase().includes("test")) {
+      throw new Error("FAIL-CLOSED: Testlar faqat nomida 'test' bo'lgan izolyatsiyalangan test bazasida bajarilishi shart.");
+    }
     pool = new Pool({ connectionString: PG_CONNECTION, max: 2 });
     const ts = Date.now();
 

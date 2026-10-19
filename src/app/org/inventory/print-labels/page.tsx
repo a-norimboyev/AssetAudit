@@ -66,7 +66,7 @@ export default async function BulkPrintLabelsPage({ searchParams }: PageProps) {
               <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                 <QrCode className="w-5 h-5" />
               </div>
-              <span>Ommaviy QR Yorliqlar (Bulk Labels)</span>
+              <span>Ommaviy QR Yorliqlar</span>
             </h1>
           </div>
 

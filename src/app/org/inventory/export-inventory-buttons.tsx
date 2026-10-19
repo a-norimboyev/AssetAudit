@@ -41,7 +41,7 @@ export function ExportInventoryButtons({ filters }: ExportInventoryButtonsProps)
         "Xona nomi",
         "Holati",
         "Texnik holati",
-        "Narxi (UZS)",
+        "Narxi, UZS",
         "Tavsif",
         "Yaratilgan sana",
       ]) + "\n";

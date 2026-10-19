@@ -276,36 +276,72 @@ export async function getReconciliationReport(options: {
     buildingName: string;
   }> = [];
 
-  if (completedRoomIds.length > 0) {
-    const [missingRes] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(items)
-      .where(
-        and(
-          eq(items.organizationId, options.organizationId),
-          sql`${items.roomId} IN ${completedRoomIds}`,
-          sql`${items.id} NOT IN (SELECT item_id FROM scan_events WHERE scan_events.cycle_id = ${options.cycleId} AND scan_events.organization_id = ${options.organizationId})`
-        )
-      );
-    missingItemsCount = missingRes?.count ?? 0;
+  const hasSnapshot = (cycleSnapshotRes[0]?.count ?? 0) > 0;
 
-    missingRows = await db
-      .select({
-        id: items.id,
-        name: items.name,
-        inventoryNumber: items.inventoryNumber,
-        roomNumber: sql<string>`COALESCE((SELECT room_number FROM rooms WHERE rooms.id = ${items.roomId}), 'N/A')`,
-        buildingName: sql<string>`COALESCE((SELECT buildings.name FROM rooms JOIN buildings ON rooms.building_id = buildings.id WHERE rooms.id = ${items.roomId}), 'N/A')`,
-      })
-      .from(items)
-      .where(
-        and(
-          eq(items.organizationId, options.organizationId),
-          sql`${items.roomId} IN ${completedRoomIds}`,
-          sql`${items.id} NOT IN (SELECT item_id FROM scan_events WHERE scan_events.cycle_id = ${options.cycleId} AND scan_events.organization_id = ${options.organizationId})`
+  if (completedRoomIds.length > 0) {
+    if (hasSnapshot) {
+      const [missingRes] = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(cycleItems)
+        .where(
+          and(
+            eq(cycleItems.cycleId, options.cycleId),
+            eq(cycleItems.organizationId, options.organizationId),
+            sql`${cycleItems.expectedRoomId} IN ${completedRoomIds}`,
+            sql`${cycleItems.itemId} NOT IN (SELECT item_id FROM scan_events WHERE scan_events.cycle_id = ${options.cycleId} AND scan_events.organization_id = ${options.organizationId})`
+          )
+        );
+      missingItemsCount = missingRes?.count ?? 0;
+
+      missingRows = await db
+        .select({
+          id: cycleItems.itemId,
+          name: cycleItems.itemName,
+          inventoryNumber: cycleItems.inventoryNumber,
+          roomNumber: sql<string>`COALESCE((SELECT room_number FROM rooms WHERE rooms.id = ${cycleItems.expectedRoomId}), 'N/A')`,
+          buildingName: sql<string>`COALESCE((SELECT buildings.name FROM rooms JOIN buildings ON rooms.building_id = buildings.id WHERE rooms.id = ${cycleItems.expectedRoomId}), 'N/A')`,
+        })
+        .from(cycleItems)
+        .where(
+          and(
+            eq(cycleItems.cycleId, options.cycleId),
+            eq(cycleItems.organizationId, options.organizationId),
+            sql`${cycleItems.expectedRoomId} IN ${completedRoomIds}`,
+            sql`${cycleItems.itemId} NOT IN (SELECT item_id FROM scan_events WHERE scan_events.cycle_id = ${options.cycleId} AND scan_events.organization_id = ${options.organizationId})`
+          )
         )
-      )
-      .limit(100);
+        .limit(100);
+    } else {
+      const [missingRes] = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(items)
+        .where(
+          and(
+            eq(items.organizationId, options.organizationId),
+            sql`${items.roomId} IN ${completedRoomIds}`,
+            sql`${items.id} NOT IN (SELECT item_id FROM scan_events WHERE scan_events.cycle_id = ${options.cycleId} AND scan_events.organization_id = ${options.organizationId})`
+          )
+        );
+      missingItemsCount = missingRes?.count ?? 0;
+
+      missingRows = await db
+        .select({
+          id: items.id,
+          name: items.name,
+          inventoryNumber: items.inventoryNumber,
+          roomNumber: sql<string>`COALESCE((SELECT room_number FROM rooms WHERE rooms.id = ${items.roomId}), 'N/A')`,
+          buildingName: sql<string>`COALESCE((SELECT buildings.name FROM rooms JOIN buildings ON rooms.building_id = buildings.id WHERE rooms.id = ${items.roomId}), 'N/A')`,
+        })
+        .from(items)
+        .where(
+          and(
+            eq(items.organizationId, options.organizationId),
+            sql`${items.roomId} IN ${completedRoomIds}`,
+            sql`${items.id} NOT IN (SELECT item_id FROM scan_events WHERE scan_events.cycle_id = ${options.cycleId} AND scan_events.organization_id = ${options.organizationId})`
+          )
+        )
+        .limit(100);
+    }
   }
 
   const baselineExpected = (cycleSnapshotRes[0]?.count ?? 0) > 0

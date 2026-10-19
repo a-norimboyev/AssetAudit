@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Edit2, X, Building2, Loader2, CheckCircle2, AlertCircle, Power, Hourglass, Sparkles } from "lucide-react";
+import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
 import {
   updateOrganizationAction,
   toggleOrganizationStatusAction,
@@ -43,6 +44,7 @@ interface EditOrganizationModalProps {
 
 export function EditOrganizationModal({ organization, types, trigger }: EditOrganizationModalProps) {
   const [isOpen, setIsOpen] = useState(false);
+  useBodyScrollLock(isOpen);
   const [isPending, setIsPending] = useState(false);
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
   const [name, setName] = useState(organization.name);
@@ -192,10 +194,10 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
       )}
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in overscroll-contain">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden text-left overscroll-contain max-h-[90vh] flex flex-col">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                   <Building2 className="w-4 h-4" />
@@ -214,7 +216,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
               {result?.success && (
                 <div className="p-3.5 rounded-xl text-xs flex items-center gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -394,7 +396,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                   <div className="text-[11px] text-slate-500">
                     Joriy holat:{" "}
                     <strong className={organization.isActive ? "text-emerald-600" : "text-slate-500"}>
-                      {organization.isActive ? "Faol" : "Nofaol (bloklangan)"}
+                      {organization.isActive ? "Faol" : "Nofaol"}
                     </strong>
                   </div>
                 </div>

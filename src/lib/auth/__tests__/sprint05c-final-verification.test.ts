@@ -13,12 +13,18 @@ import {
 import { verifyTenantAccess } from "../authorization-rules";
 
 describe("AssetAudit — 10X Final Verification Sprint: To'liq Xavfsizlik va Migratsiya Sinovlari", () => {
-  const PG_HOST = "127.0.0.1";
-  const PG_PORT = 5432;
-  const PG_USER = "postgres";
-  const ROOT_CONNECTION = `postgresql://${PG_USER}@${PG_HOST}:${PG_PORT}/postgres`;
-  const SHADOW_DB_NAME = "mulknazorat_sprint05b_test";
-  const SHADOW_CONNECTION = `postgresql://${PG_USER}@${PG_HOST}:${PG_PORT}/${SHADOW_DB_NAME}`;
+  const defaultConnStr =
+    process.env.DATABASE_URL ||
+    process.env.TEST_DATABASE_URL ||
+    "postgresql://postgres@127.0.0.1:5432/mulknazorat_sprint05b_test";
+  const parsedUrl = new URL(defaultConnStr);
+  const PG_HOST = parsedUrl.hostname || "127.0.0.1";
+  const PG_PORT = parseInt(parsedUrl.port || "5432", 10);
+  const PG_USER = parsedUrl.username || "postgres";
+  const PG_PASS = parsedUrl.password;
+  const authPrefix = PG_PASS ? `${PG_USER}:${PG_PASS}@` : (PG_USER ? `${PG_USER}@` : "");
+  const ROOT_CONNECTION = `postgresql://${authPrefix}${PG_HOST}:${PG_PORT}/postgres`;
+  const SHADOW_CONNECTION = defaultConnStr;
   const BASE_URL = process.env.TEST_SERVER_URL || "http://localhost:3001";
 
   // =========================================================================
@@ -37,6 +43,9 @@ describe("AssetAudit — 10X Final Verification Sprint: To'liq Xavfsizlik va Mig
     let testOrgId: string;
 
     before(async () => {
+      if (!SHADOW_CONNECTION.toLowerCase().includes("test")) {
+        throw new Error("FAIL-CLOSED: Testlar faqat nomida 'test' bo'lgan izolyatsiyalangan test bazasida bajarilishi shart.");
+      }
       shadowPool = new Pool({ connectionString: SHADOW_CONNECTION, max: 2 });
       const ts = Date.now() + Math.floor(Math.random() * 100000);
       superAdminEmail = `superadmin-${ts}@assetaudit.uz`;

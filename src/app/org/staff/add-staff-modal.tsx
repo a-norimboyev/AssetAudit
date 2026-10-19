@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useActionState } from "react";
-import { Plus, X, UserPlus, Loader2, CheckCircle2, AlertCircle, Copy, Check, Eye, EyeOff, Info, KeyRound } from "lucide-react";
+import { Plus, X, UserPlus, Loader2, CheckCircle2, AlertCircle, Copy, Check, Eye, EyeOff, KeyRound } from "lucide-react";
 import { createStaffMemberAction, type StaffActionResponse } from "@/lib/actions/staff";
+import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
 
 export function AddStaffModal() {
   const [isOpen, setIsOpen] = useState(false);
+  useBodyScrollLock(isOpen);
   const [showPassword, setShowPassword] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -49,8 +51,8 @@ export function AddStaffModal() {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in overscroll-contain">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden overscroll-contain">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -141,7 +143,7 @@ export function AddStaffModal() {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                    Xodimning to‘liq ismi (F.I.SH) <span className="text-rose-500">*</span>
+                    Xodimning to‘liq ismi <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -185,10 +187,10 @@ export function AddStaffModal() {
                     className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
                   >
                     <option value="inspector">
-                      Inventarizatsiya Tekshiruvchisi (Inspector) — faqat QR skanerlaydi
+                      Inventarizatsiya Tekshiruvchisi — faqat QR skanerlaydi
                     </option>
                     <option value="registrar">
-                      Moddiy Javobgar Shaxs (Registrar) — yangi inventar kiritadi
+                      Moddiy Javobgar Shaxs — yangi inventar kiritadi
                     </option>
                   </select>
                 </div>

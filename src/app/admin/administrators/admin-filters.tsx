@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Search, X, Loader2 } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 import { AddAdminModal } from "./add-admin-modal";
 

@@ -138,7 +138,7 @@ export default async function OrgReportsPage({ searchParams }: PageProps) {
             </div>
 
             <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
-              <span className="text-xs text-slate-400 font-semibold">Yo‘qolgan (Yetishmaydi)</span>
+              <span className="text-xs text-slate-400 font-semibold">Yo‘qolgan</span>
               <div className="text-2xl sm:text-3xl font-bold text-rose-600 mt-2 tracking-tight">
                 {report.missingItemsCount} <span className="text-xs font-normal text-slate-400">ta</span>
               </div>
@@ -189,7 +189,7 @@ export default async function OrgReportsPage({ searchParams }: PageProps) {
                           <span className="inline-flex items-center gap-1.5 text-slate-700 font-medium">
                             <DoorClosed className="w-3.5 h-3.5 text-slate-400" />
                             <span>{c.expectedRoomNumber}-xona</span>
-                            <span className="text-slate-400 text-xs">({c.expectedBuildingName})</span>
+                            <span className="text-slate-400 text-xs">· {c.expectedBuildingName}</span>
                           </span>
                         </td>
 
@@ -197,7 +197,7 @@ export default async function OrgReportsPage({ searchParams }: PageProps) {
                           <span className="inline-flex items-center gap-1.5 font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
                             <DoorClosed className="w-3.5 h-3.5 text-amber-600" />
                             <span>{c.scannedRoomNumber}-xona</span>
-                            <span className="font-normal text-[11px]">({c.scannedBuildingName})</span>
+                            <span className="font-normal text-[11px]">· {c.scannedBuildingName}</span>
                           </span>
                         </td>
 
@@ -257,13 +257,13 @@ export default async function OrgReportsPage({ searchParams }: PageProps) {
                           <span className="inline-flex items-center gap-1.5 text-slate-700 font-medium">
                             <DoorClosed className="w-3.5 h-3.5 text-slate-400" />
                             <span>{m.roomNumber}-xona</span>
-                            <span className="text-slate-400 text-xs">({m.buildingName})</span>
+                            <span className="text-slate-400 text-xs">· {m.buildingName}</span>
                           </span>
                         </td>
 
                         <td className="px-5 py-3.5">
                           <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 px-3 py-1 rounded-full border border-rose-200">
-                            <span>Topilmadi (Xona auditi yakunlangan)</span>
+                            <span>Topilmadi</span>
                           </span>
                         </td>
                       </tr>

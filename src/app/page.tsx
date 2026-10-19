@@ -10,7 +10,6 @@ import {
   FileSpreadsheet,
   Users,
   QrCode,
-  Calendar,
   Check,
   X,
   Phone,
@@ -115,7 +114,7 @@ export default function Home() {
                 href="#contact"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base font-semibold shadow-xs hover:shadow-md transition-all"
               >
-                <span>Tashkilotni ulash (Ariza)</span>
+                <span>Tashkilotni ulash</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
 
@@ -178,10 +177,6 @@ export default function Home() {
                   <p className="text-xs text-slate-500">
                     2026-yil 1-davr inventarizatsiyasi: binolar, xonalar va joylashuv nazorati
                   </p>
-                </div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white border border-slate-200 text-xs font-medium text-slate-600 shadow-2xs self-start">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                  <span>2026-yil Bahor Kampaniyasi</span>
                 </div>
               </div>
 
@@ -257,7 +252,7 @@ export default function Home() {
 
                     <div>
                       <div className="flex justify-between text-slate-700 mb-1">
-                        <span className="font-semibold">A-bino (Fakultet)</span>
+                        <span className="font-semibold">A-bino</span>
                         <span className="font-bold">75% yakunlandi</span>
                       </div>
                       <div className="w-full h-2 rounded bg-slate-100 overflow-hidden">

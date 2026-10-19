@@ -40,7 +40,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     if (!authSession || !authSession.user) {
       return NextResponse.json(
-        { error: "Autentifikatsiya talab etiladi (Kirish taqiqlangan)", code: "AUTHENTICATION_REQUIRED" },
+        { error: "Autentifikatsiya talab etiladi", code: "AUTHENTICATION_REQUIRED" },
         { status: 401 }
       );
     }

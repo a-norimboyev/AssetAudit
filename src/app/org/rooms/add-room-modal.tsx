@@ -4,6 +4,9 @@ import { useState, useActionState, useEffect } from "react";
 import { Plus, X, DoorClosed, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { createRoomAction, type ActionResponse } from "@/lib/actions/locations";
 
+import { type RoomTypeOption } from "@/lib/constants/room-types";
+import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
+
 interface BuildingOption {
   id: string;
   name: string;
@@ -20,12 +23,19 @@ interface FloorOption {
 export function AddRoomModal({
   buildings,
   floors,
+  defaultBuildingId = "",
+  defaultFloorId = "",
 }: {
   buildings: BuildingOption[];
   floors: FloorOption[];
+  roomTypes?: RoomTypeOption[];
+  defaultBuildingId?: string;
+  defaultFloorId?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedBuildingId, setSelectedBuildingId] = useState("");
+  useBodyScrollLock(isOpen);
+  const [selectedBuildingId, setSelectedBuildingId] = useState(defaultBuildingId);
+  const [selectedFloorId, setSelectedFloorId] = useState(defaultFloorId);
   const [state, formAction, isPending] = useActionState<ActionResponse | null, FormData>(
     createRoomAction,
     null
@@ -34,6 +44,12 @@ export function AddRoomModal({
   const availableFloors = selectedBuildingId
     ? floors.filter((f) => f.buildingId === selectedBuildingId)
     : floors;
+
+  function handleOpen() {
+    if (defaultBuildingId) setSelectedBuildingId(defaultBuildingId);
+    if (defaultFloorId) setSelectedFloorId(defaultFloorId);
+    setIsOpen(true);
+  }
 
   useEffect(() => {
     if (state?.success) {
@@ -47,7 +63,7 @@ export function AddRoomModal({
   return (
     <>
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={handleOpen}
         disabled={buildings.length === 0 || floors.length === 0}
         className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-2xs hover:shadow-xs transition-all disabled:opacity-50 cursor-pointer"
         title={
@@ -61,8 +77,8 @@ export function AddRoomModal({
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in overscroll-contain">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden overscroll-contain">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -109,13 +125,16 @@ export function AddRoomModal({
                     name="buildingId"
                     required
                     value={selectedBuildingId}
-                    onChange={(e) => setSelectedBuildingId(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedBuildingId(e.target.value);
+                      setSelectedFloorId("");
+                    }}
                     className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
                   >
                     <option value="">Binoni tanlang...</option>
                     {buildings.map((b) => (
                       <option key={b.id} value={b.id}>
-                        {b.name} ({b.code})
+                        {b.name}
                       </option>
                     ))}
                   </select>
@@ -131,6 +150,8 @@ export function AddRoomModal({
                   <select
                     name="floorId"
                     required
+                    value={selectedFloorId}
+                    onChange={(e) => setSelectedFloorId(e.target.value)}
                     disabled={!selectedBuildingId}
                     className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 disabled:opacity-50 transition-all"
                   >
@@ -182,45 +203,8 @@ export function AddRoomModal({
                 </div>
               </div>
 
-              {/* Xona turi va Sig'imi */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                    Xona turi <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    name="type"
-                    defaultValue="office"
-                    required
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
-                  >
-                    <option value="classroom">O‘quv xonasi (Auditoriya)</option>
-                    <option value="lab">Laboratoriya</option>
-                    <option value="office">Xizmat xonasi (Ofis)</option>
-                    <option value="warehouse">Omborxona</option>
-                    <option value="library">Kutubxona / O‘quv zali</option>
-                    <option value="conference">Majlislar zali</option>
-                    <option value="server_room">Server xonasi</option>
-                    <option value="other">Boshqa xona</option>
-                  </select>
-                  {state?.fieldErrors?.type && (
-                    <p className="mt-1 text-[11px] text-rose-600">{state.fieldErrors.type}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                    O‘rinlar sig‘imi (ixtiyoriy)
-                  </label>
-                  <input
-                    type="number"
-                    name="capacity"
-                    min={0}
-                    placeholder="Masalan: 30"
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 text-slate-900 transition-all"
-                  />
-                </div>
-              </div>
+              {/* Xona turi hozircha talab qilinmaydi, keyinchalik qayta qo'shiladi */}
+              <input type="hidden" name="type" value="lecture_hall" />
 
               <div className="pt-2 flex items-center justify-end gap-2.5">
                 <button

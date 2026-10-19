@@ -14,6 +14,36 @@ export interface ActionResponse {
   data?: unknown;
 }
 
+function generateBuildingCode(name: string): string {
+  const uzbekMap: Record<string, string> = {
+    "o‘": "o", "oʻ": "o", "g‘": "g", "gʻ": "g",
+    "O‘": "O", "Oʻ": "O", "G‘": "G", "Gʻ": "G",
+    "ў": "o", "Ў": "O", "ғ": "g", "Ғ": "G",
+    "ш": "sh", "Ш": "SH", "ч": "ch", "Ч": "CH",
+    "ҳ": "h", "Ҳ": "H", "қ": "q", "Қ": "Q",
+    "ь": "", "ъ": "",
+    "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ё": "yo",
+    "ж": "j", "з": "z", "и": "i", "й": "y", "к": "k", "л": "l", "м": "m",
+    "н": "n", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "у": "u",
+    "ф": "f", "х": "x", "ц": "ts", "э": "e", "ю": "yu", "я": "ya",
+  };
+
+  let normalized = name.trim();
+  for (const [k, v] of Object.entries(uzbekMap)) {
+    normalized = normalized.replaceAll(k, v);
+  }
+
+  const cleaned = normalized
+    .toUpperCase()
+    .replace(/[^A-Z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .slice(0, 20);
+
+  return cleaned || "BINO";
+}
+
 /**
  * 1. Yangi Bino qo'shish (Server Action)
  * Faqat Tashkilot Administratori vakolatiga ega
@@ -26,7 +56,7 @@ export async function createBuildingAction(
     const { organization } = await requireOrganizationAdmin();
 
     const name = (formData.get("name") as string)?.trim() || "";
-    const code = (formData.get("code") as string)?.trim().toUpperCase() || "";
+    let code = (formData.get("code") as string)?.trim().toUpperCase() || "";
     const address = (formData.get("address") as string)?.trim() || "";
     const floorsCount = Math.max(1, parseInt(formData.get("floorsCount") as string, 10) || 1);
 
@@ -34,10 +64,6 @@ export async function createBuildingAction(
 
     if (!name || name.length < 2) {
       fieldErrors.name = "Bino nomi kamida 2 ta belgidan iborat bo'lishi shart.";
-    }
-
-    if (!code || code.length < 1) {
-      fieldErrors.code = "Bino kodi kiritilishi shart (masalan: A, BOSH, 1).";
     }
 
     if (floorsCount < 1 || floorsCount > 50) {
@@ -48,19 +74,40 @@ export async function createBuildingAction(
       return { success: false, message: "Kiritilgan ma'lumotlarda xatolik bor.", fieldErrors };
     }
 
-    // Bino kodi ushbu tashkilotda takrorlanmasligini tekshirish
-    const [existing] = await db
-      .select({ id: buildings.id })
-      .from(buildings)
-      .where(and(eq(buildings.organizationId, organization.id), eq(buildings.code, code)))
-      .limit(1);
+    if (!code) {
+      const baseCode = generateBuildingCode(name);
+      let candidate = baseCode;
+      let counter = 1;
 
-    if (existing) {
-      return {
-        success: false,
-        message: `Ushbu tashkilotda "${code}" kodli bino allaqachon mavjud.`,
-        fieldErrors: { code: "Ushbu bino kodi band." },
-      };
+      while (true) {
+        const [existing] = await db
+          .select({ id: buildings.id })
+          .from(buildings)
+          .where(and(eq(buildings.organizationId, organization.id), eq(buildings.code, candidate)))
+          .limit(1);
+
+        if (!existing) {
+          code = candidate;
+          break;
+        }
+        counter++;
+        candidate = `${baseCode.slice(0, 15)}-${counter}`;
+      }
+    } else {
+      // Bino kodi ushbu tashkilotda takrorlanmasligini tekshirish
+      const [existing] = await db
+        .select({ id: buildings.id })
+        .from(buildings)
+        .where(and(eq(buildings.organizationId, organization.id), eq(buildings.code, code)))
+        .limit(1);
+
+      if (existing) {
+        return {
+          success: false,
+          message: `Ushbu tashkilotda "${code}" kodli bino allaqachon mavjud.`,
+          fieldErrors: { code: "Ushbu bino kodi band." },
+        };
+      }
     }
 
     // Tranzaksiya: Bino yaratish va dastlabki qavatlarni avtomatik yaratish
@@ -204,7 +251,10 @@ export async function createRoomAction(
     const floorId = (formData.get("floorId") as string)?.trim();
     const roomNumber = (formData.get("roomNumber") as string)?.trim() || "";
     const name = (formData.get("name") as string)?.trim() || "";
-    const type = ((formData.get("type") as string)?.trim() || "office") as RoomType;
+    const rawType = (formData.get("type") as string)?.trim();
+    const type: RoomType = rawType && (ROOM_TYPES as readonly string[]).includes(rawType as RoomType)
+      ? (rawType as RoomType)
+      : "classroom";
     const capacityRaw = formData.get("capacity") as string;
     const capacity = capacityRaw ? parseInt(capacityRaw, 10) : null;
 
@@ -214,7 +264,6 @@ export async function createRoomAction(
     if (!floorId) fieldErrors.floorId = "Qavat tanlanishi shart.";
     if (!roomNumber) fieldErrors.roomNumber = "Xona raqami kiritilishi shart (masalan: 101, 204-A).";
     if (!name) fieldErrors.name = "Xona nomi kiritilishi shart.";
-    if (!ROOM_TYPES.includes(type)) fieldErrors.type = "Yaroqsiz xona turi tanlandi.";
 
     if (Object.keys(fieldErrors).length > 0) {
       return { success: false, message: "Kiritilgan ma'lumotlarda xatolik bor.", fieldErrors };
@@ -447,7 +496,10 @@ export async function updateRoomAction(
 
     const roomId = (formData.get("roomId") as string)?.trim();
     const name = (formData.get("name") as string)?.trim() || "";
-    const type = ((formData.get("type") as string)?.trim() || "office") as RoomType;
+    const rawType = (formData.get("type") as string)?.trim();
+    const type: RoomType | undefined = rawType && (ROOM_TYPES as readonly string[]).includes(rawType as RoomType)
+      ? (rawType as RoomType)
+      : undefined;
     const capacityRaw = formData.get("capacity") as string;
     const capacity = capacityRaw ? parseInt(capacityRaw, 10) : null;
     const isActiveVal = formData.get("isActive");
@@ -455,7 +507,6 @@ export async function updateRoomAction(
 
     if (!roomId) return { success: false, message: "Xona ID ko'rsatilmadi." };
     if (!name) return { success: false, message: "Xona nomi kiritilishi shart." };
-    if (!ROOM_TYPES.includes(type)) return { success: false, message: "Yaroqsiz xona turi." };
 
     const [existing] = await db
       .select({ id: rooms.id, roomNumber: rooms.roomNumber })
@@ -469,7 +520,7 @@ export async function updateRoomAction(
       .update(rooms)
       .set({
         name,
-        type,
+        ...(type ? { type } : {}),
         capacity: capacity && capacity > 0 ? capacity : null,
         ...(isActive !== undefined ? { isActive } : {}),
       })

@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import {
-  User,
   Lock,
   Globe,
   KeyRound,
@@ -11,7 +10,6 @@ import {
   Eye,
   EyeOff,
   RefreshCw,
-  ShieldCheck,
   Save,
   Mail,
 } from "lucide-react";

@@ -21,7 +21,6 @@ test.describe("2. Bino, Qavat va Xonalar Boshqaruvi", () => {
 
     const buildingCode = `C${Date.now().toString().slice(-4)}`;
     await page.fill('input[name="name"]', `E2E Yangi Korpus ${buildingCode}`);
-    await page.fill('input[name="code"]', buildingCode);
     await page.click('form button[type="submit"]');
 
     // Muvaffaqiyat xabari

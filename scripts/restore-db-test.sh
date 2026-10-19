@@ -44,7 +44,7 @@ trap cleanup EXIT
 
 # 3. Zaxira faylini vaqtinchalik bazaga tiklash (pg_restore)
 echo "[3/4] Ma'lumotlarni tiklash bajarilmoqda..."
-pg_restore -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${TMP_DB}" --no-owner --no-privileges "${BACKUP_FILE}" || true
+pg_restore -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${TMP_DB}" --no-owner --no-privileges "${BACKUP_FILE}"
 
 # 4. Tiklangan ma'lumotlar butunligini tekshirish
 echo "======================================================================"

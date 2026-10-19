@@ -385,8 +385,15 @@ export async function exportInventoryDataAction(filters?: {
       status: filters?.status,
       search: filters?.search,
       page: 1,
-      pageSize: 5000,
+      pageSize: 10000,
     });
+
+    if (res.totalCount > 10000) {
+      return {
+        success: false,
+        message: `Eksport qilinayotgan inventarlar soni (${res.totalCount} ta) maksimal ruxsat etilgan 10 000 tadan ortiq. Iltimos, bino, toifa yoki holat filtrlari orqali saralangan holda eksport qiling.`,
+      };
+    }
 
     const exportRows: ExportInventoryRow[] = res.items.map((i) => ({
       inventoryNumber: i.inventoryNumber,
@@ -440,8 +447,15 @@ export async function exportInventoryExcelAction(filters?: {
       status: filters?.status,
       search: filters?.search,
       page: 1,
-      pageSize: 5000,
+      pageSize: 10000,
     });
+
+    if (res.totalCount > 10000) {
+      return {
+        success: false,
+        message: `Eksport qilinayotgan inventarlar soni (${res.totalCount} ta) maksimal ruxsat etilgan 10 000 tadan ortiq. Iltimos, bino, toifa yoki holat filtrlari orqali saralangan holda eksport qiling.`,
+      };
+    }
 
     const workbook = new ExcelJS.Workbook();
     workbook.creator = "AssetAudit Platform";

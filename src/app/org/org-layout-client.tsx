@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { OrgLogoutButton } from "./org-logout-button";
 import { LogoIcon } from "@/components/ui/logo";
+import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
 
 interface OrgLayoutClientProps {
   children: React.ReactNode;
@@ -33,6 +34,7 @@ interface OrgLayoutClientProps {
   profile: {
     fullName: string | null;
     role: string;
+    mustChangePassword?: boolean;
   };
   user: {
     email: string;
@@ -72,6 +74,7 @@ export function OrgLayoutClient({
   const pathname = usePathname();
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  useBodyScrollLock(isSidebarOpen);
   const [searchQuery, setSearchQuery] = useState("");
 
   const initials = getInitials(profile.fullName, user.username || user.email);
@@ -134,14 +137,14 @@ export function OrgLayoutClient({
       {isSidebarOpen && (
         <div
           onClick={() => setIsSidebarOpen(false)}
-          className="fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-xs lg:hidden transition-opacity"
+          className="fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-xs lg:hidden transition-opacity overscroll-contain"
           aria-hidden="true"
         />
       )}
 
       {/* Asosiy Chap Sidebar paneli (100% Preview dizayni bilan bir xil) */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 overscroll-contain ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -294,6 +297,23 @@ export function OrgLayoutClient({
             </button>
           </div>
         </header>
+
+        {profile.mustChangePassword && (
+          <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3 text-xs text-amber-900">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0 animate-pulse" />
+              <span>
+                <strong>Xavfsizlik eslatmasi:</strong> Dastlabki vaqtinchalik paroldan foydalanmoqdasiz. Xavfsizlikni ta&apos;minlash uchun yangi shaxsiy parol o&apos;rnating.
+              </span>
+            </div>
+            <Link
+              href="/org/settings"
+              className="px-2.5 py-1 rounded-md bg-amber-600 hover:bg-amber-700 text-white font-medium shrink-0 transition"
+            >
+              Parolni almashtirish &rarr;
+            </Link>
+          </div>
+        )}
 
         {/* Sahifa ichki kontenti */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">{children}</main>

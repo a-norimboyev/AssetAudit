@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { requirePlatformAdmin } from "@/lib/auth/authorization";
 import { db } from "@/lib/db";
-import { user, account, session } from "@/lib/db/schema/auth";
+import { user, account } from "@/lib/db/schema/auth";
 import { eq, and, ne, or } from "drizzle-orm";
 import { hashPassword, verifyPassword } from "better-auth/crypto";
 import { logSecurityAudit } from "@/lib/audit/logger";

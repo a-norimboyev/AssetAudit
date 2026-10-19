@@ -195,7 +195,6 @@ export async function createOrganizationAction(
           subscriptionExpiresAt: data.subscriptionExpiresAt,
           subscriptionNotes: data.subscriptionNotes,
           logoUrl: data.logoUrl,
-          adminPassword: finalPassword || undefined,
           adminPhone: data.adminPhone?.trim() || undefined,
         },
         tx
@@ -236,7 +235,7 @@ export async function createOrganizationAction(
           role: "organization_admin",
           fullName: finalAdminFullName,
           isActive: true,
-          mustChangePassword: false,
+          mustChangePassword: true,
           createdAt: now,
           updatedAt: now,
         });
@@ -291,7 +290,7 @@ export async function createOrganizationAction(
             email: finalEmail,
             temporaryPassword: finalPassword,
             fullName: finalAdminFullName,
-            role: "Tashkilot Rahbari (Administrator)",
+            role: "Tashkilot Rahbari",
           }
         : undefined,
     };

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Menu, Search, Bell, Sparkles } from "lucide-react";
+import { Menu, Search, Bell } from "lucide-react";
 
 interface DashboardHeaderProps {
   onMenuToggle: () => void;

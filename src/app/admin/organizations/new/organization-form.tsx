@@ -15,7 +15,6 @@ import {
   Check,
   Hourglass,
   Sparkles,
-  Phone,
 } from "lucide-react";
 import { createOrganizationAction } from "../actions";
 import { validateOrganizationInput, generateCodeFromName } from "@/lib/validations/organization";

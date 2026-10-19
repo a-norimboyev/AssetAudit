@@ -4,15 +4,10 @@ import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Search,
-  Filter,
-  FileSpreadsheet,
-  FileText,
   Loader2,
   X,
   ChevronDown,
 } from "lucide-react";
-import { exportInventoryDataAction, exportInventoryExcelAction } from "@/lib/actions/inventory";
-import { buildCsvRow } from "@/lib/utils/csv";
 
 interface BuildingOption {
   id: string;
@@ -26,18 +21,16 @@ interface CategoryOption {
 }
 
 interface InventoryFiltersProps {
-  categories: CategoryOption[];
+  categories?: CategoryOption[];
   buildings: BuildingOption[];
-  currentCategoryId: string;
+  currentCategoryId?: string;
   currentBuildingId: string;
   currentStatus: string;
   currentSearch: string;
 }
 
 export function InventoryFilters({
-  categories,
   buildings,
-  currentCategoryId,
   currentBuildingId,
   currentStatus,
   currentSearch,
@@ -46,8 +39,6 @@ export function InventoryFilters({
   const searchParams = useSearchParams();
 
   const [search, setSearch] = useState(currentSearch);
-  const [isExportingCsv, setIsExportingCsv] = useState(false);
-  const [isExportingExcel, setIsExportingExcel] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function updateQuery(updates: Record<string, string | null>) {
@@ -77,109 +68,8 @@ export function InventoryFilters({
     updateQuery({ q: null });
   }
 
-  async function handleExportCsv() {
-    setIsExportingCsv(true);
-    try {
-      const res = await exportInventoryDataAction({
-        categoryId: currentCategoryId !== "all" ? currentCategoryId : undefined,
-        buildingId: currentBuildingId !== "all" ? currentBuildingId : undefined,
-        status: currentStatus !== "all" ? currentStatus : undefined,
-        search: currentSearch || undefined,
-      });
-
-      if (!res.success || !res.data) {
-        alert(res.message || "Eksport qilishda xatolik yuz berdi.");
-        return;
-      }
-
-      let csv = "\uFEFF";
-      csv += buildCsvRow([
-        "Inventar raqami",
-        "Nomi",
-        "Toifasi",
-        "Bino",
-        "Xona",
-        "Holati",
-        "Sifati",
-        "Narxi",
-        "Tavsif",
-        "Kiritilgan sana",
-      ]) + "\n";
-
-      for (const row of res.data) {
-        csv += buildCsvRow([
-          row.inventoryNumber,
-          row.name,
-          row.categoryName,
-          row.buildingName,
-          `${row.roomNumber} (${row.roomName})`,
-          row.status,
-          row.condition,
-          row.price || "",
-          row.description || "",
-          row.createdAt,
-        ]) + "\n";
-      }
-
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `inventarlar_${new Date().toISOString().split("T")[0]}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch {
-      alert("CSV eksport qilishda tarmoq xatosi yuz berdi.");
-    } finally {
-      setIsExportingCsv(false);
-    }
-  }
-
-  async function handleExportExcel() {
-    setIsExportingExcel(true);
-    try {
-      const res = await exportInventoryExcelAction({
-        categoryId: currentCategoryId !== "all" ? currentCategoryId : undefined,
-        buildingId: currentBuildingId !== "all" ? currentBuildingId : undefined,
-        status: currentStatus !== "all" ? currentStatus : undefined,
-        search: currentSearch || undefined,
-      });
-
-      if (!res.success || !res.base64) {
-        alert(res.message || "Excel eksport qilishda xatolik yuz berdi.");
-        return;
-      }
-
-      const byteCharacters = atob(res.base64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", res.filename || `inventarlar_${new Date().toISOString().split("T")[0]}.xlsx`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch {
-      alert("Excel eksport qilishda tarmoq xatosi yuz berdi.");
-    } finally {
-      setIsExportingExcel(false);
-    }
-  }
-
   return (
-    <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/80 shadow-2xs space-y-4">
-      {/* 1-qator: Qidiruv, Bino va Holat filtrlari + Eksport tugmalari */}
+    <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/80 shadow-2xs">
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
         {/* Qidiruv formasi */}
         <form onSubmit={handleSearchSubmit} className="flex-1 max-w-md flex items-center gap-2">
@@ -246,73 +136,7 @@ export function InventoryFilters({
             </select>
             <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
-
-          {/* Eksport Tugmalari */}
-          <div className="flex items-center gap-1.5 pl-1 border-l border-slate-200">
-            <button
-              onClick={handleExportCsv}
-              disabled={isExportingCsv || isExportingExcel}
-              type="button"
-              className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
-              title="Filtrlangan inventarlarni CSV formatida yuklab olish"
-            >
-              {isExportingCsv ? (
-                <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
-              ) : (
-                <FileText className="w-4 h-4 text-emerald-600" />
-              )}
-              <span className="hidden sm:inline">CSV</span>
-            </button>
-
-            <button
-              onClick={handleExportExcel}
-              disabled={isExportingCsv || isExportingExcel}
-              type="button"
-              className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
-              title="Filtrlangan inventarlarni to'liq Excel (.xlsx) formatida yuklab olish"
-            >
-              {isExportingExcel ? (
-                <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-              ) : (
-                <FileSpreadsheet className="w-4 h-4 text-blue-600" />
-              )}
-              <span className="hidden sm:inline">Excel</span>
-            </button>
-          </div>
         </div>
-      </div>
-
-      {/* 2-qator: Toifalar bo'yicha tezkor filtr tugmalari */}
-      <div className="pt-3 border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-        <span className="font-semibold text-slate-400 flex items-center gap-1 mr-1 shrink-0">
-          <Filter className="w-3.5 h-3.5" />
-          <span>Toifa:</span>
-        </span>
-        <button
-          type="button"
-          onClick={() => updateQuery({ categoryId: "all" })}
-          className={`px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap transition-all cursor-pointer ${
-            currentCategoryId === "all"
-              ? "bg-blue-600 text-white shadow-2xs"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-          }`}
-        >
-          Barchasi
-        </button>
-        {categories.map((c) => (
-          <button
-            key={c.id}
-            type="button"
-            onClick={() => updateQuery({ categoryId: c.id })}
-            className={`px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap transition-all cursor-pointer ${
-              currentCategoryId === c.id
-                ? "bg-blue-600 text-white shadow-2xs"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            }`}
-          >
-            {c.name}
-          </button>
-        ))}
       </div>
     </div>
   );

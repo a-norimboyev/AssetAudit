@@ -10,7 +10,6 @@ import {
   Building2,
   ArrowRight,
   Info,
-  Calendar,
   Layers,
 } from "lucide-react";
 import { StatCard } from "@/components/ui/StatCard";
@@ -81,7 +80,7 @@ export const DashboardView: React.FC = () => {
       itemsCount: 290,
     },
     {
-      name: "C-bino (Laboratoriya)",
+      name: "C-bino",
       code: "C-LAB",
       totalRooms: 26,
       auditedRooms: 8,
@@ -89,7 +88,7 @@ export const DashboardView: React.FC = () => {
       itemsCount: 240,
     },
     {
-      name: "E-bino (Axborot markazi)",
+      name: "E-bino",
       code: "E-BINO",
       totalRooms: 20,
       auditedRooms: 4,
@@ -98,14 +97,14 @@ export const DashboardView: React.FC = () => {
     },
   ];
 
-  // Joylashuv nomuvofiqliklari (Biznes qoidadagi 131-xona misoli bilan)
+  // Joylashuv nomuvofiqliklari
   const discrepancies: DiscrepancyItem[] = [
     {
       id: "disc-1",
-      name: "Ofis ish stoli (Yog‘och, 140x70)",
+      name: "Ofis ish stoli",
       invNumber: "TATU-2024-001314",
-      originalRoom: "131-xona (Kafedra)",
-      scannedRoom: "130-xona (O‘quv zali)",
+      originalRoom: "131-xona — Kafedra",
+      scannedRoom: "130-xona — O‘quv zali",
       building: "Bosh bino",
       inspectorName: "Sardor Rahimov",
       date: "Bugun, 14:20",
@@ -197,13 +196,6 @@ export const DashboardView: React.FC = () => {
             2026-yil 1-davr inventarizatsiyasi: binolar, xonalar va joylashuv nazorati
           </p>
         </div>
-
-        <div className="flex items-center gap-2 self-start md:self-auto">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-medium text-slate-600 shadow-2xs">
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
-            <span>2026-yil Bahor Kampaniyasi</span>
-          </div>
-        </div>
       </div>
 
       {/* Demo ma'lumotlar bo'yicha aniq ogohlantirish banneri */}
@@ -249,7 +241,7 @@ export const DashboardView: React.FC = () => {
         <StatCard
           title="Hali aniqlanmagan"
           value="248"
-          subtitle="Skanerlanmagan (Kutilmoqda)"
+          subtitle="Skanerlanmagan"
           icon={Clock}
           colorVariant="slate"
           badgeText="17.5%"

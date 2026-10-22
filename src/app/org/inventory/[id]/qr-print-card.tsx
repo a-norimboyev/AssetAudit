@@ -30,52 +30,21 @@ export function QrPrintCard({
 
   return (
     <div className="space-y-4">
-      {/* Chop etiladigan Stiker Kartasi (50x30mm / 70x35mm nisbatga mos) */}
+      {/* Chop etiladigan Stiker Kartasi (QR tepada, inventar raqami pastda) */}
       <div
         id="printable-qr-sticker"
-        className="p-4 sm:p-5 rounded-xl bg-white border-2 border-slate-900 shadow-2xs text-slate-900 max-w-sm mx-auto sm:mx-0"
+        className="p-4 rounded-xl bg-white border-2 border-slate-900 shadow-2xs text-slate-900 w-fit flex flex-col items-center justify-center text-center mx-auto sm:mx-0"
       >
-        <div className="flex items-center justify-between pb-2 border-b border-slate-200 text-[11px] font-bold">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="w-4 h-4 rounded bg-blue-600 text-white flex items-center justify-center text-[10px] shrink-0 font-bold">
-              A
-            </span>
-            <span className="tracking-tight truncate" title={organizationName}>
-              {organizationName}
-            </span>
-          </div>
-          <span className="font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
-            {organizationCode}
-          </span>
+        <div className="p-1.5 bg-white border border-slate-200 rounded-lg shadow-2xs">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={qrDataUrl}
+            alt={`QR kod: ${inventoryNumber}`}
+            className="w-28 h-28 sm:w-32 sm:h-32 object-contain"
+          />
         </div>
-
-        <div className="py-3 flex items-center gap-3">
-          <div className="shrink-0 p-1.5 bg-white border border-slate-200 rounded-lg shadow-2xs">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={qrDataUrl}
-              alt={`QR kod: ${inventoryNumber}`}
-              className="w-24 h-24 object-contain"
-            />
-          </div>
-          <div className="min-w-0 text-left">
-            <div className="font-mono font-black text-sm text-slate-950 tracking-tight">
-              {inventoryNumber}
-            </div>
-            <div className="font-semibold text-xs text-slate-800 line-clamp-2 mt-0.5 leading-snug">
-              {itemName}
-            </div>
-            <div className="text-[10px] text-slate-500 mt-1 flex items-center gap-1 font-medium">
-              <span>{buildingName}</span>
-              <span>•</span>
-              <span className="font-mono font-bold text-slate-700">{roomNumber}-xona</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[9px] text-slate-400 font-mono">
-          <span>Kamera orqali skanerlang</span>
-          <span>AssetAudit Rasmiy Mulk</span>
+        <div className="mt-2.5 font-mono font-black text-sm sm:text-base text-slate-950 tracking-wider text-center break-all">
+          {inventoryNumber}
         </div>
       </div>
 

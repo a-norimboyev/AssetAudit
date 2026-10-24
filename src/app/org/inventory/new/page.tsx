@@ -25,7 +25,7 @@ export default async function NewInventoryPage() {
     getItemCategoriesList(),
     getBuildingsList({ organizationId: organization.id, pageSize: 100 }),
     getFloorsList({ organizationId: organization.id }),
-    getRoomsList({ organizationId: organization.id, pageSize: 200 }),
+    getRoomsList({ organizationId: organization.id, pageSize: 1000 }),
   ]);
 
   const buildingOptions = buildingsRes.items.map((b) => ({

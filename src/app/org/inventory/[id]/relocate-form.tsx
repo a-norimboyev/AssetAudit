@@ -98,7 +98,7 @@ export function RelocateForm({
           >
             {buildings.map((b) => (
               <option key={b.id} value={b.id}>
-                {b.name} ({b.code})
+                {b.name}
               </option>
             ))}
           </select>
@@ -122,7 +122,7 @@ export function RelocateForm({
             <option value="">Qavatni tanlang...</option>
             {availableFloors.map((f) => (
               <option key={f.id} value={f.id}>
-                {f.name} ({f.floorNumber}-qavat)
+                {f.name}
               </option>
             ))}
           </select>

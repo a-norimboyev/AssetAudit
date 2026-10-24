@@ -34,7 +34,9 @@ export function AddRoomModal({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   useBodyScrollLock(isOpen);
-  const [selectedBuildingId, setSelectedBuildingId] = useState(defaultBuildingId);
+  const [selectedBuildingId, setSelectedBuildingId] = useState(
+    defaultBuildingId || (buildings.length === 1 ? buildings[0].id : "")
+  );
   const [selectedFloorId, setSelectedFloorId] = useState(defaultFloorId);
   const [state, formAction, isPending] = useActionState<ActionResponse | null, FormData>(
     createRoomAction,
@@ -158,7 +160,7 @@ export function AddRoomModal({
                     <option value="">Qavatni tanlang...</option>
                     {availableFloors.map((f) => (
                       <option key={f.id} value={f.id}>
-                        {f.name} ({f.floorNumber}-qavat)
+                        {f.name}
                       </option>
                     ))}
                   </select>

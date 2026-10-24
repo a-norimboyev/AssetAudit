@@ -201,7 +201,7 @@ export async function getRoomsList(options: {
   pageSize?: number;
 }): Promise<PaginatedResult<RoomListItem>> {
   const page = Math.max(1, options.page || 1);
-  const pageSize = Math.min(100, Math.max(1, options.pageSize || 25));
+  const pageSize = Math.min(1000, Math.max(1, options.pageSize || 25));
   const offset = (page - 1) * pageSize;
 
   const conditions = [eq(rooms.organizationId, options.organizationId)];

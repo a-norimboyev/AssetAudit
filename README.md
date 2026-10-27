@@ -34,7 +34,7 @@
 | **Ma'lumotlar Bazasi** | [PostgreSQL 16](https://www.postgresql.org) | Tranzaksion ACID xavfsizligi, Composite FK cheklovlari |
 | **ORM & Migratsiyalar** | [Drizzle ORM 0.45](https://orm.drizzle.team) | Zero-overhead tiplashtirilgan SQL migratsiyalari |
 | **Dizayn & UI** | [Tailwind CSS v4](https://tailwindcss.com) + Lucide | Zamonaviy va moslashuvchan korporativ interfeys |
-| **Test Tizimi** | Node Test Runner (`tsx --test`) + Playwright | 238 ta unit/integratsion test va 17 ta E2E test |
+| **Test Tizimi** | Node Test Runner (`tsx --test`) + Playwright | 251 ta unit/integratsion test va 17 ta E2E test |
 | **Deploy & OS** | Ubuntu 24.04 LTS, Nginx, PM2, Node 24 | Standalone production build |
 
 ---

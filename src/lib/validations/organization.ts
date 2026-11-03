@@ -31,7 +31,7 @@ export interface OrganizationValidationResult {
  * Tashkilot nomidan avtomatik qisqa kod yasash
  */
 export function generateCodeFromName(name: string): string {
-  if (!name || !name.trim()) return "ORG";
+  if (!name || !name.trim()) return "OTM";
   const clean = name
     .trim()
     .replace(/[‘'`"ʻ’]/g, "")
@@ -46,7 +46,7 @@ export function generateCodeFromName(name: string): string {
     const w = words[0].toUpperCase();
     if (w.length >= 2) return w.slice(0, 10);
   }
-  return `ORG-${Math.floor(100 + Math.random() * 900)}`;
+  return `OTM-${Math.floor(100 + Math.random() * 900)}`;
 }
 
 const CODE_REGEX = /^[A-Za-z0-9_-]{2,50}$/;

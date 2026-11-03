@@ -44,17 +44,17 @@ export function AdminLogoutButton() {
       <button
         onClick={handleLogout}
         disabled={isLoggingOut}
-        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all disabled:opacity-60 cursor-pointer"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-rose-50/60 hover:border-rose-200 hover:text-rose-600 text-slate-700 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all disabled:opacity-60 cursor-pointer"
         title="Tizimdan chiqish"
       >
         {isLoggingOut ? (
           <>
-            <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-500" />
-            <span>Chiqilmoqda...</span>
+            <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-500" />
+            <span className="text-rose-600">Chiqilmoqda...</span>
           </>
         ) : (
           <>
-            <LogOut className="w-3.5 h-3.5 text-slate-500" />
+            <LogOut className="w-3.5 h-3.5 text-slate-500 group-hover:text-rose-600" />
             <span>Chiqish</span>
           </>
         )}

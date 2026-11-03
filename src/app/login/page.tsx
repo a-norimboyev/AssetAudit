@@ -6,7 +6,7 @@ import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
 import {
   Lock,
-  Mail,
+  User,
   Eye,
   EyeOff,
   ArrowRight,
@@ -16,7 +16,6 @@ import {
   Phone,
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
-
 import { mapLoginError, NETWORK_ERROR_MESSAGE } from "@/lib/auth/login-errors";
 
 export default function LoginPage() {
@@ -43,7 +42,7 @@ export default function LoginPage() {
 
     const trimmedLogin = login.trim();
     if (!trimmedLogin) {
-      setErrorMessage("Kirish emailini kiriting.");
+      setErrorMessage("Loginni kiriting.");
       return;
     }
 
@@ -56,34 +55,30 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      let result;
       const normalizedLogin = trimmedLogin.toLowerCase();
+      let result;
 
-      // Super Admin yagona kirish logini: super@admin
+      // Super Admin yoki username orqali kirish
       if (
-        normalizedLogin === "super@admin" ||
         normalizedLogin === "superadmin" ||
+        normalizedLogin === "super@admin" ||
         normalizedLogin === "superadmin@auth.assetaudit.uz"
       ) {
-        result = await signIn.email({
-          email: "superadmin@auth.assetaudit.uz",
+        result = await signIn.username({
+          username: "superadmin",
           password,
           rememberMe: true,
         });
-      } else if (normalizedLogin.includes("@") && normalizedLogin.includes(".")) {
-        result = await signIn.email({
-          email: normalizedLogin,
-          password,
-          rememberMe: true,
-        });
+
+        // Agar username bilan topilmasa, email orqali sinab ko'rish
         if (result.error) {
-          const uRes = await signIn.username({
-            username: normalizedLogin,
+          const emailRes = await signIn.email({
+            email: "superadmin@auth.assetaudit.uz",
             password,
             rememberMe: true,
           });
-          if (!uRes.error) {
-            result = uRes;
+          if (!emailRes.error) {
+            result = emailRes;
           }
         }
       } else {
@@ -92,14 +87,16 @@ export default function LoginPage() {
           password,
           rememberMe: true,
         });
-        if (result.error && normalizedLogin.includes("@")) {
-          const eRes = await signIn.email({
-            email: normalizedLogin,
+
+        // Agar foydalanuvchi tizimda email formatida saqlangan bo'lsa
+        if (result.error && !normalizedLogin.includes("@")) {
+          const fallbackRes = await signIn.email({
+            email: `${normalizedLogin}@auth.assetaudit.uz`,
             password,
             rememberMe: true,
           });
-          if (!eRes.error) {
-            result = eRes;
+          if (!fallbackRes.error) {
+            result = fallbackRes;
           }
         }
       }
@@ -124,7 +121,7 @@ export default function LoginPage() {
           if (meData.code === "ACCOUNT_INACTIVE") {
             setErrorMessage("Akkauntingiz faolsizlantirilgan. Administratorga murojaat qiling.");
           } else {
-            setErrorMessage(meData.message || "Foydalanuvchi biznes-profili topilmadi.");
+            setErrorMessage(meData.message || "Foydalanuvchi profili topilmadi.");
           }
           isSubmittingRef.current = false;
           setIsLoading(false);
@@ -171,7 +168,7 @@ export default function LoginPage() {
               Tizimga kirish
             </h1>
             <p className="mt-1.5 text-xs sm:text-sm text-slate-500">
-              AssetAudit inventarizatsiya platformasi boshqaruv portali
+              OTM aktivlarini boshqarish va inventarizatsiya tizimi
             </p>
           </div>
 
@@ -191,18 +188,18 @@ export default function LoginPage() {
                 htmlFor="login"
                 className="block text-xs font-semibold text-slate-700 mb-1.5"
               >
-                Kirish emaili:
+                Login
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <Mail className="w-4 h-4" />
+                  <User className="w-4 h-4" />
                 </div>
                 <input
                   id="login"
                   type="text"
                   value={login}
                   onChange={(e) => setLogin(e.target.value)}
-                  placeholder="Emailni kiriting"
+                  placeholder="Loginni kiriting"
                   autoComplete="username"
                   required
                   disabled={isLoading}
@@ -217,7 +214,7 @@ export default function LoginPage() {
                   htmlFor="password"
                   className="block text-xs font-semibold text-slate-700"
                 >
-                  Maxfiy parol
+                  Parol
                 </label>
               </div>
               <div className="relative">
@@ -247,7 +244,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-
             <button
               type="submit"
               disabled={isLoading}
@@ -260,20 +256,17 @@ export default function LoginPage() {
                 </>
               ) : (
                 <>
-                  <span>Kirish</span>
+                  <span>Tizimga kirish</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-slate-100 text-center space-y-2">
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Tizimga kirish administrator tomonidan taqdim etilgan login va parol orqali amalga oshiriladi.
-            </p>
+          <div className="mt-6 pt-5 border-t border-slate-100 text-center">
             <div className="flex items-center justify-center gap-1.5 text-xs text-slate-600">
               <Phone className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-              <span>Bog‘lanish:</span>
+              <span>Texnik yordam:</span>
               <a
                 href="tel:+998933642030"
                 className="font-semibold text-blue-600 hover:text-blue-700 hover:underline"
@@ -298,7 +291,7 @@ export default function LoginPage() {
       {/* Pastki footer */}
       <footer className="border-t border-slate-200/80 bg-white py-4 text-center text-xs text-slate-400">
         <div className="w-full px-4 sm:px-8 text-center">
-          &copy; 2026 AssetAudit. Barcha huquqlar himoyalangan.
+          &copy; 2026 AssetAudit. Oliy ta&apos;lim muassasalari inventarizatsiya platformasi.
         </div>
       </footer>
     </div>

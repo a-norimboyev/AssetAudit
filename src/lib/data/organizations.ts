@@ -3,6 +3,10 @@ import { db } from "@/lib/db";
 import { organizations, organizationTypes, type OrganizationSettings } from "@/lib/db/schema/organizations";
 import { profiles } from "@/lib/db/schema/profiles";
 import { user } from "@/lib/db/schema/auth";
+import { items } from "@/lib/db/schema/inventory";
+import { scanEvents } from "@/lib/db/schema/audit";
+import { getRecentSecurityAuditLogs } from "@/lib/audit/logger";
+import { generateCodeFromName } from "@/lib/validations/organization";
 import { and, or, ilike, eq, desc, sql, inArray } from "drizzle-orm";
 import { getPlatformSettings } from "@/lib/data/platform-settings";
 
@@ -26,6 +30,13 @@ export interface OrganizationSubscriptionInfo {
   statusLabel: string;
 }
 
+export interface OrganizationAssetUsage {
+  limitMlrd: number;
+  usedValueSom: number;
+  usedPercent: number;
+  itemCount: number;
+}
+
 export interface OrganizationListItem {
   id: string;
   name: string;
@@ -37,6 +48,7 @@ export interface OrganizationListItem {
   createdAt: Date;
   admin: OrganizationAdminInfo | null;
   subscription: OrganizationSubscriptionInfo;
+  assetUsage?: OrganizationAssetUsage;
 }
 
 export function computeSubscriptionInfo(
@@ -140,6 +152,8 @@ export interface OrganizationsStats {
   inactive: number;
   typesCount: number;
   expiringCount?: number;
+  totalAssets: number;
+  auditProgressPercent: number;
 }
 
 export interface OrganizationTypeOption {
@@ -163,29 +177,49 @@ export interface PaginatedOrganizationsResult {
 }
 
 /**
- * 1. Haqiqiy PostgreSQL ma'lumotlar bazasidan tashkilotlar statistikasini olish
+ * 1. Haqiqiy PostgreSQL ma'lumotlar bazasidan tashkilotlar va respublika monitoring statistikasini olish
  * Bitta so'rovda agregatsiya qilinadi (Yuqori unumdorlik)
  */
 export async function getOrganizationsStats(): Promise<OrganizationsStats> {
-  const [stats] = await db
-    .select({
-      total: sql<number>`count(*)::int`,
-      active: sql<number>`count(*) filter (where ${organizations.isActive} = true)::int`,
-      inactive: sql<number>`count(*) filter (where ${organizations.isActive} = false)::int`,
-    })
-    .from(organizations);
+  const [stats, typesStats, assetStats, scannedStats] = await Promise.all([
+    db
+      .select({
+        total: sql<number>`count(*)::int`,
+        active: sql<number>`count(*) filter (where ${organizations.isActive} = true)::int`,
+        inactive: sql<number>`count(*) filter (where ${organizations.isActive} = false)::int`,
+      })
+      .from(organizations),
+    db
+      .select({
+        typesCount: sql<number>`count(*)::int`,
+      })
+      .from(organizationTypes)
+      .where(eq(organizationTypes.isActive, true)),
+    db
+      .select({
+        totalAssets: sql<number>`count(*)::int`,
+      })
+      .from(items),
+    db
+      .select({
+        verifiedAssets: sql<number>`count(distinct ${scanEvents.itemId})::int`,
+      })
+      .from(scanEvents)
+      .where(eq(scanEvents.isMatch, true)),
+  ]);
 
-  const [typesStats] = await db
-    .select({
-      typesCount: sql<number>`count(*)::int`,
-    })
-    .from(organizationTypes);
+  const totalAssets = assetStats[0]?.totalAssets ?? 0;
+  const verifiedAssets = scannedStats[0]?.verifiedAssets ?? 0;
+  const auditProgressPercent =
+    totalAssets > 0 ? Math.min(100, Math.round((verifiedAssets / totalAssets) * 100)) : 0;
 
   return {
-    total: stats?.total ?? 0,
-    active: stats?.active ?? 0,
-    inactive: stats?.inactive ?? 0,
-    typesCount: typesStats?.typesCount ?? 0,
+    total: stats[0]?.total ?? 0,
+    active: stats[0]?.active ?? 0,
+    inactive: stats[0]?.inactive ?? 0,
+    typesCount: typesStats[0]?.typesCount ?? 0,
+    totalAssets,
+    auditProgressPercent,
   };
 }
 
@@ -199,6 +233,7 @@ export async function getOrganizationTypesList(): Promise<OrganizationTypeOption
       name: organizationTypes.name,
     })
     .from(organizationTypes)
+    .where(eq(organizationTypes.isActive, true))
     .orderBy(organizationTypes.name);
 
   return types;
@@ -212,7 +247,7 @@ export async function getOrganizationsList(
   options: GetOrganizationsOptions = {}
 ): Promise<PaginatedOrganizationsResult> {
   const page = Math.max(1, options.page || 1);
-  const pageSize = Math.min(100, Math.max(1, options.pageSize || 20));
+  const pageSize = Math.min(500, Math.max(1, options.pageSize || 20));
   const offset = (page - 1) * pageSize;
 
   const conditions = [];
@@ -302,7 +337,30 @@ export async function getOrganizationsList(
     }
   }
 
-  const items: OrganizationListItem[] = rawItems.map((org) => {
+  // 6. OTM aktivlari statistikasi (Aktivlar balansi, jami qiymat va foiz)
+  const assetStatsMap = new Map<string, { totalValue: number; itemCount: number }>();
+  if (orgIds.length > 0) {
+    const assetRows = await db
+      .select({
+        organizationId: items.organizationId,
+        totalValue: sql<number>`COALESCE(SUM(CASE WHEN ${items.status} != 'written_off' THEN COALESCE(${items.price}, 0)::numeric ELSE 0 END), 0)::float`,
+        itemCount: sql<number>`count(*)::int`,
+      })
+      .from(items)
+      .where(inArray(items.organizationId, orgIds))
+      .groupBy(items.organizationId);
+
+    for (const row of assetRows) {
+      if (row.organizationId) {
+        assetStatsMap.set(row.organizationId, {
+          totalValue: Number(row.totalValue) || 0,
+          itemCount: Number(row.itemCount) || 0,
+        });
+      }
+    }
+  }
+
+  const itemsList: OrganizationListItem[] = rawItems.map((org) => {
     const rawAdmin = adminsMap.get(org.id) || null;
     const admin = rawAdmin
       ? {
@@ -310,22 +368,51 @@ export async function getOrganizationsList(
           password: undefined,
           phone: (org.settings?.adminPhone as string) || undefined,
         }
-      : null;
+      : (org.settings?.adminName ? {
+          name: org.settings.adminName as string,
+          username: (org.settings.adminLogin as string) || "admin",
+          email: `${(org.settings.adminLogin as string) || "admin"}@assetaudit.uz`,
+          phone: (org.settings.adminPhone as string) || undefined,
+        } : null);
     const safeSettings = org.settings ? { ...org.settings } : {};
     delete safeSettings.adminPassword;
     delete (safeSettings as Record<string, unknown>).password;
 
     const subscription = computeSubscriptionInfo(org.createdAt, safeSettings);
+    const assetStat = assetStatsMap.get(org.id) || { totalValue: 0, itemCount: 0 };
+    const limitMlrd = typeof safeSettings.assetLimitMlrd === "number" && safeSettings.assetLimitMlrd > 0
+      ? safeSettings.assetLimitMlrd
+      : 500;
+    const limitInSom = limitMlrd * 1_000_000_000;
+    const effectiveAssetValue =
+      assetStat.totalValue > 0
+        ? assetStat.totalValue
+        : typeof safeSettings.assetValueMlrd === "number"
+        ? (safeSettings.assetValueMlrd as number) * 1_000_000_000
+        : typeof safeSettings.auditProgress === "number"
+        ? Math.round(((safeSettings.auditProgress as number) / 100) * limitInSom)
+        : 0;
+    const rawPercent = limitInSom > 0 ? (effectiveAssetValue / limitInSom) * 100 : 0;
+    const usedPercent = Math.min(100, Math.round(rawPercent));
+
+    const assetUsage: OrganizationAssetUsage = {
+      limitMlrd,
+      usedValueSom: effectiveAssetValue,
+      usedPercent,
+      itemCount: assetStat.itemCount,
+    };
+
     return {
       ...org,
       settings: safeSettings,
       admin,
       subscription,
+      assetUsage,
     };
   });
 
   return {
-    items,
+    items: itemsList,
     totalCount,
     totalPages,
     currentPage: page,
@@ -349,10 +436,12 @@ export class OrganizationError extends Error {
 
 export interface CreateOrganizationInput {
   name: string;
-  code: string;
-  typeId: string;
+  code?: string;
+  typeId?: string;
   isActive?: boolean;
+  assetLimitMlrd?: number;
   subscriptionPlan?: string;
+  subscriptionStartsAt?: string;
   subscriptionExpiresAt?: string;
   subscriptionNotes?: string;
   logoUrl?: string;
@@ -387,9 +476,10 @@ export async function createOrganization(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   executor: any = db
 ) {
-  const normalizedCode = input.code.trim().toUpperCase();
+  const rawCode = input.code && input.code.trim() ? input.code.trim() : generateCodeFromName(input.name);
+  const normalizedCode = rawCode.toUpperCase();
   const trimmedName = input.name.trim();
-  const trimmedTypeId = input.typeId.trim().toLowerCase();
+  const trimmedTypeId = input.typeId && input.typeId.trim() ? input.typeId.trim().toLowerCase() : "university";
   const isActive = input.isActive ?? true;
 
   const plan = input.subscriptionPlan || "1_year";
@@ -422,8 +512,9 @@ export async function createOrganization(
           maxItems: platformSettings.quotas.defaultMaxItems,
           maxStorageMb: platformSettings.quotas.defaultMaxStorageMb,
           maxConcurrentAudits: platformSettings.quotas.defaultMaxConcurrentAudits,
+          assetLimitMlrd: typeof input.assetLimitMlrd === "number" && input.assetLimitMlrd > 0 ? input.assetLimitMlrd : 500,
           subscriptionPlan: plan,
-          subscriptionStartsAt: now.toISOString(),
+          subscriptionStartsAt: input.subscriptionStartsAt || now.toISOString(),
           subscriptionExpiresAt: expiresAtStr,
           subscriptionNotes: input.subscriptionNotes,
           logoUrl: input.logoUrl?.trim() || undefined,
@@ -473,7 +564,7 @@ export async function createOrganization(
     if (pgCode === "42501") {
       throw new OrganizationError(
         "DATABASE_PERMISSION_DENIED",
-        "Ma'lumotlar bazasida tashkilot yaratish huquqi (INSERT privilege) yetarli emas. Iltimos, administratorga murojaat qiling.",
+        "Ma'lumotlar bazasida tashkilot yaratish huquqi yetarli emas. Iltimos, administratorga murojaat qiling.",
         500
       );
     }
@@ -485,10 +576,14 @@ export async function createOrganization(
 export interface UpdateOrganizationInput {
   id: string;
   name: string;
-  typeId: string;
+  typeId?: string;
   subscriptionPlan?: string;
   subscriptionExpiresAt?: string;
   subscriptionNotes?: string;
+  logoUrl?: string | null;
+  assetLimitMlrd?: number;
+  adminName?: string;
+  adminPhone?: string;
 }
 
 /**
@@ -496,7 +591,7 @@ export interface UpdateOrganizationInput {
  */
 export async function updateOrganization(input: UpdateOrganizationInput) {
   const trimmedName = input.name.trim();
-  const trimmedTypeId = input.typeId.trim().toLowerCase();
+  const trimmedTypeId = input.typeId && input.typeId.trim() ? input.typeId.trim().toLowerCase() : "university";
 
   try {
     const [existing] = await db
@@ -507,6 +602,34 @@ export async function updateOrganization(input: UpdateOrganizationInput) {
 
     const currentSettings = existing?.settings || {};
     let newSettings = { ...currentSettings };
+
+    if (input.logoUrl !== undefined) {
+      if (input.logoUrl) {
+        newSettings.logoUrl = input.logoUrl.trim();
+      } else {
+        delete newSettings.logoUrl;
+      }
+    }
+
+    if (typeof input.assetLimitMlrd === "number" && input.assetLimitMlrd > 0) {
+      newSettings.assetLimitMlrd = input.assetLimitMlrd;
+    }
+
+    if (input.adminName !== undefined) {
+      newSettings.adminName = input.adminName.trim();
+      try {
+        await db
+          .update(profiles)
+          .set({ fullName: input.adminName.trim(), updatedAt: new Date() })
+          .where(and(eq(profiles.organizationId, input.id), eq(profiles.role, "organization_admin")));
+      } catch (profileErr) {
+        console.warn("[updateOrganization] Profile admin update non-fatal:", profileErr);
+      }
+    }
+
+    if (input.adminPhone !== undefined) {
+      newSettings.adminPhone = input.adminPhone.trim();
+    }
 
     if (input.subscriptionPlan) {
       const plan = input.subscriptionPlan;
@@ -620,20 +743,32 @@ export interface DashboardOverviewData {
   recentOrganizations: OrganizationListItem[];
   expiringOrganizations: OrganizationListItem[];
   types: OrganizationTypeOption[];
+  recentAuditLogs: Array<{
+    id: string;
+    actorUserId: string | null;
+    actorName: string | null;
+    organizationId: string | null;
+    organizationName: string | null;
+    event: string;
+    action: string;
+    metadata: Record<string, unknown>;
+    createdAt: Date;
+  }>;
 }
 
 /**
  * 9. Super Admin Bosh sahifasi (Dashboard) uchun to'liq tahliliy ko'rsatkichlarni olish
  */
 export async function getDashboardOverview(): Promise<DashboardOverviewData> {
-  const [stats, orgsResult, types] = await Promise.all([
+  const [stats, orgsResult, types, recentAuditLogs] = await Promise.all([
     getOrganizationsStats(),
-    getOrganizationsList({ page: 1, pageSize: 20 }),
+    getOrganizationsList({ page: 1, pageSize: 300 }),
     getOrganizationTypesList(),
+    getRecentSecurityAuditLogs(10),
   ]);
 
   const expiringOrganizations = orgsResult.items
-    .filter((o) => o.subscription.status === "expiring_soon" || o.subscription.status === "expired")
+    .filter((o) => o.isActive && (o.subscription.status === "expiring_soon" || o.subscription.status === "expired"))
     .sort((a, b) => a.subscription.daysRemaining - b.subscription.daysRemaining);
 
   return {
@@ -644,6 +779,7 @@ export async function getDashboardOverview(): Promise<DashboardOverviewData> {
     recentOrganizations: orgsResult.items,
     expiringOrganizations,
     types,
+    recentAuditLogs,
   };
 }
 

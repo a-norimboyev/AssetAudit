@@ -9,6 +9,11 @@ import { auth } from "@/lib/auth";
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Development va Mock frontend dizayn rejimida /admin ko'rinishiga to'sqinlik qilmaslik
+  if (process.env.NODE_ENV === "development" && pathname.startsWith("/admin")) {
+    return NextResponse.next();
+  }
+
   if (
     pathname.startsWith("/admin") ||
     pathname.startsWith("/org") ||

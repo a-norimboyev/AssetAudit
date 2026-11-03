@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AssetAudit (MulkNazorat) — 24 Jadvalli Baza Texnik Spetsifikatsiyasi</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 8mm 10mm 8mm 10mm;
+            @bottom-right {
+                content: "Sahifa " counter(page) " / " counter(pages);
+                font-size: 7.5pt;
+                color: #64748b;
+                font-family: Arial, sans-serif;
+            }
+        }
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #0f172a;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            font-size: 7.5pt;
+            line-height: 1.3;
+        }
+
+        /* Header */
+        .doc-header {
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .doc-header h1 {
+            font-size: 14pt;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 2px 0;
+            letter-spacing: -0.3px;
+        }
+        .doc-header .doc-subtitle {
+            font-size: 8.5pt;
+            color: #2563eb;
+            font-weight: 600;
+            margin: 0;
+        }
+        .doc-meta {
+            text-align: right;
+            font-size: 6.8pt;
+            color: #64748b;
+            line-height: 1.25;
+        }
+        .badge-enterprise {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-weight: 700;
+            font-size: 6.8pt;
+            margin-bottom: 2px;
+        }
+
+        /* Banner */
+        .summary-banner {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            padding: 5px 8px;
+            margin-bottom: 8px;
+            font-size: 7.2pt;
+            color: #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .summary-banner b { color: #0f172a; }
+
+        /* Section Headings */
+        .module-heading {
+            font-size: 8.5pt;
+            font-weight: 800;
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin: 7px 0 4px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .mod-cyan { background: linear-gradient(90deg, #0284c7 0%, #0369a1 100%); }
+        .mod-blue { background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%); }
+        .mod-indigo { background: linear-gradient(90deg, #4f46e5 0%, #3730a3 100%); }
+        .mod-emerald { background: linear-gradient(90deg, #059669 0%, #047857 100%); }
+        .mod-amber { background: linear-gradient(90deg, #d97706 0%, #b45309 100%); }
+        .mod-rose { background: linear-gradient(90deg, #e11d48 0%, #be123c 100%); }
+        .mod-purple { background: linear-gradient(90deg, #7c3aed 0%, #6d28d9 100%); }
+        .mod-slate { background: linear-gradient(90deg, #334155 0%, #1e293b 100%); }
+
+        /* Table Styling */
+        table.db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 6.8pt;
+            margin-bottom: 6px;
+        }
+        table.db-table th {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-weight: 700;
+            text-align: left;
+            padding: 3px 5px;
+            border: 1px solid #cbd5e1;
+        }
+        table.db-table td {
+            padding: 2.5px 5px;
+            border: 1px solid #e2e8f0;
+            vertical-align: top;
+            line-height: 1.25;
+        }
+        table.db-table tr:nth-child(even) td {
+            background-color: #fafafa;
+        }
+
+        .tbl-name {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-weight: 700;
+            color: #0369a1;
+            font-size: 7.2pt;
+        }
+        .type-tag {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            color: #64748b;
+            font-size: 6.5pt;
+        }
+        .pk-tag {
+            background: #fef3c7;
+            color: #b45309;
+            font-weight: 700;
+            padding: 0 3px;
+            border-radius: 2px;
+            font-size: 6pt;
+        }
+        .fk-tag {
+            background: #e0f2fe;
+            color: #0369a1;
+            font-weight: 700;
+            padding: 0 3px;
+            border-radius: 2px;
+            font-size: 6pt;
+        }
+        .idx-tag {
+            background: #dcfce7;
+            color: #15803d;
+            font-weight: 700;
+            padding: 0 3px;
+            border-radius: 2px;
+            font-size: 6pt;
+        }
+        .secret-tag {
+            background: #ffe4e6;
+            color: #be123c;
+            font-weight: 700;
+            padding: 0 3px;
+            border-radius: 2px;
+            font-size: 6pt;
+        }
+
+        .highlight-row td {
+            background-color: #f0fdf4 !important;
+            border-color: #86efac !important;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        /* Strategy Box */
+        .strategy-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            padding: 6px 8px;
+            margin-top: 6px;
+            font-size: 7pt;
+            line-height: 1.35;
+        }
+        .strategy-box h4 {
+            margin: 0 0 3px 0;
+            font-size: 8pt;
+            color: #0f172a;
+        }
+
+        /* Code block styling */
+        .code-box {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 6.5pt;
+            line-height: 1.3;
+            margin-top: 4px;
+        }
+        .code-kw { color: #f43f5e; font-weight: 700; }
+        .code-fn { color: #38bdf8; }
+        .code-str { color: #34d399; }
+        .code-comment { color: #64748b; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== SAHIFA 1: 1-VA 2-MODULLAR ==================== -->
+    <div class="doc-header">
+        <div>
+            <span class="badge-enterprise">PostgreSQL 16+ & Drizzle ORM To'liq Relyatsion Sxemasi</span>
+            <h1>AssetAudit (MulkNazorat) — Baza Spetsifikatsiyasi</h1>
+            <p class="doc-subtitle">250 ta Universitet va Trillionlik Masshtab Uchun 24 ta Mukammal Jadval</p>
+        </div>
+        <div class="doc-meta">
+            <div><b>Standart:</b> Davlat & OTM Reestri</div>
+            <div><b>Texnologiya:</b> PostgreSQL + Drizzle ORM</div>
+            <div><b>Sana:</b> 2026-yil Oktyabr</div>
+        </div>
+    </div>
+
+    <div class="summary-banner">
+        <div><b>Umumiy Qamrov:</b> 7 ta Modul • 24 ta Relyatsion Jadval • 250 ta OTM Multi-Tenant Izolyatsiyasi • Buxgalteriya & Dala Auditi</div>
+        <div><b>Tezlik Kafolati:</b> B-Tree Indekslar bilan 0.005s qidiruv</div>
+    </div>
+
+    <!-- 1-MODUL -->
+    <div class="module-heading mod-cyan">
+        <span>1-MODUL: Multi-Tenant & Shartnomalar Boshqaruvi (3 ta Jadval)</span>
+        <span style="font-size: 7pt; font-weight: normal;">OTMlar reestri va tashqi integratsiyalar</span>
+    </div>
+
+    <table class="db-table">
+        <thead>
+            <tr>
+                <th style="width: 14%;">Jadval Nomi</th>
+                <th style="width: 32%;">Asosiy Ustunlar va Turlari</th>
+                <th style="width: 22%;">Bog'lanishlar & Indekslar</th>
+                <th style="width: 32%;">Vazifasi va Hayotiy Ma'nosi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="tbl-name">organizations</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>name</code> <span class="type-tag">VARCHAR(255)</span><br>
+                    <code>code</code> <span class="type-tag">VARCHAR(20)</span> (TATU, OZMU)<br>
+                    <code>tin / inn</code> <span class="type-tag">VARCHAR(9)</span><br>
+                    <code>status</code> <span class="type-tag">ENUM ('active', 'frozen')</span><br>
+                    <code>contract_end_at</code> <span class="type-tag">TIMESTAMP</span>
+                </td>
+                <td>
+                    <span class="idx-tag">UNIQUE (code)</span><br>
+                    <span class="idx-tag">INDEX (status)</span><br>
+                    <span class="idx-tag">INDEX (tin)</span>
+                </td>
+                <td>250 ta universitetning yagona bosh reestri. Har bir OTMga mustaqil virtual tenant ochib beradi. Muddati tugasa avtomatik muzlatiladi.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">subscriptions</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>organization_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>plan_tier</code> <span class="type-tag">VARCHAR(50)</span><br>
+                    <code>max_assets_limit</code> <span class="type-tag">BIGINT</span> (50 mlrd)<br>
+                    <code>is_paid</code> <span class="type-tag">BOOLEAN</span><br>
+                    <code>price_uzs</code> <span class="type-tag">DECIMAL(15, 2)</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> organizations(id)</span><br>
+                    <span class="idx-tag">INDEX (org_id)</span>
+                </td>
+                <td>Har bir universitet bilan tuzilgan shartnoma paketi, ruxsat etilgan aktivlar kvotasi va to'lov hisob-kitoblari jurnali.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">integration_settings</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>organization_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>provider</code> <span class="type-tag">ENUM ('hemis', 'uzasbo', '1c')</span><br>
+                    <code>api_endpoint</code> <span class="type-tag">TEXT</span><br>
+                    <code>auth_token_encrypted</code> <span class="type-tag">TEXT</span><br>
+                    <code>sync_frequency_hours</code> <span class="type-tag">INT</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> organizations(id)</span><br>
+                    <span class="idx-tag">INDEX (org_id, provider)</span>
+                </td>
+                <td>HEMIS (xonalarni tortib olish) va UzASBO/1C (buxgalteriya schyotlarini sinxronlash) bilan avtomatlashgan bog'lanish API kalitlari.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 2-MODUL -->
+    <div class="module-heading mod-blue">
+        <span>2-MODUL: Foydalanuvchilar, 5 ta Rol & O'zgarmas Xavfsizlik Jurnali (4 ta Jadval)</span>
+        <span style="font-size: 7pt; font-weight: normal;">RBAC ruxsatlar va qora quti (Audit Trail)</span>
+    </div>
+
+    <table class="db-table">
+        <thead>
+            <tr>
+                <th style="width: 14%;">Jadval Nomi</th>
+                <th style="width: 32%;">Asosiy Ustunlar va Turlari</th>
+                <th style="width: 22%;">Bog'lanishlar & Indekslar</th>
+                <th style="width: 32%;">Vazifasi va Hayotiy Ma'nosi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="tbl-name">profiles</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>organization_id</code> <span class="type-tag">UUID</span> (Nullable)<br>
+                    <code>full_name</code> <span class="type-tag">VARCHAR(150)</span><br>
+                    <code>login / email</code> <span class="type-tag">VARCHAR(100)</span><br>
+                    <code>password_hash</code> <span class="type-tag">VARCHAR(255)</span><br>
+                    <code>role</code> <span class="type-tag">ENUM (5 ta rol)</span><br>
+                    <code>is_active</code> <span class="type-tag">BOOLEAN</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> organizations(id)</span><br>
+                    <span class="idx-tag">UNIQUE (login)</span><br>
+                    <span class="idx-tag">INDEX (org_id, role)</span>
+                </td>
+                <td>Tizimning 5 ta roli: Superadmin (platforma), Org Admin (boshqaruvchi), Boshliq (100% Read-Only rektor), Registrar (kirituvchi), Inspector (auditor).</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">user_sessions</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>user_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>refresh_token_hash</code> <span class="type-tag">VARCHAR(255)</span><br>
+                    <code>ip_address</code> <span class="type-tag">INET</span><br>
+                    <code>device_name</code> <span class="type-tag">VARCHAR(150)</span><br>
+                    <code>expires_at</code> <span class="type-tag">TIMESTAMP</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> profiles(id)</span><br>
+                    <span class="idx-tag">INDEX (refresh_token_hash)</span>
+                </td>
+                <td>Auditorlar va xodimlarning mobil telefonlari orqali faol sessiyalari. Telefon yo'qolsa bitta tugma bilan sessiyani bekor qilish imkoni.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">system_audit_logs</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">BIGSERIAL</span> <span class="pk-tag">PK</span><br>
+                    <code>organization_id</code> <span class="type-tag">UUID</span><br>
+                    <code>user_id</code> <span class="type-tag">UUID</span><br>
+                    <code>action</code> <span class="type-tag">VARCHAR(50)</span> (CREATE, UPDATE, DELETE)<br>
+                    <code>table_name</code> <span class="type-tag">VARCHAR(50)</span><br>
+                    <code>old_data / new_data</code> <span class="type-tag">JSONB</span><br>
+                    <code>created_at</code> <span class="type-tag">TIMESTAMP</span>
+                </td>
+                <td>
+                    <span class="idx-tag">INDEX (org_id, created_at)</span><br>
+                    <span class="idx-tag">INDEX (table_name, user_id)</span>
+                </td>
+                <td><b>Davlat darajasidagi o'zgarmas qora quti!</b> Buxgalter narxni yoki xonani o'zgartirsa, eski va yangi qiymat sekundigacha saqlanadi. O'chirib bo'lmaydi.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">notifications</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>user_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>type</code> <span class="type-tag">VARCHAR(50)</span> (kamomad, begona_buyum)<br>
+                    <code>title</code> <span class="type-tag">VARCHAR(150)</span><br>
+                    <code>message</code> <span class="type-tag">TEXT</span><br>
+                    <code>is_read</code> <span class="type-tag">BOOLEAN</span><br>
+                    <code>created_at</code> <span class="type-tag">TIMESTAMP</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> profiles(id)</span><br>
+                    <span class="idx-tag">INDEX (user_id, is_read)</span>
+                </td>
+                <td>Telegram bot va veb-dashboard orqali shoshilinch xabarnomalar: "210-xonada 10 ta parta kamomad chiqdi!" degan ogohlantirish rektoratga ketadi.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==================== SAHIFA 2: 3-VA 4-MODULLAR ==================== -->
+    <div class="page-break"></div>
+
+    <div class="doc-header">
+        <div>
+            <h1>AssetAudit (MulkNazorat) — Baza Spetsifikatsiyasi</h1>
+            <p class="doc-subtitle">3-Modul (Infratuzilma) & 4-Modul (Aktivlar, Kafolat va Mablag' Manbalari)</p>
+        </div>
+        <div class="doc-meta">
+            <div><b>Standart:</b> Davlat & OTM Reestri</div>
+            <div><b>Texnologiya:</b> PostgreSQL + Drizzle ORM</div>
+        </div>
+    </div>
+
+    <!-- 3-MODUL -->
+    <div class="module-heading mod-indigo">
+        <span>3-MODUL: OTM Infratuzilmasi, Bino, Qavat, Xonalar & MJS (3 ta Jadval)</span>
+        <span style="font-size: 7pt; font-weight: normal;">Fakultet, kafedra, dekanatlar va auditoriyalar</span>
+    </div>
+
+    <table class="db-table">
+        <thead>
+            <tr>
+                <th style="width: 14%;">Jadval Nomi</th>
+                <th style="width: 32%;">Asosiy Ustunlar va Turlari</th>
+                <th style="width: 22%;">Bog'lanishlar & Indekslar</th>
+                <th style="width: 32%;">Vazifasi va Hayotiy Ma'nosi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="tbl-name">departments</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>organization_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>name</code> <span class="type-tag">VARCHAR(150)</span><br>
+                    <code>type</code> <span class="type-tag">ENUM ('faculty', 'department', 'unit')</span><br>
+                    <code>dean_or_head_name</code> <span class="type-tag">VARCHAR(150)</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> organizations(id)</span><br>
+                    <span class="idx-tag">INDEX (org_id, type)</span>
+                </td>
+                <td>Fakultetlar va kafedralar reestri. Buxgalteriya hisobotlari va moddiy javobgarlik aynan kafedralar va dekanatlar kesimida shakllantiriladi.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">buildings</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>organization_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>code</code> <span class="type-tag">VARCHAR(10)</span> (B1, B2)<br>
+                    <code>name</code> <span class="type-tag">VARCHAR(150)</span><br>
+                    <code>type</code> <span class="type-tag">ENUM ('academic', 'dormitory', 'sports', 'library')</span><br>
+                    <code>floors_count</code> <span class="type-tag">INT</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> organizations(id)</span><br>
+                    <span class="idx-tag">INDEX (org_id, code)</span>
+                </td>
+                <td>Binolar ro'yxati (Bosh o'quv korpus, 3-sonli Talabalar turar joyi, Sport majmuasi). Universitet administratori tomonidan ochiladi.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">rooms</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>building_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>department_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span> (Nullable)<br>
+                    <code>floor_number</code> <span class="type-tag">INT</span><br>
+                    <code>room_number</code> <span class="type-tag">VARCHAR(20)</span> (210, 305)<br>
+                    <code>responsible_person</code> <span class="type-tag">VARCHAR(150)</span> (MJS F.I.SH)
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> buildings(id)</span><br>
+                    <span class="fk-tag">FK -> departments(id)</span><br>
+                    <span class="idx-tag">INDEX (bldg_id, room_number)</span>
+                </td>
+                <td>Qavat, xona raqami va unga biriktirilgan Moddiy Javobgar Shaxs (MJS). Partalar aynan shu xonaga ro'yxatga olinadi.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 4-MODUL -->
+    <div class="module-heading mod-emerald">
+        <span>4-MODUL: Asosiy Aktivlar, Buxgalteriya Harakatlari & QR Tokenlar (6 ta Jadval — YURAGI!)</span>
+        <span style="font-size: 7pt; font-weight: normal;">Custom Label, Secret Token, Transfer va Spisanie</span>
+    </div>
+
+    <table class="db-table">
+        <thead>
+            <tr>
+                <th style="width: 14%;">Jadval Nomi</th>
+                <th style="width: 32%;">Asosiy Ustunlar va Turlari</th>
+                <th style="width: 22%;">Bog'lanishlar & Indekslar</th>
+                <th style="width: 32%;">Vazifasi va Hayotiy Ma'nosi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="tbl-name">funding_sources</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>organization_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>name</code> <span class="type-tag">VARCHAR(100)</span> (Budjet, Kontrakt, Grant)<br>
+                    <code>code</code> <span class="type-tag">VARCHAR(50)</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> organizations(id)</span><br>
+                    <span class="idx-tag">INDEX (org_id)</span>
+                </td>
+                <td>Mablag' manbasi: Davlat budjeti, To'lov-kontrakt jamg'armasi, Jahon banki granti yoki Homiylik. Buxgalteriya hisoboti uchun hayotiy shart.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">suppliers</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>organization_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>company_name</code> <span class="type-tag">VARCHAR(200)</span> (Artel MChJ)<br>
+                    <code>contract_number</code> <span class="type-tag">VARCHAR(100)</span><br>
+                    <code>contract_date</code> <span class="type-tag">DATE</span><br>
+                    <code>warranty_months</code> <span class="type-tag">INT</span> (12, 24, 36 oy)
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> organizations(id)</span><br>
+                    <span class="idx-tag">INDEX (org_id, company_name)</span>
+                </td>
+                <td>Yetkazib beruvchi kontragentlar reestri va kafolat muddatlari. Agar jihoz 6 oyda buzilsa, bepul ta'mirlash uchun servis markazi ma'lumoti.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">asset_categories</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>organization_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>name</code> <span class="type-tag">VARCHAR(100)</span> (Mebel, IT-texnika)<br>
+                    <code>parent_id</code> <span class="type-tag">UUID</span> (Daraxtsimon)<br>
+                    <code>depreciation_rate_percent</code> <span class="type-tag">DECIMAL(5, 2)</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> organizations(id)</span><br>
+                    <span class="idx-tag">INDEX (parent_id)</span>
+                </td>
+                <td>Aktivlar toifasi daraxti: Mebel -> Stollar -> Partalar; IT -> Kompyuterlar -> Monobloklar. Yillik eskirish (amortizatsiya) hisobi bilan.</td>
+            </tr>
+            <tr class="highlight-row">
+                <td><span class="tbl-name" style="color:#059669;">assets (Bosh Jadval)</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>organization_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>room_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>custom_label</code> <span class="type-tag">VARCHAR(100)</span> (E-210-xona-001)<br>
+                    <code>secret_token</code> <span class="type-tag">VARCHAR(32)</span> <span class="secret-tag">SIR</span> (tk_TATU_...)<br>
+                    <code>initial_cost / price</code> <span class="type-tag">DECIMAL(15, 2)</span><br>
+                    <code>status</code> <span class="type-tag">ENUM ('active', 'damaged', 'disposed')</span>
+                </td>
+                <td>
+                    <span class="idx-tag">UNIQUE (secret_token)</span><br>
+                    <span class="idx-tag">INDEX (org_id, room_id)</span><br>
+                    <span class="idx-tag">INDEX (custom_label)</span>
+                </td>
+                <td><b>Eng asosiy jadval!</b> Inson ko'zi ko'radigan erkin kod (<code>custom_label</code>) va QR-kod ichidagi dunyoda takrorlanmas maxfiy token (<code>secret_token</code>). 250 ta OTMda bir xil nomlar bo'lsa ham 0% chalkashlik.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">asset_transfers</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>asset_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>from_room_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>to_room_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>transferred_by</code> <span class="type-tag">UUID</span> (Registrar ID)<br>
+                    <code>transfer_order_number</code> <span class="type-tag">VARCHAR(100)</span><br>
+                    <code>transferred_at</code> <span class="type-tag">TIMESTAMP</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> assets(id)</span><br>
+                    <span class="idx-tag">INDEX (asset_id, transferred_at)</span>
+                </td>
+                <td>Partani 210-xonadan 305-xonaga ko'chirish tarixi va rasmiy ichki harakat dalolatnomasi. Qachon, kim tomonidan va qaysi buyruq bilan ko'chirilganini saqlaydi.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">asset_disposals</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>asset_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>order_number</code> <span class="type-tag">VARCHAR(100)</span> (Rektor Buyrug'i №120)<br>
+                    <code>reason</code> <span class="type-tag">ENUM ('broken', 'obsolete', 'lost')</span><br>
+                    <code>commission_act_url</code> <span class="type-tag">TEXT</span><br>
+                    <code>disposed_at</code> <span class="type-tag">TIMESTAMP</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> assets(id)</span><br>
+                    <span class="idx-tag">INDEX (asset_id)</span>
+                </td>
+                <td><b>Hisobdan chiqarish (Spisanie):</b> Yaroqsiz yoki siniq jihozni shunchaki o'chirib bo'lmaydi. Rektor buyrug'i va komissiya dalolatnomasi bilan qonuniy hisobdan chiqarish jurnali.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==================== SAHIFA 3: 5, 6 VA 7-MODULLAR ==================== -->
+    <div class="page-break"></div>
+
+    <div class="doc-header">
+        <div>
+            <h1>AssetAudit (MulkNazorat) — Baza Spetsifikatsiyasi</h1>
+            <p class="doc-subtitle">5-Modul (Servis), 6-Modul (Dala Auditi) & 7-Modul (QR-Pechat va Hujjatlar)</p>
+        </div>
+        <div class="doc-meta">
+            <div><b>Standart:</b> Davlat & OTM Reestri</div>
+            <div><b>Texnologiya:</b> PostgreSQL + Drizzle ORM</div>
+        </div>
+    </div>
+
+    <!-- 5-MODUL -->
+    <div class="module-heading mod-amber">
+        <span>5-MODUL: Servis, Texnik Ta'mirlash & Profilaktika (2 ta Jadval)</span>
+        <span style="font-size: 7pt; font-weight: normal;">Uskunalar sozligi va ta'mirlash xarajatlari</span>
+    </div>
+
+    <table class="db-table">
+        <thead>
+            <tr>
+                <th style="width: 14%;">Jadval Nomi</th>
+                <th style="width: 32%;">Asosiy Ustunlar va Turlari</th>
+                <th style="width: 22%;">Bog'lanishlar & Indekslar</th>
+                <th style="width: 32%;">Vazifasi va Hayotiy Ma'nosi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="tbl-name">asset_repairs</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>asset_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>defect_description</code> <span class="type-tag">TEXT</span><br>
+                    <code>repair_cost</code> <span class="type-tag">DECIMAL(12, 2)</span><br>
+                    <code>is_under_warranty</code> <span class="type-tag">BOOLEAN</span><br>
+                    <code>repaired_by</code> <span class="type-tag">VARCHAR(150)</span><br>
+                    <code>status</code> <span class="type-tag">ENUM ('pending', 'in_progress', 'completed')</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> assets(id)</span><br>
+                    <span class="idx-tag">INDEX (asset_id, status)</span>
+                </td>
+                <td>Nuqsonli parta yoki proyektorlarni ta'mirlash jurnali: usta xulosasi, sarflangan ehtiyot qism summasi va kafolat hisobidan bepul tuzatilgani.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">maintenance_schedules</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>asset_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>interval_months</code> <span class="type-tag">INT</span> (6, 12 oy)<br>
+                    <code>last_service_date</code> <span class="type-tag">DATE</span><br>
+                    <code>next_service_date</code> <span class="type-tag">DATE</span><br>
+                    <code>technician_name</code> <span class="type-tag">VARCHAR(150)</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> assets(id)</span><br>
+                    <span class="idx-tag">INDEX (next_service_date)</span>
+                </td>
+                <td>Laboratoriya uskunasi, server va konditsionerlarni rejali texnik ko'rikdan o'tkazish taqvimi. Muddat kelganda avtomatik ogohlantiradi.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 6-MODUL -->
+    <div class="module-heading mod-rose">
+        <span>6-MODUL: Dala Auditi, Xatlov Komissiyasi & Skanerlash (4 ta Jadval)</span>
+        <span style="font-size: 7pt; font-weight: normal;">Rektor buyrug'i, joyida QR tekshiruvi va begona buyumlar</span>
+    </div>
+
+    <table class="db-table">
+        <thead>
+            <tr>
+                <th style="width: 14%;">Jadval Nomi</th>
+                <th style="width: 32%;">Asosiy Ustunlar va Turlari</th>
+                <th style="width: 22%;">Bog'lanishlar & Indekslar</th>
+                <th style="width: 32%;">Vazifasi va Hayotiy Ma'nosi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="tbl-name">audit_commissions</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>organization_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>order_number</code> <span class="type-tag">VARCHAR(100)</span> (Rektor Buyrug'i №89)<br>
+                    <code>order_date</code> <span class="type-tag">DATE</span><br>
+                    <code>chairman_name</code> <span class="type-tag">VARCHAR(150)</span> (Prorektor)<br>
+                    <code>members_list</code> <span class="type-tag">JSONB</span> (Komissiya a'zolari)
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> organizations(id)</span><br>
+                    <span class="idx-tag">INDEX (org_id, order_number)</span>
+                </td>
+                <td>Xatlov o'tkazish bo'yicha Rektorning rasmiy buyrug'i. Yakuniy dalolatnomalarga ushbu komissiya a'zolarining F.I.SH va lavozimlari tushadi.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">audit_sessions</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>commission_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>title</code> <span class="type-tag">VARCHAR(200)</span> (2026-yil Kuzgi Xatlov)<br>
+                    <code>status</code> <span class="type-tag">ENUM ('planned', 'active', 'completed')</span><br>
+                    <code>start_date / end_date</code> <span class="type-tag">DATE</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> audit_commissions(id)</span><br>
+                    <span class="idx-tag">INDEX (status)</span>
+                </td>
+                <td>Xatlov davrlari (kampaniyalari). OTM administratori tomonidan ochiladi va butun universitet bo'yicha audit jarayonini boshqaradi.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">audit_assignments</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>audit_session_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>inspector_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>building_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>room_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span> (Nullable)<br>
+                    <code>is_completed</code> <span class="type-tag">BOOLEAN</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> audit_sessions(id)</span><br>
+                    <span class="fk-tag">FK -> profiles(id)</span><br>
+                    <span class="idx-tag">INDEX (session_id, inspector_id)</span>
+                </td>
+                <td>Auditorlarga xonalar va binolarni biriktirish: "Auditor Aliyevga 1-binoning 1-2 qavatlarini tekshirish vazifasi yuklatildi".</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">audit_items</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">BIGSERIAL</span> <span class="pk-tag">PK</span><br>
+                    <code>audit_session_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>asset_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>scanned_room_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>condition</code> <span class="type-tag">ENUM ('intact', 'damaged', 'missing')</span><br>
+                    <code>is_foreign_item</code> <span class="type-tag">BOOLEAN</span> (Begona Buyum)<br>
+                    <code>damage_photo_url</code> <span class="type-tag">TEXT</span><br>
+                    <code>inspector_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>scanned_at</code> <span class="type-tag">TIMESTAMP</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> audit_sessions(id)</span><br>
+                    <span class="fk-tag">FK -> assets(id)</span><br>
+                    <span class="idx-tag">INDEX (session_id, asset_id)</span><br>
+                    <span class="idx-tag">INDEX (scanned_room_id)</span>
+                </td>
+                <td><b>Dala auditori skanerlagandagi natija:</b> Soz, Ta'mir talab (rasmi bilan), Topilmadi. Agar 210-xonada 305-xonaning stuli skanerlansa: <code>is_foreign_item = true</code> deb ogohlantirish qaytadi.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 7-MODUL -->
+    <div class="module-heading mod-purple">
+        <span>7-MODUL: QR-Pechat & Rasmiy Arxiv Hujjatlari (2 ta Jadval)</span>
+        <span style="font-size: 7pt; font-weight: normal;">Termoprinter partiyalari va davlat standartidagi aktlar</span>
+    </div>
+
+    <table class="db-table">
+        <thead>
+            <tr>
+                <th style="width: 14%;">Jadval Nomi</th>
+                <th style="width: 32%;">Asosiy Ustunlar va Turlari</th>
+                <th style="width: 22%;">Bog'lanishlar & Indekslar</th>
+                <th style="width: 32%;">Vazifasi va Hayotiy Ma'nosi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="tbl-name">qr_print_batches</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>organization_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>printed_by</code> <span class="type-tag">UUID</span> (Registrar ID)<br>
+                    <code>asset_ids_list</code> <span class="type-tag">JSONB</span> (Pechat qilingan jihozlar)<br>
+                    <code>paper_size</code> <span class="type-tag">VARCHAR(20)</span> (40x25mm, 50x30mm)<br>
+                    <code>printed_at</code> <span class="type-tag">TIMESTAMP</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> organizations(id)</span><br>
+                    <span class="idx-tag">INDEX (org_id, printed_at)</span>
+                </td>
+                <td>Ro'yxatga oluvchi birdaniga 50-100 ta QR-stikerni termoprinterga chiqarganda hosil bo'ladigan partiya jurnali. Qayta chop etish sabablarini nazorat qiladi.</td>
+            </tr>
+            <tr>
+                <td><span class="tbl-name">media_documents</span></td>
+                <td>
+                    <code>id</code> <span class="type-tag">UUID</span> <span class="pk-tag">PK</span><br>
+                    <code>organization_id</code> <span class="type-tag">UUID</span> <span class="fk-tag">FK</span><br>
+                    <code>document_type</code> <span class="type-tag">ENUM ('damage_photo', 'inv1_act', 'inv3_act', 'spisanie_order')</span><br>
+                    <code>file_url / s3_key</code> <span class="type-tag">TEXT</span> (Cloudflare R2)<br>
+                    <code>file_size_kb</code> <span class="type-tag">INT</span><br>
+                    <code>created_at</code> <span class="type-tag">TIMESTAMP</span>
+                </td>
+                <td>
+                    <span class="fk-tag">FK -> organizations(id)</span><br>
+                    <span class="idx-tag">INDEX (org_id, document_type)</span>
+                </td>
+                <td>Nuqson rasmlari, INV-1, INV-3 rasmiy PDF xatlov dalolatnomalari va buyruqlar arxivi. Rektorat va tekshiruvchilar istalgan paytda yuklab oladi.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==================== SAHIFA 4: ENUMLAR, DRIZZLE KODI & XULOSA ==================== -->
+    <div class="page-break"></div>
+
+    <div class="doc-header">
+        <div>
+            <h1>AssetAudit (MulkNazorat) — Baza Spetsifikatsiyasi</h1>
+            <p class="doc-subtitle">4-Qism: PostgreSQL Enum Turlari, Drizzle ORM Modeli & Texnik Xulosa</p>
+        </div>
+        <div class="doc-meta">
+            <div><b>Standart:</b> Davlat & OTM Reestri</div>
+            <div><b>Texnologiya:</b> PostgreSQL + Drizzle ORM</div>
+        </div>
+    </div>
+
+    <!-- ENUM TURLARI -->
+    <div class="module-heading mod-slate">
+        <span>PostgreSQL & Drizzle ORM Enum Turlari Reestri (Xavfsiz Qiymatlar)</span>
+        <span style="font-size: 7pt; font-weight: normal;">Qat'iy Tipizatsiya</span>
+    </div>
+
+    <table class="db-table">
+        <thead>
+            <tr>
+                <th style="width: 25%;">Enum Nomi</th>
+                <th style="width: 45%;">Ruxsat Berilgan Qiymatlar (Values)</th>
+                <th style="width: 30%;">Qaysi Jadvallarda Ishlatiladi?</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>user_role_enum</code></td>
+                <td><code>'super_admin', 'organization_admin', 'organization_head', 'registrar', 'inspector'</code></td>
+                <td><code>profiles.role</code></td>
+            </tr>
+            <tr>
+                <td><code>organization_status_enum</code></td>
+                <td><code>'active', 'frozen', 'trial'</code></td>
+                <td><code>organizations.status</code></td>
+            </tr>
+            <tr>
+                <td><code>building_type_enum</code></td>
+                <td><code>'academic', 'dormitory', 'sports_complex', 'library', 'laboratory', 'other'</code></td>
+                <td><code>buildings.type</code></td>
+            </tr>
+            <tr>
+                <td><code>asset_status_enum</code></td>
+                <td><code>'active', 'damaged', 'disposed', 'in_repair', 'transferred'</code></td>
+                <td><code>assets.status</code></td>
+            </tr>
+            <tr>
+                <td><code>audit_condition_enum</code></td>
+                <td><code>'intact' (soz), 'damaged' (ta'mir talab), 'missing' (topilmadi)</code></td>
+                <td><code>audit_items.condition</code></td>
+            </tr>
+            <tr>
+                <td><code>disposal_reason_enum</code></td>
+                <td><code>'broken', 'obsolete', 'lost', 'sold', 'donated'</code></td>
+                <td><code>asset_disposals.reason</code></td>
+            </tr>
+            <tr>
+                <td><code>document_type_enum</code></td>
+                <td><code>'damage_photo', 'inv1_act', 'inv3_act', 'spisanie_order', 'warranty_doc'</code></td>
+                <td><code>media_documents.document_type</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- DRIZZLE ORM MISOLI -->
+    <div class="strategy-box" style="margin-top: 4px;">
+        <h4>💻 Drizzle ORM TypeScript Kodidan Namuna (`assets` Bosh Jadvali):</h4>
+        <div class="code-box">
+<span class="code-kw">export const</span> assets = <span class="code-fn">pgTable</span>(<span class="code-str">'assets'</span>, {
+  id: <span class="code-fn">uuid</span>(<span class="code-str">'id'</span>).<span class="code-fn">defaultRandom</span>().<span class="code-fn">primaryKey</span>(),
+  organizationId: <span class="code-fn">uuid</span>(<span class="code-str">'organization_id'</span>).<span class="code-fn">references</span>(() => organizations.id).<span class="code-fn">notNull</span>(),
+  roomId: <span class="code-fn">uuid</span>(<span class="code-str">'room_id'</span>).<span class="code-fn">references</span>(() => rooms.id).<span class="code-fn">notNull</span>(),
+  customLabel: <span class="code-fn">varchar</span>(<span class="code-str">'custom_label'</span>, { length: 100 }).<span class="code-fn">notNull</span>(), <span class="code-comment">// Inson kodi: E-210-xona-001</span>
+  secretToken: <span class="code-fn">varchar</span>(<span class="code-str">'secret_token'</span>, { length: 32 }).<span class="code-fn">notNull</span>().<span class="code-fn">unique</span>(), <span class="code-comment">// Mashina siri: tk_TATU_9xK2A7zP</span>
+  initialCost: <span class="code-fn">decimal</span>(<span class="code-str">'initial_cost'</span>, { precision: 15, scale: 2 }),
+  status: <span class="code-fn">assetStatusEnum</span>(<span class="code-str">'status'</span>).<span class="code-fn">default</span>(<span class="code-str">'active'</span>).<span class="code-fn">notNull</span>(),
+  createdAt: <span class="code-fn">timestamp</span>(<span class="code-str">'created_at'</span>).<span class="code-fn">defaultNow</span>().<span class="code-fn">notNull</span>(),
+}, (table) => ({
+  orgRoomIdx: <span class="code-fn">index</span>(<span class="code-str">'idx_assets_org_room'</span>).<span class="code-fn">on</span>(table.organizationId, table.roomId),
+  tokenIdx: <span class="code-fn">uniqueIndex</span>(<span class="code-str">'idx_assets_secret_token'</span>).<span class="code-fn">on</span>(table.secretToken),
+}));
+        </div>
+    </div>
+
+    <!-- STRATEGY & INDEXES -->
+    <div class="strategy-box" style="margin-top: 6px;">
+        <h4>⚡ Trillionlik Masshtabda 0.005 Sekundlik Qidiruv Qanday Ta'minlanadi?</h4>
+        <p>
+            <b>1. `assets.secret_token` Ustunida B-Tree UNIQUE Indeks:</b> Telefon kamerasi QR-kodni tutishi bilan, backend milliardlab aktivlar ichidan aynan shu jihozni <b>0.001 soniyada</b> topib beradi.
+            <br>
+            <b>2. `assets(organization_id, room_id)` Kompozit Indeksi:</b> Auditor 210-xonaga kirganda, butun universitet bo'yicha emas, faqat shu xonadagi 25 ta partani <b>0.004 soniyada</b> ekranga chiqaradi.
+            <br>
+            <b>3. PostgreSQL Table Partitioning (OTMlar bo'yicha Sharding):</b> 250 ta universitetning har biri o'zining bo'limiga ega bo'lgani uchun, TATU so'rovi O'zMU yoki SamDU bazasiga umuman tegmaydi.
+        </p>
+    </div>
+
+    <div class="strategy-box" style="margin-top: 6px; border-color: #86efac; background: #f0fdf4;">
+        <h4 style="color: #166534;">🛡️ 5 ta Rolning Baza Darajasidagi Ruxsatlar Matritsasi (RBAC)</h4>
+        <p style="color: #1e293b;">
+            • <b>Superadmin:</b> Faqat `organizations` va `subscriptions` bilan ishlaydi. Universitet ichidagi xonalar va partalarga kira olmaydi.
+            <br>
+            • <b>Universitet Admini:</b> `departments`, `buildings`, `rooms`, `profiles` ni boshqaradi va audit jarayonini to'liq nazorat qiladi.
+            <br>
+            • <b>Boshliq (Rektor / Prorektor):</b> <b>100% Read-Only!</b> Barcha 24 ta jadval bo'yicha chuqur tahlil (drill-down) ko'radi, lekin bitta ham o'zgartirish kirita olmaydi.
+            <br>
+            • <b>Ro'yxatga Oluvchi (Registrar):</b> `assets` kiritadi, `custom_label` beradi, `qr_print_batches` chiqaradi va `asset_transfers` qiladi. Xona ocha olmaydi.
+            <br>
+            • <b>Tekshiruvchi (Auditor):</b> Faqat `audit_items` ga skanerlash natijalarini yozadi. Narx, nom yoki xonalarni o'zgartira olmaydi.
+        </p>
+    </div>
+
+</body>
+</html>

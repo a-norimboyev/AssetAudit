@@ -8,7 +8,7 @@ import { profiles, type UserRole } from "@/lib/db/schema/profiles";
 import { organizations } from "@/lib/db/schema/organizations";
 import { hashPassword, verifyPassword } from "better-auth/crypto";
 import { generateId } from "better-auth";
-import { eq, and, or, sql } from "drizzle-orm";
+import { eq, and, or, ne, sql } from "drizzle-orm";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { logSecurityAudit } from "@/lib/audit/logger";
@@ -183,7 +183,12 @@ export async function createStaffMemberAction(
         username: finalUsername,
         email: finalEmail,
         temporaryPassword: password,
-        role: role === "inspector" ? "Inventarizatsiya Tekshiruvchisi" : "Moddiy Javobgar Shaxs (Registrar)",
+        role:
+          role === "head"
+            ? "Boshliq (Kuzatuvchi)"
+            : role === "inspector"
+            ? "Inventarizatsiya Tekshiruvchisi"
+            : "Moddiy Javobgar Shaxs",
         fullName,
       },
     };
@@ -241,8 +246,8 @@ export async function resetStaffPasswordAction(formData: FormData): Promise<Staf
       return { success: false, message: "Xodim topilmadi yoki ushbu tashkilotga tegishli emas." };
     }
 
-    if (targetProfile.role !== "inspector" && targetProfile.role !== "registrar") {
-      return { success: false, message: "Faqat inspektor va moddiy javobgarlarning parolini reset qilish mumkin." };
+    if (targetProfile.role !== "head" && targetProfile.role !== "inspector" && targetProfile.role !== "registrar") {
+      return { success: false, message: "Faqat boshliq, inspektor va moddiy javobgarlarning parolini reset qilish mumkin." };
     }
 
     const newTemporaryPassword = generateSecureTemporaryPassword();
@@ -285,7 +290,12 @@ export async function resetStaffPasswordAction(formData: FormData): Promise<Staf
         username: targetProfile.username || targetProfile.email,
         email: targetProfile.email,
         temporaryPassword: newTemporaryPassword,
-        role: targetProfile.role === "inspector" ? "Inventarizatsiya Tekshiruvchisi" : "Moddiy Javobgar Shaxs",
+        role:
+          targetProfile.role === "head"
+            ? "Boshliq (Kuzatuvchi)"
+            : targetProfile.role === "inspector"
+            ? "Inventarizatsiya Tekshiruvchisi"
+            : "Moddiy Javobgar Shaxs",
         fullName: targetProfile.fullName,
       },
     };
@@ -340,8 +350,8 @@ export async function toggleStaffStatusAction(
       return { success: false, message: "Xodim topilmadi yoki ushbu tashkilotga tegishli emas." };
     }
 
-    if (targetProfile.role !== "inspector" && targetProfile.role !== "registrar") {
-      return { success: false, message: "Faqat inspektor va moddiy javobgarlarning holatini o'zgartirish mumkin." };
+    if (targetProfile.role !== "head" && targetProfile.role !== "inspector" && targetProfile.role !== "registrar") {
+      return { success: false, message: "Faqat boshliq, inspektor va moddiy javobgarlarning holatini o'zgartirish mumkin." };
     }
 
     await db.transaction(async (tx) => {
@@ -407,6 +417,7 @@ export async function createOrganizationAdminAction(
     const rawUsername = (formData.get("username") as string)?.trim() || "";
     let password = (formData.get("password") as string)?.trim() || "";
     const phone = (formData.get("phone") as string)?.trim() || "";
+    const image = (formData.get("image") as string)?.trim() || null;
 
     const fieldErrors: Record<string, string> = {};
 
@@ -426,7 +437,7 @@ export async function createOrganizationAdminAction(
     } else if (rawUsername.includes("@")) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(rawUsername)) {
-        fieldErrors.username = "To'g'ri email manzilini kiriting (masalan: nodir@gmail.com).";
+        fieldErrors.username = "To'g'ri email manzilini kiriting - masalan: nodir@gmail.com.";
       } else {
         finalEmail = rawUsername.toLowerCase().trim();
         finalUsername = finalEmail;
@@ -502,7 +513,7 @@ export async function createOrganizationAdminAction(
         name: fullName,
         email: finalEmail,
         emailVerified: true,
-        image: null,
+        image: image || null,
         username: finalUsername,
         displayUsername: finalUsername,
         createdAt: now,
@@ -557,7 +568,7 @@ export async function createOrganizationAdminAction(
         username: finalUsername,
         email: finalEmail,
         temporaryPassword: password,
-        role: "Tashkilot Rahbari (Administrator)",
+        role: "Universitet Rahbari",
         fullName,
       },
     };
@@ -565,6 +576,52 @@ export async function createOrganizationAdminAction(
     return {
       success: false,
       message: err instanceof Error ? err.message : "Administratorni yaratishda server xatosi yuz berdi.",
+    };
+  }
+}
+
+/**
+ * Tashkilot Administratori rasmini (Avatar) yangilash yoki o'chirish (Super Admin uchun)
+ */
+export async function updateOrganizationAdminAvatarAction(
+  targetUserId: string,
+  imageUrl: string | null
+): Promise<{ success: boolean; message?: string; error?: string }> {
+  try {
+    const authContext = await requirePlatformAdmin();
+    if (authContext.profile.role !== "super_admin") {
+      return {
+        success: false,
+        error: "Ruxsat etilmagan: Faqat Super Admin rasmni o'zgartira oladi.",
+      };
+    }
+
+    if (!targetUserId) {
+      return { success: false, error: "Administrator ID ko'rsatilmadi." };
+    }
+
+    await db
+      .update(user)
+      .set({
+        image: imageUrl || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(user.id, targetUserId));
+
+    revalidatePath("/admin/administrators");
+    revalidatePath(`/admin/administrators/${targetUserId}`);
+
+    return {
+      success: true,
+      message: imageUrl
+        ? "Administrator rasmi muvaffaqiyatli saqlandi!"
+        : "Administrator rasmi olib tashlandi.",
+    };
+  } catch (error) {
+    console.error("[updateOrganizationAdminAvatarAction] Error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Rasm saqlashda xatolik yuz berdi.",
     };
   }
 }
@@ -641,7 +698,7 @@ export async function resetOrganizationAdminPasswordAction(formData: FormData): 
         username: adminProfile.username || adminProfile.email,
         email: adminProfile.email,
         temporaryPassword: newTemporaryPassword,
-        role: "Tashkilot Rahbari (Administrator)",
+        role: "Universitet Rahbari",
         fullName: adminProfile.fullName,
       },
     };
@@ -752,7 +809,7 @@ export async function changeTemporaryPasswordAction(
     const fieldErrors: Record<string, string> = {};
 
     if (!currentPassword) {
-      fieldErrors.currentPassword = "Joriy (vaqtinchalik) parolni kiriting.";
+      fieldErrors.currentPassword = "Joriy parolni kiriting.";
     }
 
     const passCheck = validateStaffPassword(newPassword);
@@ -791,7 +848,7 @@ export async function changeTemporaryPasswordAction(
     if (!isCurrentValid) {
       return {
         success: false,
-        message: "Joriy (vaqtinchalik) parol noto'g'ri kiritildi.",
+        message: "Joriy parol noto'g'ri kiritildi.",
         fieldErrors: { currentPassword: "Joriy parol noto'g'ri." },
       };
     }
@@ -933,6 +990,259 @@ export async function changeAdminOwnPasswordAction(
     return {
       success: false,
       message: err instanceof Error ? err.message : "Parolni yangilashda xatolik yuz berdi.",
+    };
+  }
+}
+
+export interface UpdateOrganizationAdminInput {
+  userId: string;
+  fullName: string;
+  username: string;
+  phone?: string;
+  newPassword?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateOrganizationAdminResponse {
+  success: boolean;
+  message: string;
+  fieldErrors?: Record<string, string>;
+  updatedAdmin?: {
+    userId: string;
+    fullName: string;
+    username: string;
+    phone?: string;
+    isActive: boolean;
+    temporaryPassword?: string;
+  };
+}
+
+/**
+ * 8. Super Admin tomonidan OTM Administratori ma'lumotlarini tahrirlash
+ * Ism, Login, Telefon raqami, Parol va Faollik holatini yangilaydi.
+ */
+export async function updateOrganizationAdminAction(
+  input: UpdateOrganizationAdminInput
+): Promise<UpdateOrganizationAdminResponse> {
+  let actorUserId = "unknown";
+  try {
+    const authContext = await requirePlatformAdmin();
+    actorUserId = authContext.user.id;
+
+    const userId = input.userId?.trim();
+    if (!userId) {
+      return { success: false, message: "Foydalanuvchi identifikatori ko'rsatilmadi." };
+    }
+
+    const [adminProfile] = await db
+      .select({
+        userId: profiles.userId,
+        fullName: profiles.fullName,
+        role: profiles.role,
+        organizationId: profiles.organizationId,
+        isActive: profiles.isActive,
+        username: user.username,
+        email: user.email,
+      })
+      .from(profiles)
+      .innerJoin(user, eq(profiles.userId, user.id))
+      .where(and(eq(profiles.userId, userId), eq(profiles.role, "organization_admin")))
+      .limit(1);
+
+    if (!adminProfile) {
+      return { success: false, message: "Tashkilot administratori topilmadi." };
+    }
+
+    const fieldErrors: Record<string, string> = {};
+
+    // 1. Ism tekshiruvi
+    const cleanFullName = input.fullName?.trim();
+    if (!cleanFullName) {
+      fieldErrors.fullName = "Administrator ism-sharifini kiriting.";
+    }
+
+    // 2. Login tekshiruvi
+    const cleanUsername = input.username?.trim().toLowerCase();
+    if (!cleanUsername) {
+      fieldErrors.username = "Admin loginini kiriting.";
+    } else if (cleanUsername.length < 3) {
+      fieldErrors.username = "Login kamida 3 ta belgidan iborat bo'lishi kerak.";
+    } else {
+      // Login bandligini tekshirish
+      const [existingUser] = await db
+        .select({ id: user.id })
+        .from(user)
+        .where(
+          and(
+            or(eq(user.username, cleanUsername), eq(user.email, cleanUsername)),
+            ne(user.id, userId)
+          )
+        )
+        .limit(1);
+
+      if (existingUser) {
+        fieldErrors.username = "Ushbu login band. Iltimos, boshqa login tanlang.";
+      }
+    }
+
+    // 3. Parol tekshiruvi (agar kiritilgan bo'lsa)
+    const newPassword = input.newPassword?.trim();
+    if (newPassword && newPassword.length < 6) {
+      fieldErrors.newPassword = "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak.";
+    }
+
+    if (Object.keys(fieldErrors).length > 0) {
+      return { success: false, message: "Kiritilgan ma'lumotlarda xatolik bor.", fieldErrors };
+    }
+
+    const cleanPhone = input.phone?.trim() || "";
+    const nextActiveState = input.isActive !== undefined ? input.isActive : adminProfile.isActive;
+
+    await db.transaction(async (tx) => {
+      // 1. Profiles jadvalini yangilash
+      await tx
+        .update(profiles)
+        .set({
+          fullName: cleanFullName!,
+          isActive: nextActiveState,
+          updatedAt: new Date(),
+        })
+        .where(eq(profiles.userId, userId));
+
+      // 2. User jadvalini yangilash
+      const isInternalEmail = adminProfile.email?.endsWith("@auth.assetaudit.uz");
+      const updatedEmail = isInternalEmail ? `${cleanUsername}@auth.assetaudit.uz` : undefined;
+
+      await tx
+        .update(user)
+        .set({
+          name: cleanFullName!,
+          username: cleanUsername!,
+          displayUsername: cleanUsername!,
+          ...(updatedEmail ? { email: updatedEmail } : {}),
+          updatedAt: new Date(),
+        })
+        .where(eq(user.id, userId));
+
+      // 3. Tashkilot telefon raqamini sinxronizatsiya qilish
+      if (adminProfile.organizationId) {
+        await tx.execute(
+          sql`UPDATE organizations 
+              SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPhone}', to_jsonb(${cleanPhone}::text)),
+                  updated_at = NOW() 
+              WHERE id = ${adminProfile.organizationId}`
+        );
+      }
+
+      // 4. Parolni yangilash
+      if (newPassword) {
+        const newHash = await hashPassword(newPassword);
+        await tx
+          .update(account)
+          .set({ password: newHash, updatedAt: new Date() })
+          .where(and(eq(account.userId, userId), eq(account.providerId, "credential")));
+
+        await tx
+          .update(profiles)
+          .set({ mustChangePassword: false, updatedAt: new Date() })
+          .where(eq(profiles.userId, userId));
+
+        // Parol o'zgarganda faol sessiyalarni bekor qilish
+        await tx.delete(session).where(eq(session.userId, userId));
+      }
+
+      // 5. Agar nofaol qilinsa, sessiyalarini bekor qilish
+      if (!nextActiveState) {
+        await tx.delete(session).where(eq(session.userId, userId));
+      }
+    });
+
+    logSecurityAudit({
+      event: "ORGANIZATION_ADMIN_UPDATED",
+      actorUserId,
+      organizationId: adminProfile.organizationId,
+      metadata: {
+        targetUserId: userId,
+        fullName: cleanFullName,
+        username: cleanUsername,
+        phoneChanged: Boolean(cleanPhone),
+        passwordChanged: Boolean(newPassword),
+        isActive: nextActiveState,
+      },
+    });
+
+    revalidatePath("/admin/administrators");
+    revalidatePath(`/admin/administrators/${userId}`);
+    revalidatePath("/admin/organizations");
+    revalidatePath("/org/settings");
+
+    return {
+      success: true,
+      message: `"${cleanFullName}" ma'lumotlari muvaffaqiyatli saqlandi!`,
+      updatedAdmin: {
+        userId,
+        fullName: cleanFullName!,
+        username: cleanUsername!,
+        phone: cleanPhone || undefined,
+        isActive: nextActiveState,
+        temporaryPassword: newPassword || undefined,
+      },
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "Administrator ma'lumotlarini yangilashda xatolik yuz berdi.",
+    };
+  }
+}
+
+/**
+ * 9. Tashkilot Administratori o'z telefon raqami va profilini yangilash
+ * Super Admin bilan 2 tomonlama sinxron ishlaydi.
+ */
+export async function updateAdminOwnProfileAction(
+  formData: FormData
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const { organization, profile, user: authUser } = await requireOrganizationAdmin();
+    const phone = (formData.get("phone") as string)?.trim() || "";
+    const fullName = (formData.get("fullName") as string)?.trim() || "";
+
+    if (!fullName) {
+      return { success: false, message: "Ism-sharifingizni kiriting." };
+    }
+
+    await db.transaction(async (tx) => {
+      await tx
+        .update(profiles)
+        .set({ fullName, updatedAt: new Date() })
+        .where(eq(profiles.userId, profile.userId));
+
+      await tx
+        .update(user)
+        .set({ name: fullName, updatedAt: new Date() })
+        .where(eq(user.id, authUser.id));
+
+      await tx.execute(
+        sql`UPDATE organizations 
+            SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{adminPhone}', to_jsonb(${phone}::text)),
+                updated_at = NOW() 
+            WHERE id = ${organization.id}`
+      );
+    });
+
+    revalidatePath("/org/settings");
+    revalidatePath("/admin/administrators");
+    revalidatePath("/admin/organizations");
+
+    return {
+      success: true,
+      message: "Profil ma'lumotlaringiz muvaffaqiyatli saqlandi!",
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "Profilni saqlashda xatolik yuz berdi.",
     };
   }
 }

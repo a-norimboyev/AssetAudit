@@ -4,12 +4,12 @@ import { mapLoginError, NETWORK_ERROR_MESSAGE } from "@/lib/auth/login-errors";
 
 describe("AssetAudit — Login Sahifasi Duplicate Request va Xatoliklar Himoyasi", () => {
   describe("1. HTTP va Auth xatoliklarini farqlash (mapLoginError)", () => {
-    it("401 xatoligi: noto'g'ri login, email yoki parol xabari chiqishi kerak", () => {
+    it("401 xatoligi: noto'g'ri login yoki parol xabari chiqishi kerak", () => {
       const msg401 = mapLoginError({ status: 401 });
-      assert.equal(msg401, "Login, email yoki parol noto'g'ri kiritildi.");
+      assert.equal(msg401, "Login yoki parol noto'g'ri kiritildi.");
 
       const msgCode = mapLoginError({ code: "INVALID_EMAIL_OR_PASSWORD" });
-      assert.equal(msgCode, "Login, email yoki parol noto'g'ri kiritildi.");
+      assert.equal(msgCode, "Login yoki parol noto'g'ri kiritildi.");
     });
 
     it("429 xatoligi: rate-limit cheklovi va 1 daqiqa kutish xabari chiqishi kerak", () => {

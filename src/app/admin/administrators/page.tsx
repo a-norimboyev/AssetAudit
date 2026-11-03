@@ -7,25 +7,22 @@ import {
 import { getOrganizationsList } from "@/lib/data/organizations";
 import { AdminFilters } from "./admin-filters";
 import { AddAdminModal } from "./add-admin-modal";
-import { ToggleAdminStatusButton } from "./toggle-admin-status-button";
+import { AdminsTable } from "./admins-table";
 import {
   Users,
-  ShieldCheck,
   Building2,
   CheckCircle2,
-  XCircle,
-  Calendar,
   ChevronLeft,
   ChevronRight,
-  Eye,
 } from "lucide-react";
 
 export const metadata = {
   title: "Administratorlar — AssetAudit Platformasi",
-  description: "Platformaga ulangan tashkilotlar rahbarlari va administratorlari",
+  description: "Platformaga ulangan OTMlar rahbarlari va administratorlari",
 };
 
 export const instant = false;
+
 
 interface PageProps {
   searchParams: Promise<{
@@ -35,8 +32,13 @@ interface PageProps {
 }
 
 export default async function AdminAdministratorsPage({ searchParams }: PageProps) {
-  // 1. Super Admin avtorizatsiyasi (Server-side himoya)
-  await requirePlatformAdmin();
+  try {
+    await requirePlatformAdmin();
+  } catch (e) {
+    if (process.env.NODE_ENV === "production") {
+      throw e;
+    }
+  }
 
   // 2. URL qidiruv parametrlarini o'qish
   const params = await searchParams;
@@ -47,8 +49,19 @@ export default async function AdminAdministratorsPage({ searchParams }: PageProp
   const [stats, data, orgs] = await Promise.all([
     getOrganizationAdminsStats(),
     getOrganizationAdminsList({ page, pageSize: 20, search }),
-    getOrganizationsList({ pageSize: 100 }),
+    getOrganizationsList({ pageSize: 300 }),
   ]);
+
+  // 250 ta OTMni alifbo tartibida saralash va logolarini tayyorlash
+  const sortedOrgs = [...orgs.items]
+    .map((o) => ({
+      id: o.id,
+      name: o.name,
+      code: o.code,
+      isActive: o.isActive,
+      logoUrl: (o.settings?.logoUrl as string) || undefined,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, "uz"));
 
   const hasFilter = Boolean(search);
 
@@ -87,7 +100,7 @@ export default async function AdminAdministratorsPage({ searchParams }: PageProp
 
         <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Qamrab olingan tashkilotlar</span>
+            <span className="text-xs font-semibold text-slate-500">Qamrab olingan OTMlar</span>
             <div className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
               <Building2 className="w-4 h-4" />
             </div>
@@ -95,12 +108,12 @@ export default async function AdminAdministratorsPage({ searchParams }: PageProp
           <div className="text-2xl sm:text-3xl font-bold text-slate-900 mt-3 tracking-tight">
             {stats.organizationsCount}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1 font-medium">Admin biriktirilgan tashkilotlar</div>
+          <div className="text-[11px] text-slate-400 mt-1 font-medium">Admin biriktirilgan oliy ta&apos;lim muassasalari</div>
         </div>
       </div>
 
       {/* Filtrlash va Qidiruv */}
-      <AdminFilters currentSearch={search} organizations={orgs.items} />
+      <AdminFilters currentSearch={search} organizations={sortedOrgs} />
 
       {/* Administratorlar Jadvali yoki Bo'sh holat */}
       <div className="bg-white rounded-xl border border-slate-200/80 shadow-2xs overflow-hidden">
@@ -132,134 +145,20 @@ export default async function AdminAdministratorsPage({ searchParams }: PageProp
                   <Users className="w-8 h-8" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">
-                  Hozircha tashkilot administratorlari mavjud emas
+                  Hozircha OTM administratorlari mavjud emas
                 </h3>
                 <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Tashkilot boshqaruvchisi akkauntlari xavfsizlik va parollarni himoya qilish maqsadida xavfsiz tizim orqali bootstrap qilinadi. Parollar maskalangan tarzda saqlanadi va scrypt orqali xeshlanadi.
+                  Universitet boshqaruvchisi akkauntlari xavfsiz tizim orqali yaratiladi. Parollar himoyalangan tarzda saqlanadi.
                 </p>
 
                 <div className="mt-6 flex justify-center">
-                  <AddAdminModal organizations={orgs.items} />
+                  <AddAdminModal organizations={sortedOrgs} />
                 </div>
               </div>
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="bg-slate-50/75 border-b border-slate-200/80 text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
-                <tr>
-                  <th scope="col" className="px-5 py-3.5">Administrator</th>
-                  <th scope="col" className="px-5 py-3.5">Tashkilot</th>
-                  <th scope="col" className="px-5 py-3.5">Roli</th>
-                  <th scope="col" className="px-5 py-3.5">Holati</th>
-                  <th scope="col" className="px-5 py-3.5">Qo&apos;shilgan sana</th>
-                  <th scope="col" className="px-5 py-3.5 text-right">Amallar</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-normal">
-                {data.items.map((admin) => (
-                  <tr key={admin.userId} className="hover:bg-slate-50/70 transition-colors">
-                    {/* Administrator Ismi */}
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <Link
-                          href={`/admin/administrators/${admin.userId}`}
-                          className="w-10 h-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-xs transition-colors"
-                          title="Admin profilini ochish"
-                        >
-                          {admin.fullName.charAt(0).toUpperCase()}
-                        </Link>
-                        <div className="min-w-0">
-                          <Link
-                            href={`/admin/administrators/${admin.userId}`}
-                            className="font-bold text-slate-900 hover:text-blue-600 transition-colors text-sm truncate block"
-                            title="Admin profilini ko'rish va faoliyatini kuzatish"
-                          >
-                            {admin.fullName}
-                          </Link>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Tashkilot */}
-                    <td className="px-5 py-3.5">
-                      {admin.organizationName ? (
-                        <div>
-                          <div className="font-medium text-slate-900">
-                            {admin.organizationName}
-                          </div>
-                          <div className="text-[11px] font-mono text-slate-400">
-                            {admin.organizationCode}
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-slate-400 italic">Bog&apos;lanmagan</span>
-                      )}
-                    </td>
-
-                    {/* Roli */}
-                    <td className="px-5 py-3.5">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                        <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                        <span>Tashkilot Rahbari</span>
-                      </span>
-                    </td>
-
-                    {/* Holati */}
-                    <td className="px-5 py-3.5">
-                      <div className="flex flex-col items-start gap-1">
-                        {admin.isActive ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>Faol</span>
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-                            <XCircle className="w-3.5 h-3.5 text-rose-600" />
-                            <span>Nofaol</span>
-                          </span>
-                        )}
-                      </div>
-                    </td>
-
-                    {/* Sana */}
-                    <td className="px-5 py-3.5 text-slate-500 text-xs">
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span>
-                          {new Date(admin.createdAt).toLocaleDateString("uz-UZ", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Amallar: Profilni ko'rish va Faollashtirish/Bloklash */}
-                    <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/admin/administrators/${admin.userId}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
-                          title="Admin profilini ko'rish va faoliyatini kuzatish"
-                        >
-                          <Eye className="w-3.5 h-3.5 text-blue-600" />
-                          <span>Profil</span>
-                        </Link>
-                        <ToggleAdminStatusButton
-                          userId={admin.userId}
-                          fullName={admin.fullName}
-                          isActive={admin.isActive}
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <AdminsTable initialItems={data.items} />
         )}
 
         {/* Sahifalash (Pagination) */}

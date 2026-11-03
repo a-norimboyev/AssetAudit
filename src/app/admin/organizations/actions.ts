@@ -15,11 +15,22 @@ import { logSecurityAudit } from "@/lib/audit/logger";
 import { notifyTelegramNewTenant } from "@/lib/notifications/telegram";
 
 import { db } from "@/lib/db";
-import { user, account } from "@/lib/db/schema/auth";
+import { user, account, session } from "@/lib/db/schema/auth";
 import { profiles } from "@/lib/db/schema/profiles";
+import { organizations } from "@/lib/db/schema/organizations";
+import { items } from "@/lib/db/schema/inventory";
+import { buildings, floors, rooms } from "@/lib/db/schema/locations";
+import {
+  inventoryCycles,
+  cycleItems,
+  roomAudits,
+  scanEvents,
+  cycleConflicts,
+  systemAuditLogs,
+} from "@/lib/db/schema/audit";
 import { hashPassword } from "better-auth/crypto";
 import { generateId } from "better-auth";
-import { sql, or } from "drizzle-orm";
+import { sql, or, eq, and, inArray } from "drizzle-orm";
 import {
   generateInternalSystemEmail,
   generateSecureTemporaryPassword,
@@ -130,7 +141,7 @@ export async function createOrganizationAction(
       } else {
         const cleanInput = rawUsername.toLowerCase().trim();
         finalUsername = cleanInput;
-        finalEmail = cleanInput;
+        finalEmail = cleanInput.includes("@") ? cleanInput : generateInternalSystemEmail(cleanInput);
       }
 
       const rawPassword = data.adminPassword?.trim() || "";
@@ -172,8 +183,8 @@ export async function createOrganizationAction(
       if (existingUser) {
         return {
           success: false,
-          error: `Ushbu "${rawUsername}" manzili bilan foydalanuvchi allaqachon mavjud.`,
-          fieldErrors: { adminUsername: "Ushbu manzil band. Boshqa manzil tanlang." },
+          error: `Ushbu "${rawUsername}" logini bilan foydalanuvchi allaqachon mavjud.`,
+          fieldErrors: { adminUsername: "Ushbu login band. Boshqa login tanlang." },
         };
       }
     }
@@ -191,6 +202,7 @@ export async function createOrganizationAction(
       const org = await createOrganization(
         {
           ...validation.normalized,
+          assetLimitMlrd: data.assetLimitMlrd,
           subscriptionPlan: data.subscriptionPlan,
           subscriptionExpiresAt: data.subscriptionExpiresAt,
           subscriptionNotes: data.subscriptionNotes,
@@ -360,16 +372,17 @@ export async function updateOrganizationAction(
     actorUserId = authContext.user.id;
 
     if (!data.id || !data.id.trim()) {
-      return { success: false, error: "Tashkilot ID ko'rsatilmagan." };
+      return { success: false, error: "OTM ID ko'rsatilmagan." };
     }
     if (!data.name || data.name.trim().length < 2) {
-      return { success: false, error: "Tashkilot nomi kamida 2 ta belgidan iborat bo'lishi kerak." };
+      return { success: false, error: "OTM nomi kamida 2 ta belgidan iborat bo'lishi kerak." };
     }
-    if (!data.typeId || !data.typeId.trim()) {
-      return { success: false, error: "Tashkilot turi tanlanishi shart." };
-    }
+    const effectiveTypeId = (data.typeId && data.typeId.trim()) ? data.typeId.trim() : "university";
 
-    const updated = await updateOrganization(data);
+    const updated = await updateOrganization({
+      ...data,
+      typeId: effectiveTypeId,
+    });
 
     logSecurityAudit({
       event: "ORGANIZATION_UPDATED",
@@ -419,5 +432,383 @@ export async function toggleOrganizationStatusAction(
     return { success: true };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : "Xatolik yuz berdi." };
+  }
+}
+
+export interface ResetAdminPasswordActionResult {
+  success: boolean;
+  error?: string;
+  temporaryPassword?: string;
+  username?: string;
+  fullName?: string;
+}
+
+/**
+ * Server Action: Tashkilot administratori parolini tiklash / yangilash
+ */
+export async function resetOrganizationAdminPasswordAction(input: {
+  organizationId: string;
+  userId?: string;
+  customPassword?: string;
+}): Promise<ResetAdminPasswordActionResult> {
+  try {
+    const authContext = await requirePlatformAdmin();
+    const actorUserId = authContext.user.id;
+
+    if (!input.organizationId) {
+      return { success: false, error: "OTM ID ko'rsatilmagan." };
+    }
+
+    // 1. OTM admin profilini topish
+    let targetUserId = input.userId;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let adminProfile: any = null;
+
+    if (targetUserId) {
+      const [found] = await db
+        .select({
+          userId: profiles.userId,
+          fullName: profiles.fullName,
+          organizationId: profiles.organizationId,
+          username: user.username,
+          email: user.email,
+        })
+        .from(profiles)
+        .innerJoin(user, eq(profiles.userId, user.id))
+        .where(
+          and(
+            eq(profiles.userId, targetUserId),
+            eq(profiles.organizationId, input.organizationId)
+          )
+        )
+        .limit(1);
+      adminProfile = found;
+    }
+
+    if (!adminProfile) {
+      const [found] = await db
+        .select({
+          userId: profiles.userId,
+          fullName: profiles.fullName,
+          organizationId: profiles.organizationId,
+          username: user.username,
+          email: user.email,
+        })
+        .from(profiles)
+        .innerJoin(user, eq(profiles.userId, user.id))
+        .where(
+          and(
+            eq(profiles.organizationId, input.organizationId),
+            eq(profiles.role, "organization_admin")
+          )
+        )
+        .limit(1);
+      adminProfile = found;
+      if (adminProfile) {
+        targetUserId = adminProfile.userId;
+      }
+    }
+
+    if (!adminProfile || !targetUserId) {
+      return {
+        success: false,
+        error: "Ushbu OTMga biriktirilgan administrator topilmadi.",
+      };
+    }
+
+    const newPassword =
+      input.customPassword && input.customPassword.trim()
+        ? input.customPassword.trim()
+        : generateSecureTemporaryPassword();
+    const passwordHash = await hashPassword(newPassword);
+
+    await db.transaction(async (tx) => {
+      // 1. Hisob parolini yangilash
+      await tx
+        .update(account)
+        .set({ password: passwordHash, updatedAt: new Date() })
+        .where(
+          and(
+            eq(account.userId, targetUserId),
+            eq(account.providerId, "credential")
+          )
+        );
+
+      // 2. Profil mustChangePassword ni true qilish
+      await tx
+        .update(profiles)
+        .set({ mustChangePassword: true, updatedAt: new Date() })
+        .where(eq(profiles.userId, targetUserId));
+
+      // 3. Eski faol sessiyalarni xavfsizlik uchun bekor qilish
+      await tx.delete(session).where(eq(session.userId, targetUserId));
+    });
+
+    logSecurityAudit({
+      event: "ORGANIZATION_ADMIN_PASSWORD_RESET",
+      actorUserId,
+      organizationId: input.organizationId,
+      metadata: { targetUserId, username: adminProfile.username },
+    });
+
+    revalidatePath("/admin/organizations");
+    revalidatePath("/admin/administrators");
+    revalidatePath("/admin");
+
+    return {
+      success: true,
+      temporaryPassword: newPassword,
+      username: adminProfile.username || adminProfile.email,
+      fullName: adminProfile.fullName,
+    };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : "Parolni tiklashda xatolik yuz berdi.",
+    };
+  }
+}
+
+/**
+ * Server Action: Yangi administrator biriktirish / yaratish
+ */
+export async function createOrAssignOrganizationAdminAction(input: {
+  organizationId: string;
+  fullName: string;
+  username: string;
+  password?: string;
+  phone?: string;
+}): Promise<{
+  success: boolean;
+  error?: string;
+  credentials?: {
+    username: string;
+    temporaryPassword: string;
+    fullName: string;
+  };
+}> {
+  try {
+    const authContext = await requirePlatformAdmin();
+    const actorUserId = authContext.user.id;
+
+    if (!input.organizationId) {
+      return { success: false, error: "OTM ID ko'rsatilmagan." };
+    }
+    if (!input.fullName || input.fullName.trim().length < 2) {
+      return {
+        success: false,
+        error: "Administrator F.I.Sh. kiritilishi shart (kamida 2 ta belgi).",
+      };
+    }
+    if (!input.username || input.username.trim().length < 3) {
+      return {
+        success: false,
+        error: "Login kamida 3 ta belgidan iborat bo'lishi kerak.",
+      };
+    }
+
+    const cleanUsername = input.username.trim().toLowerCase();
+    const finalPassword =
+      input.password && input.password.trim()
+        ? input.password.trim()
+        : generateSecureTemporaryPassword();
+    const passwordHash = await hashPassword(finalPassword);
+    const systemEmail = generateInternalSystemEmail(cleanUsername);
+
+    // OTM mavjudligini tekshirish
+    const [org] = await db
+      .select({
+        id: organizations.id,
+        code: organizations.code,
+        settings: organizations.settings,
+      })
+      .from(organizations)
+      .where(eq(organizations.id, input.organizationId))
+      .limit(1);
+
+    if (!org) {
+      return { success: false, error: "OTM topilmadi." };
+    }
+
+    const newUserId = generateId();
+    await db.transaction(async (tx) => {
+      // 1. user
+      await tx.insert(user).values({
+        id: newUserId,
+        name: input.fullName.trim(),
+        email: systemEmail,
+        username: cleanUsername,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      // 2. account
+      await tx.insert(account).values({
+        id: generateId(),
+        userId: newUserId,
+        accountId: newUserId,
+        providerId: "credential",
+        password: passwordHash,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      // 3. profile
+      await tx.insert(profiles).values({
+        userId: newUserId,
+        organizationId: input.organizationId,
+        role: "organization_admin",
+        fullName: input.fullName.trim(),
+        mustChangePassword: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      // 4. OTM sozlamalarida administrator ismi va telefonini yangilash
+      const currentSettings = org.settings || {};
+      await tx
+        .update(organizations)
+        .set({
+          settings: {
+            ...currentSettings,
+            adminName: input.fullName.trim(),
+            adminPhone: input.phone?.trim() || currentSettings.adminPhone || "",
+          },
+          updatedAt: new Date(),
+        })
+        .where(eq(organizations.id, input.organizationId));
+    });
+
+    logSecurityAudit({
+      event: "ORGANIZATION_ADMIN_CREATED",
+      actorUserId,
+      organizationId: input.organizationId,
+      metadata: { newUserId, username: cleanUsername },
+    });
+
+    revalidatePath("/admin/organizations");
+    revalidatePath("/admin/administrators");
+    revalidatePath("/admin");
+
+    return {
+      success: true,
+      credentials: {
+        username: cleanUsername,
+        temporaryPassword: finalPassword,
+        fullName: input.fullName.trim(),
+      },
+    };
+  } catch (err: unknown) {
+    const msg =
+      err instanceof Error
+        ? err.message
+        : "Administrator yaratishda xatolik yuz berdi.";
+    if (msg.includes("unique") || msg.includes("duplicate")) {
+      return {
+        success: false,
+        error: "Ushbu login tizimda allaqachon mavjud, boshqa login tanlang.",
+      };
+    }
+    return { success: false, error: msg };
+  }
+}
+
+export interface DeleteOrganizationActionResult {
+  success: boolean;
+  error?: string;
+}
+
+export async function deleteOrganizationAction(
+  organizationId: string,
+  confirmationName: string
+): Promise<DeleteOrganizationActionResult> {
+  try {
+    const sessionUser = await requirePlatformAdmin();
+    const actorUserId = sessionUser.user.id;
+
+    if (!organizationId || !organizationId.trim()) {
+      return { success: false, error: "OTM identifikatori ko'rsatilmadi." };
+    }
+
+    const [org] = await db
+      .select({
+        id: organizations.id,
+        name: organizations.name,
+      })
+      .from(organizations)
+      .where(eq(organizations.id, organizationId))
+      .limit(1);
+
+    if (!org) {
+      return { success: false, error: "Bunday OTM topilmadi." };
+    }
+
+    if (confirmationName.trim().toLowerCase() !== org.name.trim().toLowerCase()) {
+      return {
+        success: false,
+        error: `Tasdiqlash nomi noto'g'ri kiritildi. OTM nomini aynan ko'chirib yozing.`,
+      };
+    }
+
+    await db.transaction(async (tx) => {
+      // 1. Ushbu OTMga biriktirilgan profillarni topish
+      const orgProfiles = await tx
+        .select({ userId: profiles.userId })
+        .from(profiles)
+        .where(eq(profiles.organizationId, organizationId));
+
+      const userIds = orgProfiles.map((p) => p.userId);
+
+      // 2. Ushbu foydalanuvchilarning sessiyalari, accountlari va profillarini o'chirish
+      if (userIds.length > 0) {
+        await tx.delete(session).where(inArray(session.userId, userIds));
+        await tx.delete(account).where(inArray(account.userId, userIds));
+        await tx.delete(profiles).where(eq(profiles.organizationId, organizationId));
+        await tx.delete(user).where(inArray(user.id, userIds));
+      }
+
+      // 3. Audit va tekshiruvlar jadvallaridan tozalash
+      await tx.delete(cycleConflicts).where(eq(cycleConflicts.organizationId, organizationId));
+      await tx.delete(scanEvents).where(eq(scanEvents.organizationId, organizationId));
+      await tx.delete(roomAudits).where(eq(roomAudits.organizationId, organizationId));
+      await tx.delete(cycleItems).where(eq(cycleItems.organizationId, organizationId));
+      await tx.delete(inventoryCycles).where(eq(inventoryCycles.organizationId, organizationId));
+      await tx.delete(systemAuditLogs).where(eq(systemAuditLogs.organizationId, organizationId));
+
+      // 4. Inventarizatsiya buyumlari (items) ni o'chirish
+      await tx.delete(items).where(eq(items.organizationId, organizationId));
+
+      // 5. Lokatsiyalar: xonalar, qavatlar, binolarni o'chirish
+      await tx.delete(rooms).where(eq(rooms.organizationId, organizationId));
+      await tx.delete(floors).where(eq(floors.organizationId, organizationId));
+      await tx.delete(buildings).where(eq(buildings.organizationId, organizationId));
+
+      // 6. OTMning o'zini o'chirish
+      await tx.delete(organizations).where(eq(organizations.id, organizationId));
+    });
+
+    logSecurityAudit({
+      event: "ORGANIZATION_DELETED",
+      actorUserId,
+      organizationId,
+      metadata: { deletedOrganizationName: org.name },
+    });
+
+    revalidatePath("/admin/organizations");
+    revalidatePath("/admin/administrators");
+    revalidatePath("/admin");
+
+    return { success: true };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : "OTMni o'chirishda kutilmagan xatolik yuz berdi.",
+    };
   }
 }

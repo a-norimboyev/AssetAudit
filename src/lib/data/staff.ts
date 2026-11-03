@@ -17,19 +17,21 @@ export interface StaffListItem {
 
 export interface StaffStats {
   totalStaff: number;
+  headsCount: number;
   inspectorsCount: number;
   registrarsCount: number;
   activeStaffCount: number;
 }
 
 /**
- * 1. Tashkilot xodimlari statistikasi (Faqat inspector va registrar)
+ * 1. Tashkilot xodimlari statistikasi (Boshliq, Inspector va Registrar)
  * Qat'iy tenant izolyatsiyasi: Faqat berilgan organizationId bo'yicha
  */
 export async function getOrganizationStaffStats(organizationId: string): Promise<StaffStats> {
   const [stats] = await db
     .select({
       total: sql<number>`count(*)::int`,
+      heads: sql<number>`count(*) filter (where ${profiles.role} = 'head')::int`,
       inspectors: sql<number>`count(*) filter (where ${profiles.role} = 'inspector')::int`,
       registrars: sql<number>`count(*) filter (where ${profiles.role} = 'registrar')::int`,
       active: sql<number>`count(*) filter (where ${profiles.isActive} = true)::int`,
@@ -38,12 +40,13 @@ export async function getOrganizationStaffStats(organizationId: string): Promise
     .where(
       and(
         eq(profiles.organizationId, organizationId),
-        inArray(profiles.role, ["inspector", "registrar"])
+        inArray(profiles.role, ["head", "inspector", "registrar"])
       )
     );
 
   return {
     totalStaff: stats?.total ?? 0,
+    headsCount: stats?.heads ?? 0,
     inspectorsCount: stats?.inspectors ?? 0,
     registrarsCount: stats?.registrars ?? 0,
     activeStaffCount: stats?.active ?? 0,
@@ -70,7 +73,7 @@ export async function getOrganizationStaffList(organizationId: string): Promise<
     .where(
       and(
         eq(profiles.organizationId, organizationId),
-        inArray(profiles.role, ["inspector", "registrar"])
+        inArray(profiles.role, ["head", "inspector", "registrar"])
       )
     )
     .orderBy(desc(profiles.createdAt));

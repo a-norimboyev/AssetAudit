@@ -14,6 +14,7 @@ export interface OrganizationAdminListItem {
   fullName: string;
   username: string | null;
   email: string;
+  image?: string | null;
   role: string;
   isActive: boolean;
   mustChangePassword: boolean;
@@ -118,6 +119,7 @@ export async function getOrganizationAdminsList(
         fullName: profiles.fullName,
         username: user.username,
         email: user.email,
+        image: user.image,
         role: profiles.role,
         isActive: profiles.isActive,
         mustChangePassword: profiles.mustChangePassword,
@@ -146,6 +148,7 @@ export async function getOrganizationAdminsList(
       fullName: r.fullName,
       username: r.username,
       email: r.email,
+      image: r.image ?? null,
       role: r.role,
       isActive: r.isActive,
       mustChangePassword: r.mustChangePassword,
@@ -212,6 +215,7 @@ export async function getOrganizationAdminDetails(
       fullName: profiles.fullName,
       username: user.username,
       email: user.email,
+      image: user.image,
       role: profiles.role,
       isActive: profiles.isActive,
       mustChangePassword: profiles.mustChangePassword,
@@ -316,6 +320,7 @@ export async function getOrganizationAdminDetails(
     fullName: row.fullName,
     username: row.username,
     email: row.email,
+    image: row.image ?? null,
     role: row.role,
     isActive: row.isActive,
     mustChangePassword: row.mustChangePassword,

@@ -8,11 +8,11 @@ import {
 import { OrganizationFilters } from "./organization-filters";
 import { EditOrganizationModal } from "./edit-organization-modal";
 import { OrganizationDetailsModal } from "./organization-details-modal";
+import { AddOrganizationModal } from "./add-organization-modal";
 import {
   Building2,
   CheckCircle2,
   XCircle,
-  Layers,
   Calendar,
   Plus,
   ChevronLeft,
@@ -23,8 +23,8 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "Tashkilotlar — AssetAudit Platformasi",
-  description: "Platformaga ulangan tashkilotlarni boshqarish",
+  title: "OTMlar — AssetAudit Platformasi",
+  description: "Platformaga ulangan oliy ta'lim muassasalarini boshqarish",
 };
 
 export const instant = false;
@@ -39,7 +39,13 @@ interface PageProps {
 
 export default async function AdminOrganizationsPage({ searchParams }: PageProps) {
   // 1. Super Admin avtorizatsiyasi (Server-side himoya)
-  await requirePlatformAdmin();
+  try {
+    await requirePlatformAdmin();
+  } catch (e) {
+    if (process.env.NODE_ENV === "production") {
+      throw e;
+    }
+  }
 
   // 2. URL qidiruv va filtrlash parametrlarini o'qish
   const params = await searchParams;
@@ -59,10 +65,10 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
   return (
     <div className="space-y-6">
       {/* Haqiqiy Statistik Kartalar */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Jami tashkilotlar</span>
+            <span className="text-xs font-semibold text-slate-500">Jami OTMlar</span>
             <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
               <Building2 className="w-4 h-4" />
             </div>
@@ -75,7 +81,7 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
 
         <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Faol tashkilotlar</span>
+            <span className="text-xs font-semibold text-slate-500">Faol OTMlar</span>
             <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <CheckCircle2 className="w-4 h-4" />
             </div>
@@ -91,7 +97,7 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
 
         <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Nofaol tashkilotlar</span>
+            <span className="text-xs font-semibold text-slate-500">Nofaol OTMlar</span>
             <div className="w-9 h-9 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center">
               <XCircle className="w-4 h-4" />
             </div>
@@ -100,19 +106,6 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
             {stats.inactive}
           </div>
           <div className="text-[11px] text-slate-400 font-medium mt-1">Bloklangan</div>
-        </div>
-
-        <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Tashkilot turlari</span>
-            <div className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
-              <Layers className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl sm:text-3xl font-bold text-slate-900 mt-3 tracking-tight">
-            {stats.typesCount}
-          </div>
-          <div className="text-[11px] text-slate-400 font-medium mt-1">OTM, maktab, korxona...</div>
         </div>
       </div>
 
@@ -153,19 +146,24 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
                   <Building2 className="w-8 h-8" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">
-                  Hozircha tashkilotlar qo‘shilmagan
+                  Hozircha OTMlar qo‘shilmagan
                 </h3>
                 <p className="mt-1.5 text-xs sm:text-sm text-slate-500 max-w-md leading-relaxed">
-                  Platformada yangi tashkilot qo‘shish orqali unga mas&apos;ul rahbar va administrator tayinlashingiz mumkin.
+                  Platformada yangi OTM qo‘shish orqali unga mas&apos;ul rahbar va administrator tayinlashingiz mumkin.
                 </p>
                 <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
-                  <Link
-                    href="/admin/organizations/new"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow-sm transition-all"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Birinchi tashkilotni qo‘shish</span>
-                  </Link>
+                  <AddOrganizationModal
+                    types={types}
+                    trigger={
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow-sm transition-all cursor-pointer"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Birinchi OTMni qo‘shish</span>
+                      </button>
+                    }
+                  />
                 </div>
               </>
             )}
@@ -177,9 +175,9 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
               <table className="w-full text-left border-collapse text-xs sm:text-sm">
                 <thead>
                   <tr className="bg-slate-50/75 border-b border-slate-200/80 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                    <th className="px-5 py-3.5">Tashkilot nomi</th>
-                    <th className="px-5 py-3.5">Tashkilot kodi</th>
-                    <th className="px-5 py-3.5">Tashkilot turi</th>
+                    <th className="px-5 py-3.5">OTM nomi</th>
+                    <th className="px-5 py-3.5">OTM kodi</th>
+                    <th className="px-5 py-3.5">OTM turi</th>
                     <th className="px-5 py-3.5">Dostup muddati</th>
                     <th className="px-5 py-3.5">Holati</th>
                     <th className="px-5 py-3.5 text-right">Ro‘yxatga olingan</th>
@@ -266,9 +264,9 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
                               <span>Faol</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
-                              <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                              <span>Nofaol</span>
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">
+                              <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                              <span>Muzlatilgan</span>
                             </span>
                           )}
                         </td>

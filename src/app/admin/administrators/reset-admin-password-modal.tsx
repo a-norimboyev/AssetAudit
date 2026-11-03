@@ -46,7 +46,7 @@ export function ResetAdminPasswordModal({
 
   function handleCopy() {
     if (!result?.credentials) return;
-    const text = `AssetAudit Tashkilot Administratori Kirish Ma'lumotlari (Parol Yangilandi):\nKirish emaili: ${result.credentials.username}\nYangi Vaqtinchalik Parol: ${result.credentials.temporaryPassword}\nF.I.SH: ${result.credentials.fullName}\nTashkilot: ${organizationName || "Asosiy"}\nKirish manzili: ${typeof window !== "undefined" ? window.location.origin : ""}/login\n(Eslatma: Tizimga birinchi kirishda yangi shaxsiy parol o'rnatish majburiydir)`;
+    const text = `AssetAudit Tashkilot Administratori Kirish Ma'lumotlari (Parol Yangilandi):\nAdmin logini: ${result.credentials.username}\nYangi Vaqtinchalik Parol: ${result.credentials.temporaryPassword}\nF.I.SH: ${result.credentials.fullName}\nTashkilot: ${organizationName || "Asosiy"}\nKirish manzili: ${typeof window !== "undefined" ? window.location.origin : ""}/login\n(Eslatma: Tizimga birinchi kirishda yangi shaxsiy parol o'rnatish majburiydir)`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -81,7 +81,7 @@ export function ResetAdminPasswordModal({
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-slate-900">Administrator parolini qayta o‘rnatish</h3>
-                  <p className="text-[11px] text-slate-500">{fullName} ({username || "Email yo'q"})</p>
+                  <p className="text-[11px] text-slate-500">{fullName} ({username || "Login yo'q"})</p>
                 </div>
               </div>
               <button
@@ -114,7 +114,7 @@ export function ResetAdminPasswordModal({
                     <span className="text-white font-bold">{result.credentials.fullName}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400">Kirish emaili:</span>{" "}
+                    <span className="text-slate-400">Admin logini:</span>{" "}
                     <span className="text-blue-300 font-bold">{result.credentials.username}</span>
                   </div>
                   <div className="pt-2 border-t border-slate-800 flex items-center justify-between">

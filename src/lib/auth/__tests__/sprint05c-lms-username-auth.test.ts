@@ -108,12 +108,12 @@ describe("AssetAudit — Sprint 05C: LMS Uslubidagi Login va Parol Tizimi", () =
   describe("3. Generic Xatoliklar va User Enumeration Himoyasi", () => {
     it("Noto'g'ri username kiritilganda generic umumiy xatolik xabari qaytishi shart", () => {
       const msg = mapLoginError({ status: 401, code: "INVALID_USERNAME_OR_PASSWORD" });
-      assert.equal(msg, "Login, email yoki parol noto'g'ri kiritildi.");
+      assert.equal(msg, "Login yoki parol noto'g'ri kiritildi.");
     });
 
     it("Noto'g'ri email kiritilganda ham generic umumiy xatolik xabari qaytishi shart", () => {
       const msg = mapLoginError({ status: 401, code: "INVALID_EMAIL_OR_PASSWORD" });
-      assert.equal(msg, "Login, email yoki parol noto'g'ri kiritildi.");
+      assert.equal(msg, "Login yoki parol noto'g'ri kiritildi.");
     });
 
     it("429 rate limit holatida kutish xabari berilishi shart", () => {

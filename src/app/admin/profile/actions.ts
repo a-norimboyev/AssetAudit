@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { requirePlatformAdmin } from "@/lib/auth/authorization";
 import { db } from "@/lib/db";
 import { user, account } from "@/lib/db/schema/auth";
+import { profiles } from "@/lib/db/schema/profiles";
 import { eq, and, ne, or } from "drizzle-orm";
 import { hashPassword, verifyPassword } from "better-auth/crypto";
 import { logSecurityAudit } from "@/lib/audit/logger";
@@ -16,11 +17,129 @@ export interface ProfileActionResult {
 }
 
 /**
+ * 0. Super Admin ism-familiyasi va loginini o'zgartirish
+ */
+export async function updateAdminProfileAction(data: {
+  fullName: string;
+  username: string;
+}): Promise<ProfileActionResult> {
+  try {
+    const authContext = await requirePlatformAdmin();
+
+    if (authContext.profile.role !== "super_admin") {
+      return {
+        success: false,
+        error: "Ruxsat etilmagan: Faqat Super Admin o'z ma'lumotlarini o'zgartirishi mumkin.",
+      };
+    }
+
+    const currentUserId = authContext.user.id;
+    const trimmedName = (data.fullName || "").trim();
+    const trimmedUsername = (data.username || "").trim().toLowerCase();
+
+    // 1. Ism validatsiyasi
+    if (!trimmedName || trimmedName.length < 2) {
+      return {
+        success: false,
+        error: "Ism va familiya kamida 2 ta belgidan iborat bo'lishi kerak.",
+      };
+    }
+
+    // 2. Login validatsiyasi
+    if (!trimmedUsername || trimmedUsername.length < 3) {
+      return {
+        success: false,
+        error: "Login kamida 3 ta belgidan iborat bo'lishi kerak.",
+      };
+    }
+
+    if (!/^[a-z0-9._-]+$/.test(trimmedUsername)) {
+      return {
+        success: false,
+        error: "Login faqat kichik lotin harflari, raqamlar, nuqta va chiziqchadan iborat bo'lishi mumkin.",
+      };
+    }
+
+    // 3. Login takrorlanmasligi tekshiruvi
+    const existing = await db
+      .select({ id: user.id })
+      .from(user)
+      .where(
+        and(
+          or(eq(user.username, trimmedUsername), eq(user.email, trimmedUsername)),
+          ne(user.id, currentUserId)
+        )
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      return {
+        success: false,
+        error: "Ushbu login allaqachon band. Iltimos, boshqa login tanlang.",
+      };
+    }
+
+    // 4. user va profiles jadvallarini yangilash
+    await db
+      .update(user)
+      .set({
+        name: trimmedName,
+        username: trimmedUsername,
+        displayUsername: trimmedUsername,
+        updatedAt: new Date(),
+      })
+      .where(eq(user.id, currentUserId));
+
+    await db
+      .update(profiles)
+      .set({
+        fullName: trimmedName,
+        updatedAt: new Date(),
+      })
+      .where(eq(profiles.userId, currentUserId));
+
+    logSecurityAudit({
+      event: "PASSWORD_CHANGED",
+      actorUserId: currentUserId,
+      metadata: {
+        action: "ADMIN_PROFILE_UPDATED",
+        newFullName: trimmedName,
+        newUsername: trimmedUsername,
+      },
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/profile");
+    revalidatePath("/admin/administrators");
+
+    return {
+      success: true,
+      message: "Ma'lumotlar muvaffaqiyatli saqlandi!",
+    };
+  } catch (error) {
+    console.error("[updateAdminProfileAction] Error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Ma'lumotlarni saqlashda xatolik yuz berdi.",
+    };
+  }
+}
+
+/**
  * 1. Kirish emailini (Gmail) yoki foydalanuvchi nomini o'zgartirish
  */
 export async function updateUsernameAction(newEmailOrUsername: string): Promise<ProfileActionResult> {
   try {
     const authContext = await requirePlatformAdmin();
+
+    // Faqat Super Admin hisob loginini o'zgartirishi mumkin
+    if (authContext.profile.role !== "super_admin") {
+      return {
+        success: false,
+        error: "Ruxsat etilmagan: Faqat Super Admin hisob loginini o'zgartirishi mumkin.",
+      };
+    }
+
     const currentUserId = authContext.user.id;
 
     const trimmed = (newEmailOrUsername || "").trim().toLowerCase();
@@ -29,7 +148,7 @@ export async function updateUsernameAction(newEmailOrUsername: string): Promise<
     if (!trimmed || trimmed.length < 3) {
       return {
         success: false,
-        error: "Kirish emaili kamida 3 ta belgidan iborat bo'lishi kerak.",
+        error: "Login kamida 3 ta belgidan iborat bo'lishi kerak.",
       };
     }
 
@@ -39,13 +158,13 @@ export async function updateUsernameAction(newEmailOrUsername: string): Promise<
       if (!emailRegex.test(trimmed)) {
         return {
           success: false,
-          error: "To'g'ri email manzilini kiriting (masalan: admin@gmail.com).",
+          error: "Login formatida xatolik bor.",
         };
       }
     } else if (!/^[a-z0-9._-]+$/.test(trimmed)) {
       return {
         success: false,
-        error: "Email yoki nom faqat kichik lotin harflari, raqamlar, nuqta va chiziqchadan iborat bo'lishi mumkin.",
+        error: "Login faqat kichik lotin harflari, raqamlar, nuqta va chiziqchadan iborat bo'lishi mumkin.",
       };
     }
 
@@ -64,7 +183,7 @@ export async function updateUsernameAction(newEmailOrUsername: string): Promise<
     if (existing.length > 0) {
       return {
         success: false,
-        error: "Ushbu email/login allaqachon band. Iltimos, boshqa email tanlang.",
+        error: "Ushbu login allaqachon band. Iltimos, boshqa login tanlang.",
       };
     }
 
@@ -83,7 +202,7 @@ export async function updateUsernameAction(newEmailOrUsername: string): Promise<
       event: "PASSWORD_CHANGED",
       actorUserId: currentUserId,
       metadata: {
-        action: "LOGIN_EMAIL_CHANGED",
+        action: "LOGIN_CHANGED",
         newEmailOrUsername: trimmed,
       },
     });
@@ -94,13 +213,13 @@ export async function updateUsernameAction(newEmailOrUsername: string): Promise<
 
     return {
       success: true,
-      message: `Kirish emaili muvaffaqiyatli "${trimmed}" ga o'zgartirildi!`,
+      message: `Login muvaffaqiyatli "${trimmed}" ga o'zgartirildi!`,
     };
   } catch (error) {
     console.error("[updateUsernameAction] Error:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Emailni o'zgartirishda xatolik yuz berdi.",
+      error: error instanceof Error ? error.message : "Loginni o'zgartirishda xatolik yuz berdi.",
     };
   }
 }
@@ -232,6 +351,48 @@ export async function updateLanguageAction(lang: string): Promise<ProfileActionR
     return {
       success: false,
       error: "Tilni o'zgartirishda xatolik yuz berdi.",
+    };
+  }
+}
+
+/**
+ * 4. Profil rasmini (Avatar) saqlash yoki o'chirish
+ */
+export async function updateAvatarAction(imageUrl: string | null): Promise<ProfileActionResult> {
+  try {
+    const authContext = await requirePlatformAdmin();
+
+    if (authContext.profile.role !== "super_admin") {
+      return {
+        success: false,
+        error: "Ruxsat etilmagan: Faqat Super Admin profil rasmini o'zgartirishi mumkin.",
+      };
+    }
+
+    const currentUserId = authContext.user.id;
+
+    await db
+      .update(user)
+      .set({
+        image: imageUrl || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(user.id, currentUserId));
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/profile");
+
+    return {
+      success: true,
+      message: imageUrl
+        ? "Profil rasmi muvaffaqiyatli saqlandi!"
+        : "Profil rasmi o'chirildi.",
+    };
+  } catch (error) {
+    console.error("[updateAvatarAction] Error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Rasm saqlashda xatolik yuz berdi.",
     };
   }
 }

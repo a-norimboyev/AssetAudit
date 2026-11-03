@@ -26,6 +26,7 @@ import {
 } from "./actions";
 import type { PlatformSettings } from "@/lib/data/platform-settings";
 import type { BackupInfo } from "@/lib/data/backup-service";
+import { useAdminToast } from "../admin-toast-context";
 
 interface SettingsManagerProps {
   initialSettings: PlatformSettings;
@@ -51,6 +52,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
     isHealthy: boolean;
   } | null>(null);
 
+  const { showSuccessToast } = useAdminToast();
   const [feedback, setFeedback] = useState<{
     type: "success" | "error";
     message: string;
@@ -72,10 +74,8 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
     startTransition(async () => {
       const res = await updatePlatformSettingsAction(settings);
       if (res.success) {
-        setFeedback({
-          type: "success",
-          message: res.message || "Platforma sozlamalari muvaffaqiyatli saqlandi!",
-        });
+        setFeedback(null);
+        showSuccessToast("Muvaffaqiyatli o'zgartirildi");
       } else {
         setFeedback({
           type: "error",
@@ -107,10 +107,8 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
         setBackupsList(updated.backups);
         if (updated.stats) setDbLiveStats(updated.stats);
 
-        setFeedback({
-          type: "success",
-          message: res.message || "PostgreSQL ma'lumotlar bazasining zaxira nusxasi olindi!",
-        });
+        setFeedback(null);
+        showSuccessToast("Muvaffaqiyatli o'zgartirildi");
       } else {
         setFeedback({
           type: "error",
@@ -129,10 +127,8 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
         settings.integrations.telegramAlertChatId
       );
       if (res.success) {
-        setFeedback({
-          type: "success",
-          message: res.message || "Test xabarnomasi muvaffaqiyatli yuborildi!",
-        });
+        setFeedback(null);
+        showSuccessToast("Muvaffaqiyatli o'zgartirildi");
       } else {
         setFeedback({
           type: "error",
@@ -189,21 +185,11 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
         </div>
       )}
 
-      {/* Xabar/Aloqa bildirishnomasi */}
-      {feedback && (
-        <div
-          className={`p-4 rounded-xl flex items-center justify-between text-xs font-semibold ${
-            feedback.type === "success"
-              ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-              : "bg-rose-50 text-rose-800 border border-rose-200"
-          }`}
-        >
+      {/* Xatolik bildirishnomasi */}
+      {feedback && feedback.type === "error" && (
+        <div className="p-4 rounded-xl flex items-center justify-between text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
           <div className="flex items-center gap-2">
-            {feedback.type === "success" ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            ) : (
-              <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
-            )}
+            <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
             <span>{feedback.message}</span>
           </div>
           <button

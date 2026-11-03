@@ -15,6 +15,9 @@ import {
   Check,
   Hourglass,
   Sparkles,
+  Coins,
+  Upload,
+  Trash2,
 } from "lucide-react";
 import { createOrganizationAction } from "../actions";
 import { validateOrganizationInput, generateCodeFromName } from "@/lib/validations/organization";
@@ -65,10 +68,60 @@ interface NewOrganizationFormProps {
 }
 
 export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
-  // Tashkilot maydonlari
+  // Universitet maydonlari
   const [name, setName] = useState("");
   const [typeId, setTypeId] = useState(types[0]?.id || "university");
-  const [isActive, setIsActive] = useState(true);
+  const [assetLimitMlrd, setAssetLimitMlrd] = useState<number>(500);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [isLogoUploading, setIsLogoUploading] = useState(false);
+  const [logoError, setLogoError] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp", "image/svg+xml"].includes(file.type)) {
+      setLogoError("Faqat JPG, PNG, WebP yoki SVG formatidagi rasmlar qabul qilinadi.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setLogoError("Rasm hajmi 5MB dan oshmasligi kerak.");
+      return;
+    }
+
+    setIsLogoUploading(true);
+    setLogoError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "logos");
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (!data.success || !data.url) {
+        setLogoError(data.error || "Logoni yuklashda xatolik yuz berdi.");
+        setIsLogoUploading(false);
+        return;
+      }
+
+      setLogoUrl(data.url);
+      setLogoError(null);
+    } catch {
+      setLogoError("Server bilan aloqa uzildi.");
+    } finally {
+      setIsLogoUploading(false);
+      if (logoInputRef.current) {
+        logoInputRef.current.value = "";
+      }
+    }
+  };
 
   // Dostup muddati va litsenziya
   const [selectedPreset, setSelectedPreset] = useState<string>("1_year");
@@ -135,8 +188,8 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
 
   function handleCopyCredentials() {
     if (!createdCredentials) return;
-    const emailValue = createdCredentials.email || createdCredentials.username;
-    const text = `AssetAudit Tashkilot Administratori:\nTashkilot: ${name}\nGmail: ${emailValue}\nParol: ${createdCredentials.temporaryPassword || adminPassword || "Belgilangan parol"}\nRoli: ${createdCredentials.role}`;
+    const loginValue = createdCredentials.username || createdCredentials.email?.split("@")[0];
+    const text = `AssetAudit — Universitet Administratori:\nUniversitet: ${name}\nAktivlar Limiti: ${assetLimitMlrd} mlrd so'm\nLitsenziya: ${getSummary().label}\nAdmin Logini: ${loginValue}\nParol: ${createdCredentials.temporaryPassword || adminPassword || "Belgilangan parol"}\nRoli: OTM Rahbari/Admini`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -218,7 +271,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
       name,
       code: generateCodeFromName(name),
       typeId,
-      isActive,
+      isActive: true,
     });
 
     const errors: Record<string, string> = {};
@@ -228,9 +281,9 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
     }
 
     if (!adminUsername.trim()) {
-      errors.adminUsername = "Gmail manzilini kiritish majburiy.";
+      errors.adminUsername = "Admin loginini kiritish majburiy.";
     } else if (adminUsername.trim().length < 3) {
-      errors.adminUsername = "Gmail manzili kamida 3 ta belgidan iborat bo'lishi kerak.";
+      errors.adminUsername = "Login kamida 3 ta belgidan iborat bo'lishi kerak.";
     }
 
     if (!adminPassword.trim()) {
@@ -253,14 +306,16 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
         name: clientValidation.normalized.name,
         code: clientValidation.normalized.code,
         typeId: clientValidation.normalized.typeId,
-        isActive: clientValidation.normalized.isActive,
+        isActive: true,
+        assetLimitMlrd: Number(assetLimitMlrd) || 500,
         subscriptionPlan: selectedPreset,
         subscriptionExpiresAt: summary.targetDate.toISOString(),
         subscriptionNotes: summary.label,
-        adminFullName: adminFullName.trim() || `${clientValidation.normalized.name} Administratori`,
+        adminFullName: adminFullName.trim() || `${clientValidation.normalized.name} Bosh Administratori`,
         adminUsername: adminUsername.trim(),
         adminPassword: adminPassword.trim() || undefined,
         adminPhone: adminPhone.trim() || undefined,
+        logoUrl: logoUrl || undefined,
       });
 
       if (!result.success) {
@@ -293,7 +348,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
         <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-center gap-3 shadow-xs">
           <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
           <p className="font-semibold">
-            Tashkilot va uning boshqaruvchisi (administrator) muvaffaqiyatli yaratildi!
+            Universitet va uning boshqaruvchi administratori muvaffaqiyatli yaratildi!
           </p>
         </div>
 
@@ -323,16 +378,24 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
 
           <div className="space-y-1.5 text-xs sm:text-sm">
             <div>
-              <span className="text-slate-400 font-sans text-xs">Tashkilot: </span>
+              <span className="text-slate-400 font-sans text-xs">Universitet: </span>
               <strong className="text-white font-semibold font-sans">{name}</strong>
+            </div>
+            <div>
+              <span className="text-slate-400 font-sans text-xs">Aktivlar balansi limiti: </span>
+              <strong className="text-emerald-400 font-bold font-sans">{assetLimitMlrd} mlrd so‘m</strong>
+            </div>
+            <div>
+              <span className="text-slate-400 font-sans text-xs">Litsenziya muddati: </span>
+              <strong className="text-indigo-300 font-semibold font-sans">{getSummary().label} ({getSummary().formattedTarget} gacha)</strong>
             </div>
             <div>
               <span className="text-slate-400 font-sans text-xs">Administrator: </span>
               <strong className="text-white font-semibold font-sans">{createdCredentials.fullName}</strong>
             </div>
             <div>
-              <span className="text-slate-400 font-sans text-xs">Admin Gmail: </span>
-              <strong className="text-blue-400 font-bold tracking-wide">{createdCredentials.email || createdCredentials.username}</strong>
+              <span className="text-slate-400 font-sans text-xs">Admin logini: </span>
+              <strong className="text-blue-400 font-bold tracking-wide">{createdCredentials.username || createdCredentials.email?.split("@")[0]}</strong>
             </div>
             {createdCredentials.temporaryPassword && (
               <div>
@@ -349,7 +412,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
           </div>
 
           <div className="pt-2 text-[11px] text-slate-400 font-sans leading-relaxed border-t border-slate-800/80">
-            Eslatma: Foydalanuvchi ushbu ma&apos;lumotlar orqali tizimga kiradi. Xavfsizlik maqsadida ushbu kirish emaili va parolni nusxalab oling yoki tashkilot rahbariga taqdim eting.
+            Eslatma: Universitet administratori ushbu login va parol orqali tizimga kiradi. Ma&apos;lumotlarni nusxalab, mas&apos;ul shaxsga taqdim eting.
           </div>
         </div>
 
@@ -359,7 +422,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
             className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors"
           >
             <Building2 className="w-4 h-4" />
-            <span>Tashkilotlar ro‘yxatiga o‘tish</span>
+            <span>OTMlar ro‘yxatiga o‘tish</span>
           </Link>
         </div>
       </div>
@@ -383,20 +446,84 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
       )}
 
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-6 sm:p-8 space-y-6">
-        {/* 1-Qism: Tashkilot rekvizitlari */}
+        {/* 1-Qism: Universitet ma'lumotlari */}
         <div className="border-b border-slate-100 pb-4">
           <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
               <Building2 className="w-4 h-4" />
             </div>
-            <span>Tashkilot rekvizitlari</span>
+            <span>Universitet ma&apos;lumotlari</span>
           </h2>
         </div>
 
-        {/* Tashkilot rasmiy nomi */}
+        {/* Universitet logotipi */}
+        <div>
+          <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+            Universitet logotipi (ixtiyoriy)
+          </label>
+          <input
+            ref={logoInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/svg+xml"
+            onChange={handleLogoFileChange}
+            className="hidden"
+          />
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden relative">
+              {logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={logoUrl}
+                  alt="Universitet logosi"
+                  className="w-full h-full object-contain p-1"
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
+                  <Building2 className="w-7 h-7 stroke-1" />
+                </div>
+              )}
+              {isLogoUploading && (
+                <div className="absolute inset-0 bg-white/80 flex items-center justify-center">
+                  <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => logoInputRef.current?.click()}
+                disabled={isLogoUploading}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <Upload className="w-4 h-4 text-slate-500" />
+                <span>{logoUrl ? "Logoni almashtirish" : "Logotip yuklash"}</span>
+              </button>
+
+              {logoUrl && (
+                <button
+                  type="button"
+                  onClick={() => setLogoUrl(null)}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>O‘chirish</span>
+                </button>
+              )}
+              <span className="text-xs text-slate-400 block w-full">
+                PNG, JPG, SVG yoki WebP (maks. 5MB)
+              </span>
+            </div>
+          </div>
+          {logoError && (
+            <p className="mt-1 text-xs text-rose-600 font-medium">{logoError}</p>
+          )}
+        </div>
+
+        {/* Universitet rasmiy nomi */}
         <div>
           <label htmlFor="name" className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
-            Tashkilotning rasmiy nomi <span className="text-red-500">*</span>
+            Universitet nomi <span className="text-red-500">*</span>
           </label>
           <input
             id="name"
@@ -411,7 +538,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
                 setFieldErrors((prev) => ({ ...prev, name: undefined }));
               }
             }}
-            placeholder="Tashkilotning rasmiy nomi"
+            placeholder="Masalan: Toshkent Axborot Texnologiyalari Universiteti"
             className={`w-full px-3.5 py-2.5 rounded-lg border text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100 ${
               fieldErrors.name
                 ? "border-red-300 bg-red-50/30 text-red-900 focus:border-red-500"
@@ -426,69 +553,66 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
           )}
         </div>
 
-        {/* Tashkilot turi */}
+        {/* Aktivlar balansi limiti */}
         <div>
-          <label htmlFor="typeId" className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
-            Tashkilot turi <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="typeId"
-            name="typeId"
-            required
-            disabled={isLoading}
-            value={typeId}
-            onChange={(e) => {
-              setTypeId(e.target.value);
-              if (fieldErrors.typeId) {
-                setFieldErrors((prev) => ({ ...prev, typeId: undefined }));
-              }
-            }}
-            className={`w-full px-3.5 py-2.5 rounded-lg border text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100 bg-white ${
-              fieldErrors.typeId
-                ? "border-red-300 bg-red-50/30 text-red-900 focus:border-red-500"
-                : "border-slate-200 bg-slate-50/50 text-slate-900 hover:border-slate-300 focus:border-blue-500 focus:bg-white cursor-pointer"
-            }`}
-          >
-            {types.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name} ({t.id})
-              </option>
-            ))}
-          </select>
-          {fieldErrors.typeId && (
-            <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
-              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-              <span>{fieldErrors.typeId}</span>
-            </p>
-          )}
+          <div className="flex items-center justify-between mb-1.5">
+            <label htmlFor="assetLimitMlrd" className="block text-xs sm:text-sm font-semibold text-slate-700">
+              Aktivlar balansi limiti <span className="text-red-500">*</span>
+            </label>
+            <span className="text-[11px] text-slate-500">Maksimal nazorat miqdori</span>
+          </div>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div className="relative flex-1">
+              <input
+                id="assetLimitMlrd"
+                name="assetLimitMlrd"
+                type="number"
+                min={1}
+                max={50000}
+                required
+                disabled={isLoading}
+                value={assetLimitMlrd}
+                onChange={(e) => {
+                  const val = Math.max(1, parseInt(e.target.value, 10) || 1);
+                  setAssetLimitMlrd(val);
+                }}
+                className="w-full pl-3.5 pr-28 py-2.5 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 hover:border-slate-300 focus:border-blue-500 focus:bg-white font-mono font-bold text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100"
+                placeholder="500"
+              />
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-500 pointer-events-none">
+                mlrd so‘m
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5">
+              {[100, 250, 500, 1000].map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => setAssetLimitMlrd(preset)}
+                  className={`flex-1 sm:flex-none px-3 py-2 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                    assetLimitMlrd === preset
+                      ? "bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-100"
+                      : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  {preset >= 1000 ? `${preset / 1000} trln` : `${preset} mlrd`}
+                </button>
+              ))}
+            </div>
+          </div>
+          <p className="mt-1 text-[11px] text-slate-500">
+            OTM hisobidagi aktivlar uchun ruxsat etilgan limit ({assetLimitMlrd} mlrd so‘m).
+          </p>
         </div>
 
-        {/* Faol / Nofaol holati */}
-        <div className="pt-2">
-          <label className="flex items-center gap-3 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              name="isActive"
-              disabled={isLoading}
-              checked={isActive}
-              onChange={(e) => setIsActive(e.target.checked)}
-              className="w-4 h-4 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500"
-            />
-            <span className="text-xs sm:text-sm font-semibold text-slate-900">
-              Tashkilot holati: Faol (Active)
-            </span>
-          </label>
-        </div>
-
-
-        {/* 2-Qism: Dostup muddati va Litsenziya */}
+        {/* 2-Qism: Litsenziya muddati */}
         <div className="border-t border-slate-100 pt-6 space-y-4">
           <div className="border-b border-slate-100 pb-3">
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
                 <Hourglass className="w-4 h-4" />
               </div>
-              <span>Dostup muddati va litsenziya</span>
+              <span>Litsenziya muddati</span>
             </h2>
           </div>
 
@@ -603,17 +727,17 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
           </div>
         </div>
 
-        {/* 3-Qism: Tashkilot administratori (Gmail va Parol) */}
+        {/* 3-Qism: Birinchi universitet admini */}
         <div className="border-t border-slate-100 pt-6 space-y-5">
           <div className="border-b border-slate-100 pb-3">
             <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
                 <ShieldCheck className="w-4 h-4" />
               </div>
-              <span>Tashkilot administratori</span>
+              <span>Birinchi universitet admini</span>
             </h2>
             <p className="text-xs text-slate-500 mt-1">
-              Tashkilot admini uchun Gmail manzili va yangi parol kiriting.
+              Universitet administratori uchun tizimga kirish logini va paroli.
             </p>
           </div>
 
@@ -633,7 +757,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
               name="adminFullName"
               type="text"
               autoComplete="off"
-              placeholder="Abdullayev Nodirbek"
+              placeholder="Masalan: Abdullayev Nodirbek"
               disabled={isLoading}
               value={adminFullName}
               onChange={(e) => setAdminFullName(e.target.value)}
@@ -641,19 +765,19 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
             />
           </div>
 
-          {/* Admin Gmail manzili */}
+          {/* Admin logini */}
           <div>
-            <label htmlFor="adminGmail" className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
-              Gmail manzili <span className="text-red-500">*</span>
+            <label htmlFor="adminUsername" className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+              Admin logini <span className="text-red-500">*</span>
             </label>
             <input
-              id="adminGmail"
-              name="adminGmail"
+              id="adminUsername"
+              name="adminUsername"
               type="text"
               autoComplete="off"
               data-lpignore="true"
               data-1p-ignore="true"
-              placeholder="Gmail manzilini kiriting"
+              placeholder="Masalan: tatu_admin"
               required
               disabled={isLoading}
               value={adminUsername}
@@ -676,7 +800,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
               </p>
             ) : (
               <p className="mt-1 text-[11px] text-slate-500">
-                Tashkilot admini ushbu Gmail manzili va parol bilan tizimga kiradi.
+                OTM administratori ushbu login va parol bilan tizimga kiradi.
               </p>
             )}
           </div>
@@ -783,7 +907,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
             ) : (
               <>
                 <Building2 className="w-4 h-4" />
-                <span>Tashkilotni yaratish</span>
+                <span>OTMni saqlash va yaratish</span>
               </>
             )}
           </button>

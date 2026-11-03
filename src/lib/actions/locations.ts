@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireOrganizationAdmin } from "@/lib/auth/authorization";
+import { requireOrganizationAdmin, requireLocationManager } from "@/lib/auth/authorization";
 import { db } from "@/lib/db";
 import { buildings, floors, rooms, type RoomType, ROOM_TYPES } from "@/lib/db/schema/locations";
 import { items } from "@/lib/db/schema/inventory";
@@ -53,7 +53,7 @@ export async function createBuildingAction(
   formData: FormData
 ): Promise<ActionResponse> {
   try {
-    const { organization } = await requireOrganizationAdmin();
+    const { organization } = await requireLocationManager();
 
     const name = (formData.get("name") as string)?.trim() || "";
     let code = (formData.get("code") as string)?.trim().toUpperCase() || "";
@@ -163,7 +163,7 @@ export async function createFloorAction(
   formData: FormData
 ): Promise<ActionResponse> {
   try {
-    const { organization } = await requireOrganizationAdmin();
+    const { organization } = await requireLocationManager();
 
     const buildingId = (formData.get("buildingId") as string)?.trim();
     const floorNumber = parseInt(formData.get("floorNumber") as string, 10);
@@ -176,13 +176,13 @@ export async function createFloorAction(
     }
 
     if (isNaN(floorNumber)) {
-      fieldErrors.floorNumber = "Qavat raqami kiritilishi shart (masalan: 1, 2, -1, 0).";
+      fieldErrors.floorNumber = "Qavat raqami kiritilishi shart - masalan: 1, 2, -1, 0.";
     } else if (floorNumber < -10 || floorNumber > 200) {
-      fieldErrors.floorNumber = "Qavat raqami -10 dan 200 gacha bo'lishi kerak (-10..-1 yerto'la, 0 zamin, 1..200 yuqori qavatlar).";
+      fieldErrors.floorNumber = "Qavat raqami -10 dan 200 oralig'ida bo'lishi kerak.";
     }
 
     if (!name) {
-      fieldErrors.name = "Qavat nomi kiritilishi shart (masalan: 1-qavat, Yerto'la).";
+      fieldErrors.name = "Qavat nomi kiritilishi shart - masalan: 1-qavat, Yerto'la.";
     }
 
     if (Object.keys(fieldErrors).length > 0) {
@@ -245,7 +245,7 @@ export async function createRoomAction(
   formData: FormData
 ): Promise<ActionResponse> {
   try {
-    const { organization } = await requireOrganizationAdmin();
+    const { organization } = await requireLocationManager();
 
     const buildingId = (formData.get("buildingId") as string)?.trim();
     const floorId = (formData.get("floorId") as string)?.trim();
@@ -262,7 +262,7 @@ export async function createRoomAction(
 
     if (!buildingId) fieldErrors.buildingId = "Bino tanlanishi shart.";
     if (!floorId) fieldErrors.floorId = "Qavat tanlanishi shart.";
-    if (!roomNumber) fieldErrors.roomNumber = "Xona raqami kiritilishi shart (masalan: 101, 204-A).";
+    if (!roomNumber) fieldErrors.roomNumber = "Xona raqami kiritilishi shart. Masalan: 101 yoki 204-A.";
     if (!name) fieldErrors.name = "Xona nomi kiritilishi shart.";
 
     if (Object.keys(fieldErrors).length > 0) {
@@ -332,7 +332,7 @@ export async function updateBuildingAction(
   formData: FormData
 ): Promise<ActionResponse> {
   try {
-    const { organization } = await requireOrganizationAdmin();
+    const { organization } = await requireLocationManager();
 
     const buildingId = (formData.get("buildingId") as string)?.trim();
     const name = (formData.get("name") as string)?.trim() || "";
@@ -451,7 +451,7 @@ export async function updateFloorAction(
   formData: FormData
 ): Promise<ActionResponse> {
   try {
-    const { organization } = await requireOrganizationAdmin();
+    const { organization } = await requireLocationManager();
 
     const floorId = (formData.get("floorId") as string)?.trim();
     const name = (formData.get("name") as string)?.trim() || "";
@@ -492,7 +492,7 @@ export async function updateRoomAction(
   formData: FormData
 ): Promise<ActionResponse> {
   try {
-    const { organization } = await requireOrganizationAdmin();
+    const { organization } = await requireLocationManager();
 
     const roomId = (formData.get("roomId") as string)?.trim();
     const name = (formData.get("name") as string)?.trim() || "";

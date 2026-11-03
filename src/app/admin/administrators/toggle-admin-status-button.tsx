@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { toggleOrganizationAdminStatusAction } from "@/lib/actions/staff";
+import { useAdminToast } from "../admin-toast-context";
 
 interface ToggleAdminStatusButtonProps {
   userId: string;
@@ -16,6 +17,7 @@ export function ToggleAdminStatusButton({
   isActive,
 }: ToggleAdminStatusButtonProps) {
   const [isPending, setIsPending] = useState(false);
+  const { showSuccessToast } = useAdminToast();
 
   async function handleToggle() {
     const nextState = !isActive;
@@ -30,6 +32,8 @@ export function ToggleAdminStatusButton({
       const res = await toggleOrganizationAdminStatusAction(userId, nextState);
       if (!res.success) {
         alert(res.message);
+      } else {
+        showSuccessToast("Muvaffaqiyatli o'zgartirildi");
       }
     } catch (err) {
       alert(err instanceof Error ? err.message : "Xatolik yuz berdi.");

@@ -4,10 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  LayoutDashboard,
   Building2,
   Users,
-  Sliders,
+  Megaphone,
   Settings,
   Menu,
   X,
@@ -16,7 +15,7 @@ import {
 interface NavItem {
   name: string;
   href: string;
-  icon: typeof LayoutDashboard;
+  icon: typeof Building2;
   exact?: boolean;
   disabled?: boolean;
   badge?: string;
@@ -24,16 +23,10 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   {
-    name: "Bosh sahifa",
+    name: "Universitetlar",
     href: "/admin",
-    icon: LayoutDashboard,
-    exact: true,
-  },
-  {
-    name: "Tashkilotlar",
-    href: "/admin/organizations",
     icon: Building2,
-    exact: false,
+    exact: true,
   },
   {
     name: "Administratorlar",
@@ -42,9 +35,9 @@ const NAV_ITEMS: NavItem[] = [
     exact: false,
   },
   {
-    name: "Platforma sozlamalari",
-    href: "/admin/settings",
-    icon: Sliders,
+    name: "Xabarnomalar",
+    href: "/admin/notifications",
+    icon: Megaphone,
     exact: false,
   },
   {
@@ -65,7 +58,7 @@ export function AdminNav() {
       <div className="lg:hidden flex items-center justify-between p-3.5 bg-white border-b border-slate-200">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Platforma Boshqaruvi
+            Super Admin
           </span>
         </div>
         <button

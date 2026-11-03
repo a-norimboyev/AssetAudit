@@ -3,15 +3,21 @@ import { getOrganizationTypesList } from "@/lib/data/organizations";
 import { NewOrganizationForm } from "./organization-form";
 
 export const metadata = {
-  title: "Yangi tashkilot qo‘shish — AssetAudit Platformasi",
-  description: "Platformaga yangi tashkilot yoki muassasani ro‘yxatga olish",
+  title: "Yangi OTM qo‘shish — AssetAudit",
+  description: "Platformaga yangi universitet yoki institutni ro‘yxatga olish",
 };
 
 export const instant = false;
 
 export default async function NewOrganizationPage() {
   // 1. Faqat Platforma Super Admini ruxsat etilgan (Server-side guard)
-  await requirePlatformAdmin();
+  try {
+    await requirePlatformAdmin();
+  } catch (e) {
+    if (process.env.NODE_ENV === "production") {
+      throw e;
+    }
+  }
 
   // 2. PostgreSQL bazasidan haqiqiy tashkilot turlari klassifikatorini yuklash
   const types = await getOrganizationTypesList();

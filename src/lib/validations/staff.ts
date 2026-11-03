@@ -10,16 +10,16 @@ export function validateStaffPassword(password: string): { valid: boolean; error
     return { valid: false, error: "Parol uzunligi kamida 12 ta belgidan iborat bo'lishi shart." };
   }
   if (!/[A-Z]/.test(password)) {
-    return { valid: false, error: "Parolda kamida bitta bosh (katta) harf bo'lishi shart [A-Z]." };
+    return { valid: false, error: "Parolda kamida bitta katta lotin harfi bo'lishi shart." };
   }
   if (!/[a-z]/.test(password)) {
-    return { valid: false, error: "Parolda kamida bitta kichik harf bo'lishi shart [a-z]." };
+    return { valid: false, error: "Parolda kamida bitta kichik lotin harfi bo'lishi shart." };
   }
   if (!/[0-9]/.test(password)) {
-    return { valid: false, error: "Parolda kamida bitta raqam bo'lishi shart [0-9]." };
+    return { valid: false, error: "Parolda kamida bitta raqam bo'lishi shart." };
   }
   if (!/[^A-Za-z0-9]/.test(password)) {
-    return { valid: false, error: "Parolda kamida bitta maxsus belgi bo'lishi shart (!@#$%^&*...)." };
+    return { valid: false, error: "Parolda kamida bitta maxsus belgi bo'lishi shart." };
   }
   return { valid: true };
 }
@@ -29,7 +29,7 @@ import crypto from "node:crypto";
 export function validateUsername(username: string): { valid: boolean; error?: string } {
   const trimmed = username.trim();
   if (!trimmed) {
-    return { valid: false, error: "Login (foydalanuvchi nomi) kiritilishi shart." };
+    return { valid: false, error: "Login nomi kiritilishi shart." };
   }
   if (trimmed.length < 3) {
     return { valid: false, error: "Login kamida 3 ta belgidan iborat bo'lishi shart." };
@@ -107,6 +107,8 @@ export interface StaffInput {
   password?: string;
 }
 
+export type ManagedStaffRole = "head" | "registrar" | "inspector";
+
 export function validateStaffInput(
   input: Partial<StaffInput>,
   orgCode?: string
@@ -117,7 +119,7 @@ export function validateStaffInput(
     fullName: string;
     username: string;
     email: string;
-    role: "inspector" | "registrar";
+    role: ManagedStaffRole;
     password?: string;
   };
 } {
@@ -140,7 +142,7 @@ export function validateStaffInput(
     if (rawUsername.includes("@")) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(rawUsername)) {
-        errors.username = "To'g'ri email manzilini kiriting (masalan: xodim@gmail.com).";
+        errors.username = "To'g'ri email manzilini kiriting - masalan: xodim@gmail.com.";
       } else {
         finalEmail = rawUsername.toLowerCase();
         finalUsername = finalEmail;
@@ -166,8 +168,8 @@ export function validateStaffInput(
     errors.username = "Xodim uchun kirish emaili kiritilishi shart.";
   }
 
-  if (role !== "inspector" && role !== "registrar") {
-    errors.role = "Faqat Inspektor yoki Moddiy javobgar shaxs (Registrar) rolini tanlash mumkin.";
+  if (role !== "head" && role !== "inspector" && role !== "registrar") {
+    errors.role = "Faqat Boshliq, Ro'yxatga oluvchi yoki Tekshiruvchi rolini tanlash mumkin.";
   }
 
   if (password) {
@@ -177,6 +179,9 @@ export function validateStaffInput(
     }
   }
 
+  const safeRole: ManagedStaffRole =
+    role === "head" ? "head" : role === "inspector" ? "inspector" : "registrar";
+
   return {
     valid: Object.keys(errors).length === 0,
     errors,
@@ -184,7 +189,7 @@ export function validateStaffInput(
       fullName,
       username: finalUsername,
       email: finalEmail,
-      role: role === "inspector" ? "inspector" : "registrar",
+      role: safeRole,
       password: password || undefined,
     },
   };

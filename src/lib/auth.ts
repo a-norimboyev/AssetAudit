@@ -33,7 +33,7 @@ function getAuthBaseUrl(): string {
   }
   if (process.env.NODE_ENV === "production") {
     throw new Error(
-      "AssetAudit: Production muhitida BETTER_AUTH_URL aniq domen bilan belgilanishi shart (masalan: https://assetaudit.uz)."
+      "AssetAudit: Production muhitida BETTER_AUTH_URL aniq domen bilan belgilanishi shart - masalan: https://assetaudit.uz."
     );
   }
   const port = process.env.PORT || "3001";

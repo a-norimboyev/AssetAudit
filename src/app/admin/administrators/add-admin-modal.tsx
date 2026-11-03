@@ -211,7 +211,7 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
     <>
       <button
         onClick={handleOpenModal}
-        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-xs transition-colors shrink-0 cursor-pointer"
+        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-xs transition-colors shrink-0 cursor-pointer"
       >
         <Plus className="w-4 h-4" />
         <span>Administrator qo‘shish</span>
@@ -219,11 +219,11 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/50 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden text-left animate-in zoom-in-95 duration-150">
+          <div className="w-full max-w-3xl bg-white rounded-md shadow-2xl border border-slate-200 overflow-hidden text-left animate-in zoom-in-95 duration-150">
             {/* Header */}
             <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                <div className="w-10 h-10 rounded bg-blue-600 text-white flex items-center justify-center shadow-xs">
                   <UserPlus className="w-5 h-5" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900">Administrator qo‘shish</h3>
@@ -231,7 +231,7 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
+                className="p-2 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -241,19 +241,19 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
             <div className="p-8">
               {result?.success && result.credentials ? (
                 <div className="space-y-6">
-                  <div className="p-4 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-sm flex items-center gap-3">
+                  <div className="p-4 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-sm flex items-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                     <span className="font-semibold">{result.message}</span>
                   </div>
 
-                  <div className="p-6 rounded-2xl bg-slate-900 text-white space-y-4 font-mono shadow-inner">
+                  <div className="p-6 rounded bg-slate-900 text-white space-y-4 font-mono shadow-inner">
                     <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                       <span className="text-slate-400 font-sans font-semibold text-xs uppercase tracking-wider">
                         Yaratilgan hisob ma&apos;lumotlari:
                       </span>
                       <button
                         onClick={copyCredentials}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-sans font-medium transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-sans font-medium transition-colors cursor-pointer"
                       >
                         {copied ? (
                           <>
@@ -286,7 +286,7 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
                         setIsOpen(false);
                         setResult(null);
                       }}
-                      className="px-7 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-xs transition-colors cursor-pointer"
+                      className="px-7 py-3 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-xs transition-colors cursor-pointer"
                     >
                       Tayyor
                     </button>
@@ -315,7 +315,7 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
                   />
 
                   {result?.message && !result.success && (
-                    <div className="p-4 rounded-xl text-sm flex items-center gap-3 bg-rose-50 text-rose-800 border border-rose-200">
+                    <div className="p-4 rounded text-sm flex items-center gap-3 bg-rose-50 text-rose-800 border border-rose-200">
                       <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
                       <span>{result.message}</span>
                     </div>
@@ -351,7 +351,7 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
                         placeholder="Universitet nomini yozing..."
                         className={`w-full ${
                           selectedLogo ? "pl-11" : "px-4"
-                        } pr-10 py-3.5 text-sm sm:text-base rounded-xl border ${
+                        } pr-10 py-3.5 text-sm sm:text-base rounded border ${
                           showOrgError ? "border-rose-300 ring-2 ring-rose-100" : "border-slate-200"
                         } bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-medium text-slate-900 transition-all placeholder:text-slate-400`}
                         autoComplete="off"
@@ -381,7 +381,7 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
 
                     {/* Qidiruv natijalari ro'yxati (Dropdown) — A dan Z gacha alifbo tartibida */}
                     {isOrgDropdownOpen && (
-                      <div className="absolute left-0 right-0 top-full mt-1.5 max-h-64 overflow-y-auto bg-white rounded-xl border border-slate-200 shadow-xl z-50 divide-y divide-slate-100 animate-in fade-in-50 duration-100">
+                      <div className="absolute left-0 right-0 top-full mt-1.5 max-h-64 overflow-y-auto bg-white rounded border border-slate-200 shadow-xl z-50 divide-y divide-slate-100 animate-in fade-in-50 duration-100">
                         {filteredOrgs.length > 0 ? (
                           filteredOrgs.map((org) => {
                             const isSelected = selectedOrg?.id === org.id;
@@ -434,7 +434,7 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="Ism va familiya"
                       required
-                      className="w-full px-4 py-3.5 text-sm sm:text-base rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-medium text-slate-900 transition-all placeholder:text-slate-400"
+                      className="w-full px-4 py-3.5 text-sm sm:text-base rounded border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-medium text-slate-900 transition-all placeholder:text-slate-400"
                       autoComplete="off"
                     />
                   </div>
@@ -463,7 +463,7 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
                         onChange={(e) => setUsername(e.target.value)}
                         placeholder="Login"
                         required
-                        className="w-full px-4 py-3.5 text-sm sm:text-base rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono font-medium text-slate-900 transition-all placeholder:text-slate-400"
+                        className="w-full px-4 py-3.5 text-sm sm:text-base rounded border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono font-medium text-slate-900 transition-all placeholder:text-slate-400"
                         autoComplete="off"
                         data-lpignore="true"
                         data-1p-ignore="true"
@@ -481,7 +481,7 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="+998 90 123 45 67"
-                        className="w-full px-4 py-3.5 text-sm sm:text-base rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono text-slate-900 transition-all placeholder:text-slate-400"
+                        className="w-full px-4 py-3.5 text-sm sm:text-base rounded border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono text-slate-900 transition-all placeholder:text-slate-400"
                         autoComplete="off"
                       />
                     </div>
@@ -511,7 +511,7 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Parol kiriting yoki 'Parol yaratish'ni bosing"
-                        className="w-full px-4 py-3.5 pr-24 text-sm sm:text-base rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono text-slate-900 transition-all placeholder:text-slate-400"
+                        className="w-full px-4 py-3.5 pr-24 text-sm sm:text-base rounded border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono text-slate-900 transition-all placeholder:text-slate-400"
                         autoComplete="new-password"
                         data-lpignore="true"
                         data-1p-ignore="true"
@@ -548,14 +548,14 @@ export function AddAdminModal({ organizations }: AddAdminModalProps) {
                     <button
                       type="button"
                       onClick={() => setIsOpen(false)}
-                      className="px-6 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
+                      className="px-6 py-3 rounded text-sm font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
                     >
                       Bekor qilish
                     </button>
                     <button
                       type="submit"
                       disabled={isPending}
-                      className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                      className="inline-flex items-center gap-2 px-7 py-3 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                     >
                       {isPending ? (
                         <>

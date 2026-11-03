@@ -44,7 +44,7 @@ export function AdminLogoutButton() {
       <button
         onClick={handleLogout}
         disabled={isLoggingOut}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-rose-50/60 hover:border-rose-200 hover:text-rose-600 text-slate-700 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all disabled:opacity-60 cursor-pointer"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-slate-200 bg-white hover:bg-rose-50/60 hover:border-rose-200 hover:text-rose-600 text-slate-700 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all disabled:opacity-60 cursor-pointer"
         title="Tizimdan chiqish"
       >
         {isLoggingOut ? (

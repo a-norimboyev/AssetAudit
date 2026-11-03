@@ -189,7 +189,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
   function handleCopyCredentials() {
     if (!createdCredentials) return;
     const loginValue = createdCredentials.username || createdCredentials.email?.split("@")[0];
-    const text = `AssetAudit — Universitet Administratori:\nUniversitet: ${name}\nAktivlar Limiti: ${assetLimitMlrd} mlrd so'm\nLitsenziya: ${getSummary().label}\nAdmin Logini: ${loginValue}\nParol: ${createdCredentials.temporaryPassword || adminPassword || "Belgilangan parol"}\nRoli: OTM Rahbari/Admini`;
+    const text = `AssetAudit — Universitet Administratori:\nUniversitet: ${name}\nAktivlar Limiti: ${assetLimitMlrd} mlrd\nLitsenziya: ${getSummary().label}\nAdmin Logini: ${loginValue}\nParol: ${createdCredentials.temporaryPassword || adminPassword || "Belgilangan parol"}\nRoli: OTM Rahbari/Admini`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -344,15 +344,15 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
   // Muvaffaqiyatli yaratilgandan keyin ko'rsatiladigan hisob ma'lumotlari ekrani
   if (createdCredentials) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-6 sm:p-8 space-y-6">
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-center gap-3 shadow-xs">
+      <div className="bg-white rounded border border-slate-200/80 shadow-2xs p-6 sm:p-8 space-y-6">
+        <div className="p-4 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-center gap-3 shadow-xs">
           <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
           <p className="font-semibold">
             Universitet va uning boshqaruvchi administratori muvaffaqiyatli yaratildi!
           </p>
         </div>
 
-        <div className="p-5 rounded-xl bg-slate-900 text-white space-y-3 font-mono text-xs shadow-inner">
+        <div className="p-5 rounded bg-slate-900 text-white space-y-3 font-mono text-xs shadow-inner">
           <div className="flex items-center justify-between pb-3 border-b border-slate-800">
             <span className="text-slate-400 font-sans font-semibold text-xs">
               Administrator hisob ma&apos;lumotlari:
@@ -360,7 +360,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
             <button
               type="button"
               onClick={handleCopyCredentials}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs transition-colors cursor-pointer"
             >
               {copied ? (
                 <>
@@ -383,7 +383,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
             </div>
             <div>
               <span className="text-slate-400 font-sans text-xs">Aktivlar balansi limiti: </span>
-              <strong className="text-emerald-400 font-bold font-sans">{assetLimitMlrd} mlrd so‘m</strong>
+              <strong className="text-emerald-400 font-bold font-sans">{assetLimitMlrd} mlrd</strong>
             </div>
             <div>
               <span className="text-slate-400 font-sans text-xs">Litsenziya muddati: </span>
@@ -419,7 +419,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
         <div className="flex justify-end pt-2">
           <Link
             href="/admin/organizations"
-            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors"
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors"
           >
             <Building2 className="w-4 h-4" />
             <span>OTMlar ro‘yxatiga o‘tish</span>
@@ -435,7 +435,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
       {generalError && (
         <div
           role="alert"
-          className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs sm:text-sm flex items-start gap-3 shadow-xs animate-in fade-in duration-200"
+          className="p-4 rounded bg-red-50 border border-red-200 text-red-800 text-xs sm:text-sm flex items-start gap-3 shadow-xs animate-in fade-in duration-200"
         >
           <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
           <div className="flex-1">
@@ -445,11 +445,11 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-6 sm:p-8 space-y-6">
+      <div className="bg-white rounded border border-slate-200/80 shadow-2xs p-6 sm:p-8 space-y-6">
         {/* 1-Qism: Universitet ma'lumotlari */}
         <div className="border-b border-slate-100 pb-4">
           <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded bg-blue-50 text-blue-600 flex items-center justify-center">
               <Building2 className="w-4 h-4" />
             </div>
             <span>Universitet ma&apos;lumotlari</span>
@@ -469,7 +469,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
             className="hidden"
           />
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden relative">
+            <div className="w-16 h-16 rounded border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden relative">
               {logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -494,7 +494,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
                 type="button"
                 onClick={() => logoInputRef.current?.click()}
                 disabled={isLogoUploading}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50"
               >
                 <Upload className="w-4 h-4 text-slate-500" />
                 <span>{logoUrl ? "Logoni almashtirish" : "Logotip yuklash"}</span>
@@ -504,7 +504,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
                 <button
                   type="button"
                   onClick={() => setLogoUrl(null)}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />
                   <span>O‘chirish</span>
@@ -539,7 +539,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
               }
             }}
             placeholder="Masalan: Toshkent Axborot Texnologiyalari Universiteti"
-            className={`w-full px-3.5 py-2.5 rounded-lg border text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100 ${
+            className={`w-full px-3.5 py-2.5 rounded border text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100 ${
               fieldErrors.name
                 ? "border-red-300 bg-red-50/30 text-red-900 focus:border-red-500"
                 : "border-slate-200 bg-slate-50/50 text-slate-900 hover:border-slate-300 focus:border-blue-500 focus:bg-white"
@@ -576,11 +576,11 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
                   const val = Math.max(1, parseInt(e.target.value, 10) || 1);
                   setAssetLimitMlrd(val);
                 }}
-                className="w-full pl-3.5 pr-28 py-2.5 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 hover:border-slate-300 focus:border-blue-500 focus:bg-white font-mono font-bold text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100"
+                className="w-full pl-3.5 pr-16 py-2.5 rounded border border-slate-200 bg-slate-50/50 text-slate-900 hover:border-slate-300 focus:border-blue-500 focus:bg-white font-mono font-bold text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100"
                 placeholder="500"
               />
               <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-500 pointer-events-none">
-                mlrd so‘m
+                mlrd
               </div>
             </div>
             <div className="flex items-center gap-1.5">
@@ -589,7 +589,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
                   key={preset}
                   type="button"
                   onClick={() => setAssetLimitMlrd(preset)}
-                  className={`flex-1 sm:flex-none px-3 py-2 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                  className={`flex-1 sm:flex-none px-3 py-2 text-xs font-semibold rounded border transition-all cursor-pointer ${
                     assetLimitMlrd === preset
                       ? "bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-100"
                       : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
@@ -601,7 +601,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
             </div>
           </div>
           <p className="mt-1 text-[11px] text-slate-500">
-            OTM hisobidagi aktivlar uchun ruxsat etilgan limit ({assetLimitMlrd} mlrd so‘m).
+            OTM hisobidagi aktivlar uchun ruxsat etilgan limit ({assetLimitMlrd} mlrd).
           </p>
         </div>
 
@@ -609,7 +609,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
         <div className="border-t border-slate-100 pt-6 space-y-4">
           <div className="border-b border-slate-100 pb-3">
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded bg-indigo-50 text-indigo-600 flex items-center justify-center">
                 <Hourglass className="w-4 h-4" />
               </div>
               <span>Litsenziya muddati</span>
@@ -629,7 +629,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
                     key={p.id}
                     type="button"
                     onClick={() => handlePresetClick(p.id, p.value, p.unit)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 rounded text-xs font-semibold border transition-all cursor-pointer ${
                       isSelected
                         ? "bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-100"
                         : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
@@ -643,7 +643,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
           </div>
 
           {/* O'zimiz istagan muddatni erkin kiritish maydonlari */}
-          <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+          <div className="p-4 rounded border border-slate-200 bg-slate-50/60 space-y-3">
             <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
               <span>O‘zingiz istagan muddatni belgilash:</span>
@@ -667,7 +667,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
                       handleCustomDurationChange(val, customUnit);
                     }}
                     placeholder="Masalan: 5"
-                    className="w-24 px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs sm:text-sm font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                    className="w-24 px-3 py-2 rounded border border-slate-200 bg-white text-xs sm:text-sm font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
                   />
                   <select
                     value={customUnit}
@@ -676,7 +676,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
                       const u = e.target.value as "days" | "months" | "years";
                       handleCustomDurationChange(customValue, u);
                     }}
-                    className="flex-1 px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 cursor-pointer"
+                    className="flex-1 px-3 py-2 rounded border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 cursor-pointer"
                   >
                     <option value="months">Oy</option>
                     <option value="years">Yil</option>
@@ -698,7 +698,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
                     value={customDate}
                     disabled={isLoading}
                     onChange={(e) => handleCustomDateChange(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 cursor-pointer"
+                    className="w-full px-3 py-2 rounded border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 cursor-pointer"
                   />
                 </div>
               </div>
@@ -708,7 +708,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
             {(() => {
               const summary = getSummary();
               return (
-                <div className="p-3 rounded-lg bg-indigo-50/70 border border-indigo-100/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+                <div className="p-3 rounded bg-indigo-50/70 border border-indigo-100/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
                     <span className="font-medium text-slate-700">
@@ -731,7 +731,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
         <div className="border-t border-slate-100 pt-6 space-y-5">
           <div className="border-b border-slate-100 pb-3">
             <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded bg-blue-50 text-blue-600 flex items-center justify-center">
                 <ShieldCheck className="w-4 h-4" />
               </div>
               <span>Birinchi universitet admini</span>
@@ -761,7 +761,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
               disabled={isLoading}
               value={adminFullName}
               onChange={(e) => setAdminFullName(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 hover:border-slate-300 focus:border-blue-500 focus:bg-white text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100"
+              className="w-full px-3.5 py-2.5 rounded border border-slate-200 bg-slate-50/50 text-slate-900 hover:border-slate-300 focus:border-blue-500 focus:bg-white text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
@@ -787,7 +787,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
                   setFieldErrors((prev) => ({ ...prev, adminUsername: undefined }));
                 }
               }}
-              className={`w-full px-3.5 py-2.5 rounded-lg border font-mono text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100 ${
+              className={`w-full px-3.5 py-2.5 rounded border font-mono text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100 ${
                 fieldErrors.adminUsername
                   ? "border-red-300 bg-red-50/30 text-red-900 focus:border-red-500"
                   : "border-slate-200 bg-slate-50/50 text-slate-900 hover:border-slate-300 focus:border-blue-500 focus:bg-white"
@@ -820,7 +820,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
                 disabled={isLoading}
                 value={adminPhone}
                 onChange={(e) => setAdminPhone(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 hover:border-slate-300 focus:border-blue-500 focus:bg-white font-mono text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100"
+                className="w-full px-3.5 py-2.5 rounded border border-slate-200 bg-slate-50/50 text-slate-900 hover:border-slate-300 focus:border-blue-500 focus:bg-white font-mono text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100"
               />
             </div>
             <p className="mt-1 text-[11px] text-slate-500">
@@ -861,7 +861,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
                   }
                 }}
                 placeholder="Parolni kiriting"
-                className={`w-full pl-3.5 pr-10 py-2.5 rounded-lg border font-mono text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100 ${
+                className={`w-full pl-3.5 pr-10 py-2.5 rounded border font-mono text-xs sm:text-sm transition-all outline-hidden focus:ring-2 focus:ring-blue-100 ${
                   fieldErrors.adminPassword
                     ? "border-red-300 bg-red-50/30 text-red-900 focus:border-red-500"
                     : "border-slate-200 bg-slate-50/50 text-slate-900 hover:border-slate-300 focus:border-blue-500 focus:bg-white"
@@ -889,7 +889,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
         <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-4 border-t border-slate-100">
           <Link
             href="/admin/organizations"
-            className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold text-center transition-colors shadow-xs"
+            className="w-full sm:w-auto px-5 py-2.5 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold text-center transition-colors shadow-xs"
           >
             Bekor qilish
           </Link>
@@ -897,7 +897,7 @@ export function NewOrganizationForm({ types }: NewOrganizationFormProps) {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow-sm transition-all cursor-pointer disabled:cursor-not-allowed"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow-sm transition-all cursor-pointer disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>

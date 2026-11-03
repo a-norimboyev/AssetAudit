@@ -183,7 +183,7 @@ export function SettingsClient() {
     <div className="space-y-6">
       {/* Toast bildirishnoma */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 text-white text-xs font-semibold shadow-xl border border-slate-700 animate-in fade-in slide-in-from-bottom-2">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded bg-slate-900 text-white text-xs font-semibold shadow-xl border border-slate-700 animate-in fade-in slide-in-from-bottom-2">
           <Check className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{toastMessage}</span>
         </div>
@@ -194,7 +194,7 @@ export function SettingsClient() {
           <button
             type="button"
             onClick={handleSecurityAudit}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
           >
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>Tekshiruv</span>
@@ -203,7 +203,7 @@ export function SettingsClient() {
           <button
             type="button"
             onClick={handleBackupSnapshot}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
           >
             <Database className="w-4 h-4 text-blue-600" />
             <span>Zaxira</span>
@@ -212,7 +212,7 @@ export function SettingsClient() {
           <button
             type="button"
             onClick={handleClearCache}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-amber-500" />
             <span>Kesh</span>
@@ -221,7 +221,7 @@ export function SettingsClient() {
           <button
             type="button"
             onClick={() => setIsNewSeasonModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Yangi mavsum</span>
@@ -230,7 +230,7 @@ export function SettingsClient() {
 
       {/* 4 ta Asosiy Ko'rsatkich Kartalari */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="p-4 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+        <div className="p-4 rounded bg-white border border-slate-200/80 shadow-2xs">
           <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
             Xavfsizlik
           </div>
@@ -239,7 +239,7 @@ export function SettingsClient() {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+        <div className="p-4 rounded bg-white border border-slate-200/80 shadow-2xs">
           <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
             Xatlov Ijrosi
           </div>
@@ -248,7 +248,7 @@ export function SettingsClient() {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+        <div className="p-4 rounded bg-white border border-slate-200/80 shadow-2xs">
           <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
             Audit Jurnali
           </div>
@@ -257,7 +257,7 @@ export function SettingsClient() {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+        <div className="p-4 rounded bg-white border border-slate-200/80 shadow-2xs">
           <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
             Oxirgi Zaxira
           </div>
@@ -268,18 +268,18 @@ export function SettingsClient() {
       </div>
 
       {/* 1. Amaldagi Xatlov Mavsumi Kartasi */}
-      <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-4">
+      <div className="p-5 sm:p-6 rounded bg-white border border-slate-200/80 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <h2 className="text-sm sm:text-base font-bold text-slate-900">
               {activeSeason.title}
             </h2>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
               Faol
             </span>
           </div>
-          <div className="text-xs text-slate-600 flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-50 border border-slate-200/60 font-medium self-start sm:self-auto">
+          <div className="text-xs text-slate-600 flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/60 font-medium self-start sm:self-auto">
             <Calendar className="w-3.5 h-3.5 text-slate-500" />
             <span>
               {activeSeason.startDate} &mdash; {activeSeason.endDate}
@@ -289,7 +289,7 @@ export function SettingsClient() {
 
         {/* Xatlov ma'lumotlari */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/70">
+          <div className="p-3.5 rounded bg-slate-50/70 border border-slate-200/70">
             <span className="text-[11px] font-semibold text-slate-400 block uppercase">
               Hujjat
             </span>
@@ -297,7 +297,7 @@ export function SettingsClient() {
               {activeSeason.orderNumber}
             </span>
           </div>
-          <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/70">
+          <div className="p-3.5 rounded bg-slate-50/70 border border-slate-200/70">
             <span className="text-[11px] font-semibold text-slate-400 block uppercase">
               Qamrov
             </span>
@@ -305,7 +305,7 @@ export function SettingsClient() {
               {activeSeason.scope}
             </span>
           </div>
-          <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/70">
+          <div className="p-3.5 rounded bg-slate-50/70 border border-slate-200/70">
             <span className="text-[11px] font-semibold text-slate-400 block uppercase">
               Skanerlandi
             </span>
@@ -335,10 +335,10 @@ export function SettingsClient() {
       </div>
 
       {/* 2. Audit Jurnali */}
-      <div className="rounded-2xl bg-white border border-slate-200/80 shadow-2xs overflow-hidden">
+      <div className="rounded bg-white border border-slate-200/80 shadow-2xs overflow-hidden">
         <div className="p-5 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
               <History className="w-4 h-4" />
             </div>
             <h3 className="font-bold text-slate-900 text-sm sm:text-base">
@@ -350,7 +350,7 @@ export function SettingsClient() {
             <button
               type="button"
               onClick={() => handleExportLogs("csv")}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
             >
               <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
               <span>CSV</span>
@@ -358,7 +358,7 @@ export function SettingsClient() {
             <button
               type="button"
               onClick={() => handleExportLogs("json")}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
             >
               <Download className="w-3.5 h-3.5 text-blue-600" />
               <span>JSON</span>
@@ -379,7 +379,7 @@ export function SettingsClient() {
                 setCurrentPage(1);
               }}
               placeholder="Qidiruv..."
-              className="w-full pl-10 pr-9 py-2 text-xs rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
+              className="w-full pl-10 pr-9 py-2 text-xs rounded border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
             />
             {searchLog && (
               <button
@@ -404,7 +404,7 @@ export function SettingsClient() {
                 setSelectedLevel("all");
                 setCurrentPage(1);
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
+              className={`px-3 py-1.5 rounded text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                 selectedLevel === "all"
                   ? "bg-blue-600 text-white shadow-2xs"
                   : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -418,7 +418,7 @@ export function SettingsClient() {
                 setSelectedLevel("success");
                 setCurrentPage(1);
               }}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                 selectedLevel === "success"
                   ? "bg-emerald-600 text-white shadow-2xs"
                   : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -433,7 +433,7 @@ export function SettingsClient() {
                 setSelectedLevel("warning");
                 setCurrentPage(1);
               }}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                 selectedLevel === "warning"
                   ? "bg-amber-600 text-white shadow-2xs"
                   : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -448,7 +448,7 @@ export function SettingsClient() {
                 setSelectedLevel("danger");
                 setCurrentPage(1);
               }}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                 selectedLevel === "danger"
                   ? "bg-rose-600 text-white shadow-2xs"
                   : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -463,7 +463,7 @@ export function SettingsClient() {
                 setSelectedLevel("info");
                 setCurrentPage(1);
               }}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                 selectedLevel === "info"
                   ? "bg-slate-800 text-white shadow-2xs"
                   : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -552,7 +552,7 @@ export function SettingsClient() {
               type="button"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage <= 1}
-              className={`p-1.5 rounded-lg border border-slate-200 transition-colors ${
+              className={`p-1.5 rounded border border-slate-200 transition-colors ${
                 currentPage > 1
                   ? "bg-white text-slate-700 hover:bg-slate-100 cursor-pointer"
                   : "bg-slate-100 text-slate-400 cursor-not-allowed"
@@ -570,7 +570,7 @@ export function SettingsClient() {
               type="button"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage >= totalPages}
-              className={`p-1.5 rounded-lg border border-slate-200 transition-colors ${
+              className={`p-1.5 rounded border border-slate-200 transition-colors ${
                 currentPage < totalPages
                   ? "bg-white text-slate-700 hover:bg-slate-100 cursor-pointer"
                   : "bg-slate-100 text-slate-400 cursor-not-allowed"
@@ -591,11 +591,11 @@ export function SettingsClient() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95"
+            className="bg-white rounded max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95"
           >
             <div className="px-6 sm:px-7 py-5 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
+                <div className="w-10 h-10 rounded bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
                   <Calendar className="w-5 h-5" />
                 </div>
                 <div>
@@ -607,7 +607,7 @@ export function SettingsClient() {
               <button
                 type="button"
                 onClick={() => setIsNewSeasonModalOpen(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
+                className="p-1.5 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
                 title="Yopish"
               >
                 <X className="w-5 h-5" />
@@ -625,7 +625,7 @@ export function SettingsClient() {
                   value={newSeasonTitle}
                   onChange={(e) => setNewSeasonTitle(e.target.value)}
                   placeholder="2026-yilgi OTMlar Kuzgi Xatlovi"
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/80 hover:bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all text-slate-900 placeholder:text-slate-400"
+                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded border border-slate-200 bg-slate-50/80 hover:bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all text-slate-900 placeholder:text-slate-400"
                 />
               </div>
 
@@ -638,7 +638,7 @@ export function SettingsClient() {
                   value={newSeasonOrder}
                   onChange={(e) => setNewSeasonOrder(e.target.value)}
                   placeholder="№ 412-sonli Farmoyish"
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/80 hover:bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all text-slate-900 placeholder:text-slate-400"
+                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded border border-slate-200 bg-slate-50/80 hover:bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all text-slate-900 placeholder:text-slate-400"
                 />
               </div>
 
@@ -652,7 +652,7 @@ export function SettingsClient() {
                     required
                     value={newSeasonStart}
                     onChange={(e) => setNewSeasonStart(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/80 hover:bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all text-slate-900 cursor-pointer"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded border border-slate-200 bg-slate-50/80 hover:bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all text-slate-900 cursor-pointer"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -664,12 +664,12 @@ export function SettingsClient() {
                     required
                     value={newSeasonEnd}
                     onChange={(e) => setNewSeasonEnd(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/80 hover:bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all text-slate-900 cursor-pointer"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded border border-slate-200 bg-slate-50/80 hover:bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all text-slate-900 cursor-pointer"
                   />
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+              <div className="p-3.5 rounded bg-slate-50 border border-slate-200/80 space-y-2.5">
                 <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
                   Majburiy Xavfsizlik Talablari
                 </span>
@@ -697,13 +697,13 @@ export function SettingsClient() {
                 <button
                   type="button"
                   onClick={() => setIsNewSeasonModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                  className="px-4 py-2.5 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
                 >
                   Bekor qilish
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Mavsum e‘lon qilish</span>

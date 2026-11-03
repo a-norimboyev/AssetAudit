@@ -67,7 +67,7 @@ export function AdminFilters({
   }
 
   return (
-    <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+    <div className="bg-white p-4 rounded border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
       {/* Qidiruv formasi */}
       <form
         onSubmit={handleSearchSubmit}
@@ -80,13 +80,13 @@ export function AdminFilters({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Administrator qidirish..."
-            className="w-full pl-10 pr-9 py-2.5 text-xs sm:text-sm bg-slate-50/60 border border-slate-200 rounded-lg focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+            className="w-full pl-10 pr-9 py-2.5 text-xs sm:text-sm bg-slate-50/60 border border-slate-200 rounded focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
           />
           {search && (
             <button
               type="button"
               onClick={handleReset}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-slate-600 rounded cursor-pointer"
               aria-label="Tozalash"
             >
               <X className="w-4 h-4" />

@@ -78,7 +78,7 @@ export function AdminToastProvider({ children }: { children: React.ReactNode }) 
               : "opacity-0 -translate-y-2 scale-95 pointer-events-none"
           }`}
         >
-          <div className="flex items-center gap-2.5 px-4 py-3 bg-emerald-600 text-white rounded-xl shadow-xl shadow-emerald-950/20 text-xs sm:text-sm font-semibold border border-emerald-500">
+          <div className="flex items-center gap-2.5 px-4 py-3 bg-emerald-600 text-white rounded shadow-xl shadow-emerald-950/20 text-xs sm:text-sm font-semibold border border-emerald-500">
             <CheckCircle2 className="w-4 h-4 shrink-0 text-white" />
             <span className="leading-tight tracking-tight">{toast.message}</span>
             <button
@@ -88,7 +88,7 @@ export function AdminToastProvider({ children }: { children: React.ReactNode }) 
                 setIsVisible(false);
                 setTimeout(() => setToast(null), 300);
               }}
-              className="ml-2 -mr-1 p-1 rounded-lg text-emerald-100 hover:text-white hover:bg-emerald-700/60 transition-colors cursor-pointer"
+              className="ml-2 -mr-1 p-1 rounded text-emerald-100 hover:text-white hover:bg-emerald-700/60 transition-colors cursor-pointer"
               aria-label="Yopish"
             >
               <X className="w-3.5 h-3.5" />

@@ -65,7 +65,7 @@ export function ResetAdminPasswordModal({
       <button
         onClick={() => setIsOpen(true)}
         title="Parolni yangilash va faol sessiyalarni bekor qilish"
-        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-amber-700 bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-200 transition-colors cursor-pointer"
+        className="inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium text-slate-600 hover:text-amber-700 bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-200 transition-colors cursor-pointer"
       >
         <KeyRound className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-600" />
         <span>Parolni reset</span>
@@ -73,10 +73,10 @@ export function ResetAdminPasswordModal({
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in overscroll-contain">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden text-left overscroll-contain">
+          <div className="w-full max-w-md bg-white rounded-md shadow-xl border border-slate-200 overflow-hidden text-left overscroll-contain">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <div className="w-9 h-9 rounded bg-amber-50 text-amber-600 flex items-center justify-center">
                   <KeyRound className="w-4 h-4" />
                 </div>
                 <div>
@@ -86,7 +86,7 @@ export function ResetAdminPasswordModal({
               </div>
               <button
                 onClick={handleClose}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
+                className="p-1.5 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -94,7 +94,7 @@ export function ResetAdminPasswordModal({
 
             {result?.success && result.credentials ? (
               <div className="p-6 space-y-4">
-                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-2">
+                <div className="p-4 rounded bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-2">
                   <div className="flex items-center gap-2 font-bold text-sm text-emerald-800">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                     <span>Yangi vaqtinchalik parol tayyor!</span>
@@ -104,7 +104,7 @@ export function ResetAdminPasswordModal({
                   </p>
                 </div>
 
-                <div className="p-4 rounded-xl bg-slate-900 text-white space-y-2.5 font-mono text-xs shadow-inner">
+                <div className="p-4 rounded bg-slate-900 text-white space-y-2.5 font-mono text-xs shadow-inner">
                   <div className="flex justify-between items-center pb-2 border-b border-slate-800 text-[11px] text-slate-400">
                     <span>YANGILANGAN KIRISH MA&apos;LUMOTLARI</span>
                     <span className="text-amber-400 font-bold">1-kirishda majburiy almashinadi</span>
@@ -127,7 +127,7 @@ export function ResetAdminPasswordModal({
                     <button
                       type="button"
                       onClick={handleCopy}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
                     >
                       {copied ? (
                         <>
@@ -147,7 +147,7 @@ export function ResetAdminPasswordModal({
                 <div className="flex justify-end pt-2">
                   <button
                     onClick={handleClose}
-                    className="px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                    className="px-5 py-2.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
                   >
                     Yopish
                   </button>
@@ -159,7 +159,7 @@ export function ResetAdminPasswordModal({
                   Administrator paroli tasodifiy yuqori entropiyali xavfsiz vaqtinchalik parolga almashtiriladi. Administrator ushbu parol bilan birinchi marta tizimga kirganida, yangi shaxsiy parol o‘rnatishi talab qilinadi.
                 </p>
 
-                <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2.5">
+                <div className="p-3.5 rounded bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2.5">
                   <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-semibold block">Faol sessiyalar bekor qilinadi:</span>
@@ -168,7 +168,7 @@ export function ResetAdminPasswordModal({
                 </div>
 
                 {result && !result.success && (
-                  <div className="p-3 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 text-xs">
+                  <div className="p-3 rounded bg-rose-50 text-rose-700 border border-rose-200 text-xs">
                     {result.message}
                   </div>
                 )}
@@ -178,7 +178,7 @@ export function ResetAdminPasswordModal({
                     type="button"
                     onClick={handleClose}
                     disabled={isPending}
-                    className="px-4 py-2 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-50"
+                    className="px-4 py-2 rounded border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-50"
                   >
                     Bekor qilish
                   </button>
@@ -186,7 +186,7 @@ export function ResetAdminPasswordModal({
                     type="button"
                     onClick={handleReset}
                     disabled={isPending}
-                    className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-5 py-2 rounded bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                   >
                     {isPending ? (
                       <>

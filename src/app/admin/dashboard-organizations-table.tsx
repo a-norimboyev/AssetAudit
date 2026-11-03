@@ -132,7 +132,7 @@ export function DashboardOrganizationsTable({
         <button
           type="button"
           onClick={() => handleCardClick("all")}
-          className={`p-5 rounded-xl text-left transition-all cursor-pointer relative select-none ${
+          className={`p-5 rounded text-left transition-all cursor-pointer relative select-none ${
             statusFilter === "all"
               ? "bg-white border-2 border-blue-600 shadow-md ring-4 ring-blue-50/80"
               : "bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs hover:border-slate-300"
@@ -142,7 +142,7 @@ export function DashboardOrganizationsTable({
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500">Jami OTMlar</span>
             <div
-              className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+              className={`w-9 h-9 rounded flex items-center justify-center transition-colors ${
                 statusFilter === "all"
                   ? "bg-blue-600 text-white"
                   : "bg-blue-50 text-blue-600"
@@ -161,7 +161,7 @@ export function DashboardOrganizationsTable({
         <button
           type="button"
           onClick={() => handleCardClick("active")}
-          className={`p-5 rounded-xl text-left transition-all cursor-pointer relative select-none ${
+          className={`p-5 rounded text-left transition-all cursor-pointer relative select-none ${
             statusFilter === "active"
               ? "bg-white border-2 border-emerald-600 shadow-md ring-4 ring-emerald-50/80"
               : "bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs hover:border-slate-300"
@@ -171,7 +171,7 @@ export function DashboardOrganizationsTable({
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500">Faol OTMlar</span>
             <div
-              className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+              className={`w-9 h-9 rounded flex items-center justify-center transition-colors ${
                 statusFilter === "active"
                   ? "bg-emerald-600 text-white"
                   : "bg-emerald-50 text-emerald-600"
@@ -193,7 +193,7 @@ export function DashboardOrganizationsTable({
         <button
           type="button"
           onClick={() => handleCardClick("frozen")}
-          className={`p-5 rounded-xl text-left transition-all cursor-pointer relative select-none ${
+          className={`p-5 rounded text-left transition-all cursor-pointer relative select-none ${
             statusFilter === "frozen"
               ? "bg-white border-2 border-rose-600 shadow-md ring-4 ring-rose-50/80"
               : "bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs hover:border-slate-300"
@@ -203,7 +203,7 @@ export function DashboardOrganizationsTable({
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500">Muzlatilgan OTMlar</span>
             <div
-              className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+              className={`w-9 h-9 rounded flex items-center justify-center transition-colors ${
                 statusFilter === "frozen"
                   ? "bg-rose-600 text-white"
                   : "bg-rose-50 text-rose-600"
@@ -225,7 +225,7 @@ export function DashboardOrganizationsTable({
         <button
           type="button"
           onClick={() => handleCardClick("expiring")}
-          className={`p-5 rounded-xl text-left transition-all cursor-pointer relative select-none ${
+          className={`p-5 rounded text-left transition-all cursor-pointer relative select-none ${
             statusFilter === "expiring"
               ? "bg-amber-50/90 border-2 border-amber-600 shadow-md ring-4 ring-amber-100/80"
               : statsCounts.expiring > 0
@@ -237,7 +237,7 @@ export function DashboardOrganizationsTable({
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500">Muddati tugayotgan OTMlar</span>
             <div
-              className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+              className={`w-9 h-9 rounded flex items-center justify-center transition-colors ${
                 statusFilter === "expiring"
                   ? "bg-amber-600 text-white"
                   : statsCounts.expiring > 0
@@ -280,7 +280,7 @@ export function DashboardOrganizationsTable({
       </div>
 
       {/* 2. Qidiruv va OTM qo'shish kartochkasi */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <div className="bg-white p-4 rounded border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         {/* Qidiruv maydoni */}
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -292,7 +292,7 @@ export function DashboardOrganizationsTable({
               setCurrentPage(1);
             }}
             placeholder="Ism, login yoki OTM bo‘yicha qidirish..."
-            className="w-full pl-10 pr-9 py-2.5 text-xs sm:text-sm bg-slate-50/60 border border-slate-200 rounded-lg focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+            className="w-full pl-10 pr-9 py-2.5 text-xs sm:text-sm bg-slate-50/60 border border-slate-200 rounded focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
           />
           {searchQuery && (
             <button
@@ -301,7 +301,7 @@ export function DashboardOrganizationsTable({
                 setSearchQuery("");
                 setCurrentPage(1);
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-slate-600 rounded cursor-pointer"
               aria-label="Tozalash"
             >
               <X className="w-4 h-4" />
@@ -316,7 +316,7 @@ export function DashboardOrganizationsTable({
       </div>
 
       {/* 3. OTMlar ro'yxati Jadvali */}
-      <div className="bg-white rounded-xl border border-slate-200/80 shadow-2xs overflow-hidden">
+      <div className="bg-white rounded border border-slate-200/80 shadow-2xs overflow-hidden">
         {/* Header */}
         <div className="p-4 sm:p-5 border-b border-slate-200/80 flex items-center justify-between gap-4">
           <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
@@ -387,10 +387,10 @@ export function DashboardOrganizationsTable({
                                 <img
                                   src={org.settings.logoUrl}
                                   alt={org.name}
-                                  className="w-9 h-9 rounded-xl object-contain bg-slate-50 border border-slate-200/80 p-0.5 shrink-0 shadow-2xs"
+                                  className="w-9 h-9 rounded object-contain bg-slate-50 border border-slate-200/80 p-0.5 shrink-0 shadow-2xs"
                                 />
                               ) : (
-                                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center text-xs font-bold border border-blue-100 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                <div className="w-9 h-9 rounded bg-blue-50 text-blue-700 flex items-center justify-center text-xs font-bold border border-blue-100 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                                   {org.name.slice(0, 2).toUpperCase()}
                                 </div>
                               )}
@@ -482,12 +482,12 @@ export function DashboardOrganizationsTable({
                       {/* 4. Holati (Faol yoki Muzlatilgan) */}
                       <td className="px-5 py-3.5 text-right whitespace-nowrap">
                         {org.isActive ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                             <span>Faol</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                             <span>Muzlatilgan</span>
                           </span>
@@ -517,7 +517,7 @@ export function DashboardOrganizationsTable({
                   type="button"
                   onClick={() => handlePageChange(safePage - 1)}
                   disabled={safePage <= 1}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                   <span>Oldingi</span>
@@ -536,7 +536,7 @@ export function DashboardOrganizationsTable({
                         key={pageNum}
                         type="button"
                         onClick={() => handlePageChange(pageNum)}
-                        className={`w-7 h-7 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                        className={`w-7 h-7 rounded text-xs font-semibold transition-colors cursor-pointer ${
                           safePage === pageNum
                             ? "bg-blue-600 text-white shadow-2xs"
                             : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
@@ -552,7 +552,7 @@ export function DashboardOrganizationsTable({
                   type="button"
                   onClick={() => handlePageChange(safePage + 1)}
                   disabled={safePage >= totalPages}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer"
                 >
                   <span>Keyingi</span>
                   <ChevronRight className="w-3.5 h-3.5" />

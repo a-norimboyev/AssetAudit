@@ -63,8 +63,6 @@ function formatUzbekDate(date?: Date | string | null, includeTime = false): stri
 
 const EXTEND_PRESETS = [
   { id: "1_month", label: "+1 oy", months: 1 },
-  { id: "3_months", label: "+3 oy", months: 3 },
-  { id: "6_months", label: "+6 oy", months: 6 },
   { id: "1_year", label: "+1 yil", years: 1 },
   { id: "2_years", label: "+2 yil", years: 2 },
   { id: "3_years", label: "+3 yil", years: 3 },
@@ -438,7 +436,7 @@ export function OrganizationDetailsModal({
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/50 backdrop-blur-xs animate-in fade-in overscroll-contain">
           <div
-            className="w-full max-w-5xl lg:max-w-6xl bg-white rounded-2xl border border-slate-200/80 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[92vh] overscroll-contain"
+            className="w-full max-w-5xl lg:max-w-6xl bg-white rounded-md border border-slate-200/80 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[92vh] overscroll-contain"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -446,7 +444,7 @@ export function OrganizationDetailsModal({
               {/* Yuqori qator: OTM nomi, logotipi, holati va tezkor amallar */}
               <div className="flex items-center justify-between gap-4 pb-5">
                 <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-13 h-13 rounded-2xl bg-slate-100 text-blue-700 flex items-center justify-center text-base font-bold shadow-xs shrink-0 overflow-hidden border border-slate-200">
+                  <div className="w-13 h-13 rounded bg-slate-100 text-blue-700 flex items-center justify-center text-base font-bold shadow-xs shrink-0 overflow-hidden border border-slate-200">
                     {organization.settings?.logoUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -464,12 +462,12 @@ export function OrganizationDetailsModal({
                         {organization.name}
                       </h2>
                       {isActive ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                           <span>Faol</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
                           <span className="w-2 h-2 rounded-full bg-rose-500" />
                           <span>Muzlatilgan</span>
                         </span>
@@ -484,7 +482,7 @@ export function OrganizationDetailsModal({
                     type="button"
                     onClick={handleToggleStatus}
                     disabled={isTogglingStatus}
-                    className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition-all cursor-pointer disabled:opacity-50 ${
+                    className={`inline-flex items-center gap-2 px-3.5 py-2 rounded text-xs sm:text-sm font-semibold border transition-all cursor-pointer disabled:opacity-50 ${
                       isActive
                         ? "bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200 shadow-2xs"
                         : "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-2xs"
@@ -508,7 +506,7 @@ export function OrganizationDetailsModal({
                       setDeleteError(null);
                       setShowDeleteModal(true);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 transition-colors cursor-pointer shadow-2xs"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded text-xs sm:text-sm font-semibold border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 transition-colors cursor-pointer shadow-2xs"
                     title="OTMni butunlay o‘chirish"
                   >
                     <Trash2 className="w-4 h-4 text-rose-600" />
@@ -518,7 +516,7 @@ export function OrganizationDetailsModal({
                   <button
                     type="button"
                     onClick={() => setIsOpen(false)}
-                    className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                    className="p-2 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
                     aria-label="Yopish"
                   >
                     <X className="w-5 h-5" />
@@ -618,7 +616,7 @@ export function OrganizationDetailsModal({
               {activeTab === "overview" && (
                 <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-150">
                   {/* 1. OTM MAS'UL ADMINISTRATORI KARTASI (Birinchi o'ringa ko'chirildi) */}
-                  <div className="p-5 sm:p-6 rounded-2xl border border-slate-200/80 bg-slate-50/50 space-y-4">
+                  <div className="p-5 sm:p-6 rounded border border-slate-200/80 bg-slate-50/50 space-y-4">
                     <div className="flex items-center justify-between pb-3 border-b border-slate-200/70">
                       <div className="flex items-center gap-2.5">
                         <UserCheck className="w-4.5 h-4.5 text-blue-600" />
@@ -634,7 +632,7 @@ export function OrganizationDetailsModal({
                               setIsResetPasswordOpen(!isResetPasswordOpen);
                               setResetSuccessData(null);
                             }}
-                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-colors cursor-pointer"
                           >
                             <KeyRound className="w-3.5 h-3.5 text-amber-600" />
                             <span>Parolni tiklash</span>
@@ -654,8 +652,8 @@ export function OrganizationDetailsModal({
                     {hasAdmin ? (
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm">
                         {/* Ism va familiyasi */}
-                        <div className="p-4 rounded-xl bg-white border border-slate-200/80 flex items-center gap-3.5">
-                          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+                        <div className="p-4 rounded bg-white border border-slate-200/80 flex items-center gap-3.5">
+                          <div className="w-10 h-10 rounded bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
                             <User className="w-5 h-5" />
                           </div>
                           <div className="min-w-0 flex-1">
@@ -669,9 +667,9 @@ export function OrganizationDetailsModal({
                         </div>
 
                         {/* Kirish logini */}
-                        <div className="p-4 rounded-xl bg-white border border-slate-200/80 flex items-center justify-between gap-3">
+                        <div className="p-4 rounded bg-white border border-slate-200/80 flex items-center justify-between gap-3">
                           <div className="flex items-center gap-3.5 min-w-0">
-                            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100">
+                            <div className="w-10 h-10 rounded bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100">
                               <Shield className="w-5 h-5" />
                             </div>
                             <div className="min-w-0">
@@ -687,7 +685,7 @@ export function OrganizationDetailsModal({
                           <button
                             type="button"
                             onClick={handleCopyLogin}
-                            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
+                            className="p-2 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
                             title="Loginni nusxalash"
                           >
                             {copiedLogin ? (
@@ -699,9 +697,9 @@ export function OrganizationDetailsModal({
                         </div>
 
                         {/* Telefon raqami */}
-                        <div className="p-4 rounded-xl bg-white border border-slate-200/80 flex items-center justify-between gap-3">
+                        <div className="p-4 rounded bg-white border border-slate-200/80 flex items-center justify-between gap-3">
                           <div className="flex items-center gap-3.5 min-w-0">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+                            <div className="w-10 h-10 rounded bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
                               <Phone className="w-5 h-5" />
                             </div>
                             <div className="min-w-0">
@@ -727,7 +725,7 @@ export function OrganizationDetailsModal({
                             <button
                               type="button"
                               onClick={handleCopyPhone}
-                              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
+                              className="p-2 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
                               title="Telefon raqamidan nusxa olish"
                             >
                               {copiedPhone ? (
@@ -740,14 +738,14 @@ export function OrganizationDetailsModal({
                         </div>
                       </div>
                     ) : (
-                      <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 flex items-center justify-between">
+                      <div className="p-4 rounded bg-amber-50/70 border border-amber-200/80 flex items-center justify-between">
                         <div className="text-xs text-amber-800">
                           Ushbu OTM uchun hali mas&apos;ul administrator biriktirilmagan.
                         </div>
                         <button
                           type="button"
                           onClick={() => setActiveTab("admin")}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold shadow-xs hover:bg-blue-700 transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-blue-600 text-white text-xs font-bold shadow-xs hover:bg-blue-700 transition-colors cursor-pointer"
                         >
                           <UserPlus className="w-4 h-4" />
                           <span>Yangi administrator yaratish</span>
@@ -757,7 +755,7 @@ export function OrganizationDetailsModal({
 
                     {/* Tezkor Parol Tiklash Paneli (Overview ichida) */}
                     {isResetPasswordOpen && (
-                      <div className="p-4 sm:p-5 rounded-xl bg-amber-50/60 border border-amber-200 space-y-3.5 animate-in fade-in duration-150">
+                      <div className="p-4 sm:p-5 rounded bg-amber-50/60 border border-amber-200 space-y-3.5 animate-in fade-in duration-150">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <KeyRound className="w-4 h-4 text-amber-600" />
@@ -789,7 +787,7 @@ export function OrganizationDetailsModal({
                                   value={newPasswordInput}
                                   onChange={(e) => setNewPasswordInput(e.target.value)}
                                   placeholder="Yangi parol (bo'sh qolsa, avtomatik yaratiladi)"
-                                  className="w-full pl-3.5 pr-20 py-2.5 text-xs sm:text-sm font-mono font-bold rounded-xl border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-200 focus:border-amber-500"
+                                  className="w-full pl-3.5 pr-20 py-2.5 text-xs sm:text-sm font-mono font-bold rounded border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-200 focus:border-amber-500"
                                 />
                                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                                   <button
@@ -818,7 +816,7 @@ export function OrganizationDetailsModal({
                                 type="button"
                                 onClick={handleExecuteResetPassword}
                                 disabled={isSavingPasswordReset}
-                                className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                                className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                               >
                                 {isSavingPasswordReset ? (
                                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -830,12 +828,12 @@ export function OrganizationDetailsModal({
                             </div>
                           </div>
                         ) : (
-                          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs sm:text-sm text-emerald-900 space-y-3">
+                          <div className="p-4 rounded bg-emerald-50 border border-emerald-200 text-xs sm:text-sm text-emerald-900 space-y-3">
                             <div className="flex items-center gap-2 font-bold text-emerald-800">
                               <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                               <span>Parol muvaffaqiyatli yangilandi!</span>
                             </div>
-                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-lg bg-white border border-emerald-200">
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded bg-white border border-emerald-200">
                               <div>
                                 <span className="text-[11px] font-semibold text-slate-400 block">
                                   Admin logini: <strong>{resetSuccessData.username}</strong>
@@ -853,7 +851,7 @@ export function OrganizationDetailsModal({
                                     setCopiedResetPassword(true);
                                     setTimeout(() => setCopiedResetPassword(false), 2000);
                                   }}
-                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 cursor-pointer"
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 cursor-pointer"
                                 >
                                   {copiedResetPassword ? (
                                     <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -865,7 +863,7 @@ export function OrganizationDetailsModal({
                                 <button
                                   type="button"
                                   onClick={() => handleCopyAllCredentials(resetSuccessData.temporaryPassword)}
-                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs cursor-pointer"
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs cursor-pointer"
                                 >
                                   {copiedAllCredentials ? (
                                     <Check className="w-3.5 h-3.5" />
@@ -883,7 +881,7 @@ export function OrganizationDetailsModal({
                   </div>
 
                   {/* 2. Litsenziya holati kartasi */}
-                  <div className="p-5 sm:p-6 rounded-2xl border border-slate-200/80 bg-white shadow-2xs space-y-4">
+                  <div className="p-5 sm:p-6 rounded border border-slate-200/80 bg-white shadow-2xs space-y-4">
                     <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                       <div className="flex items-center gap-2.5">
                         <Hourglass className="w-4.5 h-4.5 text-blue-600" />
@@ -892,7 +890,7 @@ export function OrganizationDetailsModal({
                         </h3>
                       </div>
                       <span
-                        className={`text-xs font-semibold px-3 py-1 rounded-full border ${
+                        className={`text-xs font-semibold px-3 py-1 rounded border ${
                           daysRemaining > 30
                             ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                             : daysRemaining > 0
@@ -905,19 +903,19 @@ export function OrganizationDetailsModal({
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm">
-                      <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                      <div className="p-4 rounded bg-slate-50 border border-slate-100">
                         <span className="text-slate-400 block text-xs">Reja / Tarif:</span>
                         <span className="font-bold text-slate-900 mt-1 block text-sm sm:text-base">
                           {organization.subscription.planLabel || "1 yillik dostup"}
                         </span>
                       </div>
-                      <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                      <div className="p-4 rounded bg-slate-50 border border-slate-100">
                         <span className="text-slate-400 block text-xs">Amal qilish sanasi:</span>
                         <span className="font-bold text-slate-900 mt-1 block text-sm sm:text-base">
                           {formatUzbekDate(currentExpiresAt)} gacha
                         </span>
                       </div>
-                      <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-100 flex items-center justify-between">
+                      <div className="p-4 rounded bg-blue-50/60 border border-blue-100 flex items-center justify-between">
                         <div>
                           <span className="text-blue-600 block text-xs font-semibold">
                             Qolgan vaqt:
@@ -929,7 +927,7 @@ export function OrganizationDetailsModal({
                         <button
                           type="button"
                           onClick={() => setActiveTab("license")}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-2xs transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-2xs transition-colors cursor-pointer"
                         >
                           <span>Uzaytirish</span>
                           <ArrowRight className="w-3.5 h-3.5" />
@@ -939,7 +937,7 @@ export function OrganizationDetailsModal({
                   </div>
 
                   {/* 3. Aktivlar balansi limiti kartasi */}
-                  <div className="p-5 sm:p-6 rounded-2xl border border-slate-200/80 bg-white shadow-2xs space-y-4">
+                  <div className="p-5 sm:p-6 rounded border border-slate-200/80 bg-white shadow-2xs space-y-4">
                     <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                       <div className="flex items-center gap-2.5">
                         <TrendingUp className="w-4.5 h-4.5 text-blue-600" />
@@ -957,15 +955,15 @@ export function OrganizationDetailsModal({
                       </button>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-5 p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-100">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-5 p-4 sm:p-5 rounded bg-slate-50 border border-slate-100">
                       <div>
                         <span className="text-xs font-medium text-slate-400 block">
                           Joriy belgilangan limit:
                         </span>
                         <span className="font-mono text-lg sm:text-xl font-bold text-slate-900 mt-1 block">
                           {currentLimitMlrd >= 1000
-                            ? `${currentLimitMlrd / 1000} trln so‘m`
-                            : `${currentLimitMlrd} mlrd so‘m`}
+                            ? `${currentLimitMlrd / 1000} trln`
+                            : `${currentLimitMlrd} mlrd`}
                         </span>
                       </div>
 
@@ -994,10 +992,10 @@ export function OrganizationDetailsModal({
               {/* TAB 2: ADMINISTRATOR BOSHQARUVI                            */}
               {/* ======================================================== */}
               {activeTab === "admin" && (
-                <div className="p-6 sm:p-7 rounded-2xl border border-blue-200/80 bg-blue-50/30 space-y-6 animate-in fade-in duration-150">
+                <div className="p-6 sm:p-7 rounded border border-blue-200/80 bg-blue-50/30 space-y-6 animate-in fade-in duration-150">
                   <div className="flex items-center justify-between pb-4 border-b border-blue-200/60">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                      <div className="w-10 h-10 rounded bg-blue-600 text-white flex items-center justify-center shadow-xs">
                         <UserCheck className="w-5 h-5" />
                       </div>
                       <div>
@@ -1017,7 +1015,7 @@ export function OrganizationDetailsModal({
                           setIsResetPasswordOpen(!isResetPasswordOpen);
                           setResetSuccessData(null);
                         }}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-amber-500 hover:bg-amber-600 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer"
                       >
                         <KeyRound className="w-4 h-4" />
                         <span>Parolni tiklash</span>
@@ -1028,7 +1026,7 @@ export function OrganizationDetailsModal({
                   {hasAdmin ? (
                     <div className="space-y-5">
                       {/* 1. Asosiy ma'lumotlar formasi */}
-                      <div className="p-5 sm:p-6 rounded-2xl bg-white border border-blue-200/70 shadow-2xs space-y-5">
+                      <div className="p-5 sm:p-6 rounded bg-white border border-blue-200/70 shadow-2xs space-y-5">
                         <h4 className="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider pb-2 border-b border-slate-100">
                           Aloqa va profil ma&apos;lumotlari
                         </h4>
@@ -1043,7 +1041,7 @@ export function OrganizationDetailsModal({
                               value={adminName}
                               onChange={(e) => setAdminName(e.target.value)}
                               placeholder="Azizjon Norimboyev"
-                              className="w-full px-4 py-3 text-sm rounded-xl border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-medium"
+                              className="w-full px-4 py-3 text-sm rounded border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-medium"
                             />
                           </div>
 
@@ -1056,12 +1054,12 @@ export function OrganizationDetailsModal({
                                 type="text"
                                 readOnly
                                 value={adminLogin || "admin"}
-                                className="w-full pl-4 pr-11 py-3 text-sm rounded-xl border border-slate-200 bg-slate-50 text-slate-800 font-mono font-bold select-all"
+                                className="w-full pl-4 pr-11 py-3 text-sm rounded border border-slate-200 bg-slate-50 text-slate-800 font-mono font-bold select-all"
                               />
                               <button
                                 type="button"
                                 onClick={handleCopyLogin}
-                                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                                 title="Loginni nusxalash"
                               >
                                 {copiedLogin ? (
@@ -1083,13 +1081,13 @@ export function OrganizationDetailsModal({
                                 value={adminPhone}
                                 onChange={(e) => setAdminPhone(e.target.value)}
                                 placeholder="+998 90 123 45 67"
-                                className="w-full pl-4 pr-11 py-3 text-sm rounded-xl border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono font-medium"
+                                className="w-full pl-4 pr-11 py-3 text-sm rounded border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono font-medium"
                               />
                               {adminPhone && (
                                 <button
                                   type="button"
                                   onClick={handleCopyPhone}
-                                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                                   title="Telefonni nusxalash"
                                 >
                                   {copiedPhone ? (
@@ -1108,7 +1106,7 @@ export function OrganizationDetailsModal({
                             type="button"
                             onClick={handleSaveAdmin}
                             disabled={isSavingAdmin}
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                           >
                             {isSavingAdmin ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
@@ -1121,7 +1119,7 @@ export function OrganizationDetailsModal({
                       </div>
 
                       {/* 2. Parolni tiklash (Reset Password) Paneli */}
-                      <div className="p-5 sm:p-6 rounded-2xl bg-amber-50/70 border border-amber-200/80 shadow-2xs space-y-4">
+                      <div className="p-5 sm:p-6 rounded bg-amber-50/70 border border-amber-200/80 shadow-2xs space-y-4">
                         <div className="flex items-center justify-between pb-2 border-b border-amber-200/60">
                           <div className="flex items-center gap-2">
                             <KeyRound className="w-4.5 h-4.5 text-amber-600" />
@@ -1147,7 +1145,7 @@ export function OrganizationDetailsModal({
                                   value={newPasswordInput}
                                   onChange={(e) => setNewPasswordInput(e.target.value)}
                                   placeholder="Yangi parol (ixtiyoriy, bo'sh qolsa xavfsiz parol yaratiladi)"
-                                  className="w-full pl-4 pr-24 py-3 text-sm font-mono font-bold rounded-xl border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-200 focus:border-amber-500"
+                                  className="w-full pl-4 pr-24 py-3 text-sm font-mono font-bold rounded border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-200 focus:border-amber-500"
                                 />
                                 <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
                                   <button
@@ -1176,7 +1174,7 @@ export function OrganizationDetailsModal({
                                 type="button"
                                 onClick={handleExecuteResetPassword}
                                 disabled={isSavingPasswordReset}
-                                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                               >
                                 {isSavingPasswordReset ? (
                                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -1188,13 +1186,13 @@ export function OrganizationDetailsModal({
                             </div>
                           </div>
                         ) : (
-                          <div className="p-5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 space-y-4">
+                          <div className="p-5 rounded bg-emerald-50 border border-emerald-200 text-emerald-900 space-y-4">
                             <div className="flex items-center gap-2.5 font-bold text-sm sm:text-base text-emerald-800">
                               <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                               <span>Administrator paroli muvaffaqiyatli yangilandi!</span>
                             </div>
 
-                            <div className="p-4 rounded-xl bg-white border border-emerald-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                            <div className="p-4 rounded bg-white border border-emerald-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                               <div>
                                 <span className="text-xs text-slate-400 block font-medium">
                                   Admin logini: <strong className="text-slate-800 font-mono">{resetSuccessData.username}</strong>
@@ -1215,7 +1213,7 @@ export function OrganizationDetailsModal({
                                     setCopiedResetPassword(true);
                                     setTimeout(() => setCopiedResetPassword(false), 2000);
                                   }}
-                                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs sm:text-sm font-bold text-slate-700 transition-colors cursor-pointer"
+                                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs sm:text-sm font-bold text-slate-700 transition-colors cursor-pointer"
                                 >
                                   {copiedResetPassword ? (
                                     <Check className="w-4 h-4 text-emerald-600" />
@@ -1227,7 +1225,7 @@ export function OrganizationDetailsModal({
                                 <button
                                   type="button"
                                   onClick={() => handleCopyAllCredentials(resetSuccessData.temporaryPassword)}
-                                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer"
+                                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer"
                                 >
                                   {copiedAllCredentials ? (
                                     <Check className="w-4 h-4" />
@@ -1244,9 +1242,9 @@ export function OrganizationDetailsModal({
                     </div>
                   ) : (
                     /* Administrator mavjud bo'lmaganda yaratish paneli */
-                    <div className="p-6 rounded-2xl bg-white border border-blue-200/80 shadow-2xs space-y-5">
+                    <div className="p-6 rounded bg-white border border-blue-200/80 shadow-2xs space-y-5">
                       <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
-                        <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <div className="w-9 h-9 rounded bg-blue-50 text-blue-600 flex items-center justify-center">
                           <UserPlus className="w-5 h-5" />
                         </div>
                         <div>
@@ -1269,7 +1267,7 @@ export function OrganizationDetailsModal({
                             value={newAdminFullName}
                             onChange={(e) => setNewAdminFullName(e.target.value)}
                             placeholder="Azizjon Norimboyev"
-                            className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-medium"
+                            className="w-full px-4 py-2.5 text-sm rounded border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-medium"
                           />
                         </div>
 
@@ -1282,7 +1280,7 @@ export function OrganizationDetailsModal({
                             value={newAdminUsername}
                             onChange={(e) => setNewAdminUsername(e.target.value)}
                             placeholder="masalan: tatu_admin"
-                            className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono font-medium"
+                            className="w-full px-4 py-2.5 text-sm rounded border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono font-medium"
                           />
                         </div>
 
@@ -1295,7 +1293,7 @@ export function OrganizationDetailsModal({
                             value={newAdminPhone}
                             onChange={(e) => setNewAdminPhone(e.target.value)}
                             placeholder="+998 90 123 45 67"
-                            className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono font-medium"
+                            className="w-full px-4 py-2.5 text-sm rounded border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono font-medium"
                           />
                         </div>
 
@@ -1309,7 +1307,7 @@ export function OrganizationDetailsModal({
                               value={newAdminPassword}
                               onChange={(e) => setNewAdminPassword(e.target.value)}
                               placeholder="Bo'sh qolsa avtomatik generatsiya qilinadi"
-                              className="w-full pl-4 pr-16 py-2.5 text-sm rounded-xl border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono font-medium"
+                              className="w-full pl-4 pr-16 py-2.5 text-sm rounded border border-slate-300 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono font-medium"
                             />
                             <button
                               type="button"
@@ -1328,7 +1326,7 @@ export function OrganizationDetailsModal({
                           type="button"
                           onClick={handleCreateNewAdmin}
                           disabled={isSavingNewAdmin}
-                          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                         >
                           {isSavingNewAdmin ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -1347,10 +1345,10 @@ export function OrganizationDetailsModal({
               {/* TAB 3: LITSENZIYANI UZAYTIRISH                            */}
               {/* ======================================================== */}
               {activeTab === "license" && (
-                <div className="p-6 sm:p-7 rounded-2xl border border-blue-200/80 bg-blue-50/30 space-y-6 animate-in fade-in duration-150">
+                <div className="p-6 sm:p-7 rounded border border-blue-200/80 bg-blue-50/30 space-y-6 animate-in fade-in duration-150">
                   <div className="flex items-center justify-between pb-4 border-b border-blue-200/60">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                      <div className="w-10 h-10 rounded bg-blue-600 text-white flex items-center justify-center shadow-xs">
                         <Hourglass className="w-5 h-5" />
                       </div>
                       <div>
@@ -1363,7 +1361,7 @@ export function OrganizationDetailsModal({
                       </div>
                     </div>
                     <span
-                      className={`text-xs sm:text-sm font-semibold px-3.5 py-1.5 rounded-full border ${
+                      className={`text-xs sm:text-sm font-semibold px-3.5 py-1.5 rounded border ${
                         daysRemaining > 30
                           ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                           : "bg-amber-50 text-amber-700 border-amber-200"
@@ -1375,14 +1373,14 @@ export function OrganizationDetailsModal({
 
                   {/* Hozirgi holat ko'rsatkichi */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
-                    <div className="p-4 sm:p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+                    <div className="p-4 sm:p-5 rounded bg-white border border-slate-200/80 shadow-2xs">
                       <span className="text-slate-400 block text-xs">Hozirgi amal qilish sanasi:</span>
                       <span className="font-bold text-slate-900 mt-1 block text-base">
                         {formatUzbekDate(currentExpiresAt)} gacha
                       </span>
                     </div>
 
-                    <div className="p-4 sm:p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+                    <div className="p-4 sm:p-5 rounded bg-white border border-slate-200/80 shadow-2xs">
                       <span className="text-slate-400 block text-xs">Joriy ta&apos;rif:</span>
                       <span className="font-bold text-slate-900 mt-1 block text-base">
                         {organization.subscription.planLabel || "1 yillik dostup"}
@@ -1391,7 +1389,7 @@ export function OrganizationDetailsModal({
                   </div>
 
                   {/* Uzaytirish muddati tanlovi */}
-                  <div className="p-5 sm:p-6 rounded-2xl bg-white border border-blue-200/70 shadow-2xs space-y-4">
+                  <div className="p-5 sm:p-6 rounded bg-white border border-blue-200/70 shadow-2xs space-y-4">
                     <label className="block text-sm font-bold text-slate-800">
                       Litsenziyani qancha muddatga uzaytirmoqchisiz?
                     </label>
@@ -1404,7 +1402,7 @@ export function OrganizationDetailsModal({
                             key={preset.id}
                             type="button"
                             onClick={() => setSelectedExtendPlan(preset.id)}
-                            className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer border ${
+                            className={`px-4 py-2.5 rounded text-xs sm:text-sm font-bold transition-all cursor-pointer border ${
                               isSel
                                 ? "bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-200"
                                 : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
@@ -1418,7 +1416,7 @@ export function OrganizationDetailsModal({
                       <button
                         type="button"
                         onClick={() => setSelectedExtendPlan("custom")}
-                        className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer border ${
+                        className={`px-4 py-2.5 rounded text-xs sm:text-sm font-bold transition-all cursor-pointer border ${
                           selectedExtendPlan === "custom"
                             ? "bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-200"
                             : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
@@ -1437,7 +1435,7 @@ export function OrganizationDetailsModal({
                           type="date"
                           value={customDate}
                           onChange={(e) => setCustomDate(e.target.value)}
-                          className="px-4 py-2.5 text-sm font-semibold rounded-xl border border-slate-300 bg-white text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                          className="px-4 py-2.5 text-sm font-semibold rounded border border-slate-300 bg-white text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
                         />
                       </div>
                     )}
@@ -1455,7 +1453,7 @@ export function OrganizationDetailsModal({
                         type="button"
                         onClick={handleSaveLicenseExtension}
                         disabled={isSavingLicense}
-                        className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                        className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                       >
                         {isSavingLicense ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
@@ -1473,10 +1471,10 @@ export function OrganizationDetailsModal({
               {/* TAB 4: LIMITNI OSHIRISH                                   */}
               {/* ======================================================== */}
               {activeTab === "limit" && (
-                <div className="p-6 sm:p-7 rounded-2xl border border-blue-200/80 bg-blue-50/30 space-y-6 animate-in fade-in duration-150">
+                <div className="p-6 sm:p-7 rounded border border-blue-200/80 bg-blue-50/30 space-y-6 animate-in fade-in duration-150">
                   <div className="flex items-center justify-between pb-4 border-b border-blue-200/60">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                      <div className="w-10 h-10 rounded bg-blue-600 text-white flex items-center justify-center shadow-xs">
                         <TrendingUp className="w-5 h-5" />
                       </div>
                       <div>
@@ -1489,13 +1487,13 @@ export function OrganizationDetailsModal({
                       </div>
                     </div>
 
-                    <span className="font-mono text-xs sm:text-sm font-bold px-3 py-1.5 rounded-full bg-slate-200 text-slate-800">
+                    <span className="font-mono text-xs sm:text-sm font-bold px-3 py-1.5 rounded bg-slate-200 text-slate-800">
                       Hozir: {currentLimitMlrd >= 1000 ? `${currentLimitMlrd / 1000} trln` : `${currentLimitMlrd} mlrd`}
                     </span>
                   </div>
 
                   {/* Joriy ishlatilish holati */}
-                  <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-2.5">
+                  <div className="p-4 sm:p-5 rounded bg-white border border-slate-200/80 shadow-2xs space-y-2.5">
                     <div className="flex items-center justify-between text-xs sm:text-sm font-semibold text-slate-700">
                       <span>Mavjud balans ishlatilish holati</span>
                       <span className="text-blue-600 font-bold">
@@ -1513,7 +1511,7 @@ export function OrganizationDetailsModal({
                   </div>
 
                   {/* Limitni kiritish va tezkor qiymatlar */}
-                  <div className="p-5 sm:p-6 rounded-2xl bg-white border border-blue-200/70 shadow-2xs space-y-5">
+                  <div className="p-5 sm:p-6 rounded bg-white border border-blue-200/70 shadow-2xs space-y-5">
                     <div>
                       <label className="block text-sm font-bold text-slate-800 mb-2">
                         Yangi aktivlar limiti summasini kiriting yoki tanlang:
@@ -1527,33 +1525,11 @@ export function OrganizationDetailsModal({
                           onChange={(e) =>
                             setLimitInput(Math.max(1, parseInt(e.target.value, 10) || 1))
                           }
-                          className="w-full pl-4 pr-28 py-3 text-base sm:text-lg font-mono font-bold rounded-xl border border-slate-300 bg-white text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                          className="w-full pl-4 pr-16 py-3 text-base sm:text-lg font-mono font-bold rounded border border-slate-300 bg-white text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
                         />
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs sm:text-sm font-bold text-slate-500 pointer-events-none">
-                          mlrd so‘m
+                          mlrd
                         </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <span className="text-xs font-semibold text-slate-400 block mb-2.5">
-                        Tezkor tanlov tugmalari:
-                      </span>
-                      <div className="flex flex-wrap gap-2.5">
-                        {LIMIT_PRESETS.map((preset) => (
-                          <button
-                            key={preset}
-                            type="button"
-                            onClick={() => setLimitInput(preset)}
-                            className={`px-3.5 py-2 text-xs sm:text-sm font-bold rounded-xl border transition-all cursor-pointer ${
-                              limitInput === preset
-                                ? "bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-200"
-                                : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
-                            }`}
-                          >
-                            {preset >= 1000 ? `${preset / 1000} trln` : `${preset} mlrd`}
-                          </button>
-                        ))}
                       </div>
                     </div>
 
@@ -1562,7 +1538,7 @@ export function OrganizationDetailsModal({
                         type="button"
                         onClick={() => handleSaveLimit(limitInput)}
                         disabled={isSavingLimit}
-                        className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                        className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                       >
                         {isSavingLimit ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
@@ -1600,7 +1576,7 @@ export function OrganizationDetailsModal({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="px-6 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-2xs"
+                className="px-6 py-2.5 rounded border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-2xs"
               >
                 Yopish
               </button>
@@ -1616,13 +1592,13 @@ export function OrganizationDetailsModal({
           onClick={(e) => e.stopPropagation()}
         >
           <div
-            className="w-full max-w-lg bg-white rounded-2xl border border-rose-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col"
+            className="w-full max-w-lg bg-white rounded-md border border-rose-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <div className="px-6 py-4.5 bg-rose-50/70 border-b border-rose-100 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold shrink-0 border border-rose-200">
+                <div className="w-10 h-10 rounded bg-rose-100 text-rose-600 flex items-center justify-center font-bold shrink-0 border border-rose-200">
                   <AlertTriangle className="w-5 h-5 text-rose-600" />
                 </div>
                 <div className="min-w-0">
@@ -1638,7 +1614,7 @@ export function OrganizationDetailsModal({
                   if (!isDeleting) setShowDeleteModal(false);
                 }}
                 disabled={isDeleting}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-white transition-colors cursor-pointer disabled:opacity-50"
+                className="p-1.5 rounded text-slate-400 hover:text-slate-600 hover:bg-white transition-colors cursor-pointer disabled:opacity-50"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1646,7 +1622,7 @@ export function OrganizationDetailsModal({
 
             {/* Modal Body */}
             <div className="p-6 space-y-4">
-              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200/80 text-rose-900 text-xs sm:text-sm space-y-1.5 leading-relaxed">
+              <div className="p-3.5 rounded bg-rose-50 border border-rose-200/80 text-rose-900 text-xs sm:text-sm space-y-1.5 leading-relaxed">
                 <p className="font-bold text-rose-800 flex items-center gap-1.5">
                   <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
                   Diqqat: Ushbu amalni ortga qaytarib bo‘lmaydi!
@@ -1661,7 +1637,7 @@ export function OrganizationDetailsModal({
                   Tasdiqlash uchun quyidagi maydonga universitet nomini aynan ko‘chirib yozing:
                 </label>
 
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-100 border border-slate-200 font-mono text-xs sm:text-sm font-bold text-slate-900 select-all">
+                <div className="flex items-center justify-between p-3 rounded bg-slate-100 border border-slate-200 font-mono text-xs sm:text-sm font-bold text-slate-900 select-all">
                   <span className="truncate">{organization.name}</span>
                   <button
                     type="button"
@@ -1670,7 +1646,7 @@ export function OrganizationDetailsModal({
                       setCopiedName(true);
                       setTimeout(() => setCopiedName(false), 2000);
                     }}
-                    className="ml-2 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-sans font-semibold flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs"
+                    className="ml-2 px-2.5 py-1 rounded bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-sans font-semibold flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs"
                   >
                     {copiedName ? (
                       <>
@@ -1696,7 +1672,7 @@ export function OrganizationDetailsModal({
                   placeholder={organization.name}
                   autoFocus
                   disabled={isDeleting}
-                  className="w-full px-4 py-2.5 text-xs sm:text-sm font-mono rounded-xl border border-slate-300 bg-white text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-rose-200 focus:border-rose-500 font-medium transition-all"
+                  className="w-full px-4 py-2.5 text-xs sm:text-sm font-mono rounded border border-slate-300 bg-white text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-rose-200 focus:border-rose-500 font-medium transition-all"
                 />
               </div>
 
@@ -1713,7 +1689,7 @@ export function OrganizationDetailsModal({
                 type="button"
                 onClick={() => setShowDeleteModal(false)}
                 disabled={isDeleting}
-                className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                className="px-4 py-2.5 rounded border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50"
               >
                 Bekor qilish
               </button>
@@ -1724,7 +1700,7 @@ export function OrganizationDetailsModal({
                   deleteConfirmationText.trim().toLowerCase() !== organization.name.trim().toLowerCase() ||
                   isDeleting
                 }
-                className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-xs ${
+                className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded text-xs sm:text-sm font-bold transition-all shadow-xs ${
                   deleteConfirmationText.trim().toLowerCase() === organization.name.trim().toLowerCase() && !isDeleting
                     ? "bg-rose-600 hover:bg-rose-700 text-white cursor-pointer active:scale-95 shadow-rose-200"
                     : "bg-rose-200 text-rose-400 cursor-not-allowed opacity-60"

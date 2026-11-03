@@ -63,7 +63,7 @@ export function AdminNav() {
         </div>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+          className="p-1.5 rounded border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
           aria-label={mobileMenuOpen ? "Menyuni yopish" : "Menyuni ochish"}
         >
           {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -91,7 +91,7 @@ export function AdminNav() {
                 return (
                   <div
                     key={item.name}
-                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-400 bg-slate-50/50 cursor-not-allowed select-none"
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded text-xs font-medium text-slate-400 bg-slate-50/50 cursor-not-allowed select-none"
                     title="Ushbu bo'lim keyingi bosqichda ishga tushadi"
                   >
                     <div className="flex items-center gap-3">
@@ -99,7 +99,7 @@ export function AdminNav() {
                       <span>{item.name}</span>
                     </div>
                     {item.badge && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-200/70 text-slate-500">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200/70 text-slate-500">
                         {item.badge}
                       </span>
                     )}
@@ -113,7 +113,7 @@ export function AdminNav() {
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`
-                    flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all
+                    flex items-center justify-between px-3.5 py-2.5 rounded text-xs font-semibold transition-all
                     ${
                       isActive
                         ? "bg-blue-600 text-white shadow-2xs shadow-blue-500/20"

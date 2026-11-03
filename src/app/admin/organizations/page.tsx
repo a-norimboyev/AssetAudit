@@ -66,10 +66,10 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
     <div className="space-y-6">
       {/* Haqiqiy Statistik Kartalar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow">
+        <div className="p-5 rounded bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500">Jami OTMlar</span>
-            <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded bg-blue-50 text-blue-600 flex items-center justify-center">
               <Building2 className="w-4 h-4" />
             </div>
           </div>
@@ -79,10 +79,10 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
           <div className="text-[11px] text-slate-400 mt-1 font-medium">Platforma bo‘yicha</div>
         </div>
 
-        <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow">
+        <div className="p-5 rounded bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500">Faol OTMlar</span>
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
@@ -95,10 +95,10 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
           </div>
         </div>
 
-        <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow">
+        <div className="p-5 rounded bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500">Nofaol OTMlar</span>
-            <div className="w-9 h-9 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center">
+            <div className="w-9 h-9 rounded bg-slate-100 text-slate-500 flex items-center justify-center">
               <XCircle className="w-4 h-4" />
             </div>
           </div>
@@ -117,12 +117,12 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
       />
 
       {/* Asosiy Tashkilotlar Jadvali yoki Bo'sh Holat */}
-      <div className="bg-white rounded-xl border border-slate-200/80 shadow-2xs overflow-hidden">
+      <div className="bg-white rounded border border-slate-200/80 shadow-2xs overflow-hidden">
         {data.items.length === 0 ? (
           <div className="p-10 sm:p-16 text-center flex flex-col items-center justify-center">
             {hasFilter ? (
               <>
-                <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3 border border-amber-100 shadow-xs">
+                <div className="w-14 h-14 rounded bg-amber-50 text-amber-600 flex items-center justify-center mb-3 border border-amber-100 shadow-xs">
                   <FileQuestion className="w-7 h-7" />
                 </div>
                 <h3 className="text-base font-bold text-slate-900">
@@ -134,7 +134,7 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
                 <div className="mt-5">
                   <Link
                     href="/admin/organizations"
-                    className="inline-flex items-center px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
+                    className="inline-flex items-center px-4 py-2 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
                   >
                     Barcha tashkilotlarni ko‘rish
                   </Link>
@@ -142,7 +142,7 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
               </>
             ) : (
               <>
-                <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4 border border-blue-100 shadow-xs">
+                <div className="w-16 h-16 rounded bg-blue-50 text-blue-600 flex items-center justify-center mb-4 border border-blue-100 shadow-xs">
                   <Building2 className="w-8 h-8" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">
@@ -157,7 +157,7 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
                     trigger={
                       <button
                         type="button"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow-sm transition-all cursor-pointer"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow-sm transition-all cursor-pointer"
                       >
                         <Plus className="w-4 h-4" />
                         <span>Birinchi OTMni qo‘shish</span>
@@ -203,7 +203,7 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
                             types={types}
                             trigger={
                               <div className="flex items-center gap-3 cursor-pointer group text-left">
-                                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center text-xs font-bold border border-blue-100 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors overflow-hidden">
+                                <div className="w-8 h-8 rounded bg-blue-50 text-blue-700 flex items-center justify-center text-xs font-bold border border-blue-100 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors overflow-hidden">
                                   {org.settings?.logoUrl ? (
                                     // eslint-disable-next-line @next/next/no-img-element
                                     <img src={org.settings.logoUrl} alt={org.name} className="w-full h-full object-cover" />
@@ -234,7 +234,7 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
                           </span>
                         </td>
                         <td className="px-5 py-3.5">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
                             {org.typeName || org.typeId}
                           </span>
                         </td>
@@ -244,7 +244,7 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
                               {org.subscription.planLabel}
                             </span>
                             <span
-                              className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full w-fit ${
+                              className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded w-fit ${
                                 org.subscription.status === "active"
                                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                                   : org.subscription.status === "expiring_soon"
@@ -259,12 +259,12 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
                         </td>
                         <td className="px-5 py-3.5">
                           {org.isActive ? (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                               <span>Faol</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">
                               <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                               <span>Muzlatilgan</span>
                             </span>
@@ -285,7 +285,7 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
                                 <button
                                   type="button"
                                   title="Tashkilot va admin haqida to'liq ma'lumot"
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors text-xs font-semibold cursor-pointer"
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors text-xs font-semibold cursor-pointer"
                                 >
                                   <Eye className="w-3.5 h-3.5 text-slate-500" />
                                   <span className="hidden sm:inline">Batafsil</span>
@@ -316,7 +316,7 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
                     href={`/admin/organizations?page=${page - 1}${search ? `&q=${encodeURIComponent(search)}` : ""}${typeId && typeId !== "all" ? `&type=${encodeURIComponent(typeId)}` : ""}`}
                     aria-disabled={page <= 1}
                     tabIndex={page <= 1 ? -1 : undefined}
-                    className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-medium ${
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 rounded border border-slate-200 bg-white text-xs font-medium ${
                       page <= 1
                         ? "opacity-50 pointer-events-none cursor-not-allowed"
                         : "hover:bg-slate-50 text-slate-700"
@@ -334,7 +334,7 @@ export default async function AdminOrganizationsPage({ searchParams }: PageProps
                     href={`/admin/organizations?page=${page + 1}${search ? `&q=${encodeURIComponent(search)}` : ""}${typeId && typeId !== "all" ? `&type=${encodeURIComponent(typeId)}` : ""}`}
                     aria-disabled={page >= data.totalPages}
                     tabIndex={page >= data.totalPages ? -1 : undefined}
-                    className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-medium ${
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 rounded border border-slate-200 bg-white text-xs font-medium ${
                       page >= data.totalPages
                         ? "opacity-50 pointer-events-none cursor-not-allowed"
                         : "hover:bg-slate-50 text-slate-700"

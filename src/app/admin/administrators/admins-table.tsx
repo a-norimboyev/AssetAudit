@@ -78,7 +78,7 @@ export function AdminsTable({ initialItems }: AdminsTableProps) {
                 {/* Administrator Ismi */}
                 <td className="px-5 py-3.5">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 shadow-2xs border border-slate-200/80 bg-blue-600 group-hover:bg-blue-700 transition-colors flex items-center justify-center">
+                    <div className="w-10 h-10 rounded overflow-hidden shrink-0 shadow-2xs border border-slate-200/80 bg-blue-600 group-hover:bg-blue-700 transition-colors flex items-center justify-center">
                       <span className="text-white font-bold text-xs">
                         {getInitials(admin.fullName)}
                       </span>
@@ -106,7 +106,7 @@ export function AdminsTable({ initialItems }: AdminsTableProps) {
                 <td className="px-5 py-3.5 text-right">
                   <div className="flex items-center justify-end min-h-[28px]">
                     {!admin.isActive && (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
                         <XCircle className="w-3.5 h-3.5 text-rose-600" />
                         <span>Nofaol</span>
                       </span>

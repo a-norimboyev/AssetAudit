@@ -125,7 +125,7 @@ export function AdminLayoutClient({
           <button
             type="button"
             onClick={() => setIsSidebarOpen(false)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 lg:hidden"
+            className="p-1.5 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 lg:hidden"
             aria-label="Menyuni yopish"
           >
             <X className="w-5 h-5" />
@@ -146,7 +146,7 @@ export function AdminLayoutClient({
               return (
                 <div
                   key={item.name}
-                  className="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-medium text-slate-400 bg-slate-50/50 cursor-not-allowed select-none"
+                  className="flex items-center justify-between px-3.5 py-2.5 rounded text-xs font-medium text-slate-400 bg-slate-50/50 cursor-not-allowed select-none"
                   title="Ushbu bo'lim tez kunda ishga tushadi"
                 >
                   <div className="flex items-center gap-3">
@@ -154,7 +154,7 @@ export function AdminLayoutClient({
                     <span>{item.name}</span>
                   </div>
                   {item.badge && (
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200">
                       {item.badge}
                     </span>
                   )}
@@ -167,7 +167,7 @@ export function AdminLayoutClient({
                 key={item.name}
                 href={item.href}
                 onClick={() => setIsSidebarOpen(false)}
-                className={`flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                className={`flex items-center justify-between px-3.5 py-2.5 rounded text-xs sm:text-sm font-medium transition-colors ${
                   isActive
                     ? "bg-blue-50 text-blue-700 font-semibold shadow-2xs"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
@@ -183,7 +183,7 @@ export function AdminLayoutClient({
                 </div>
 
                 {item.badge && (
-                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
+                  <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-blue-100 text-blue-700 border border-blue-200">
                     {item.badge}
                   </span>
                 )}
@@ -202,7 +202,7 @@ export function AdminLayoutClient({
             <button
               type="button"
               onClick={() => setIsSidebarOpen(true)}
-              className="p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 lg:hidden"
+              className="p-2 rounded text-slate-500 hover:text-slate-700 hover:bg-slate-100 lg:hidden"
               aria-label="Menyuni ochish"
             >
               <Menu className="w-5 h-5" />
@@ -229,7 +229,7 @@ export function AdminLayoutClient({
           <div className="flex items-center gap-3">
             <Link
               href="/admin/profile"
-              className="flex items-center gap-2.5 group hover:opacity-90 transition-opacity p-1 rounded-xl hover:bg-slate-50"
+              className="flex items-center gap-2.5 group hover:opacity-90 transition-opacity p-1 rounded hover:bg-slate-50"
               title="Sozlamalar"
             >
               <span className="text-xs sm:text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors hidden sm:block">

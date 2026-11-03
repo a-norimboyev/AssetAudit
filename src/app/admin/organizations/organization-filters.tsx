@@ -51,7 +51,7 @@ export function OrganizationFilters({ types = [], currentSearch = "" }: Props) {
   const hasActiveFilters = Boolean(currentSearch && currentSearch.trim());
 
   return (
-    <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs">
+    <div className="bg-white p-4 rounded border border-slate-200/80 shadow-2xs">
       <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         {/* Qidiruv Inputi */}
         <div className="relative flex-1">
@@ -67,7 +67,7 @@ export function OrganizationFilters({ types = [], currentSearch = "" }: Props) {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="OTM nomi yoki kodi bo‘yicha qidirish..."
-            className="w-full pl-10 pr-9 py-2.5 rounded-lg border border-slate-200 bg-slate-50/60 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all"
+            className="w-full pl-10 pr-9 py-2.5 rounded border border-slate-200 bg-slate-50/60 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all"
           />
           {searchTerm && (
             <button
@@ -93,7 +93,7 @@ export function OrganizationFilters({ types = [], currentSearch = "" }: Props) {
             type="button"
             onClick={handleClear}
             disabled={isPending}
-            className="px-4 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs sm:text-sm font-semibold transition-colors shrink-0 cursor-pointer"
+            className="px-4 py-2.5 rounded border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs sm:text-sm font-semibold transition-colors shrink-0 cursor-pointer"
             title="Barcha filtrlarni tozalash"
           >
             Tozalash

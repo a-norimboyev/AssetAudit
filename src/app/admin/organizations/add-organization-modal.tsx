@@ -432,7 +432,7 @@ Kirish manzili: ${origin}/login`;
         <button
           type="button"
           onClick={handleOpen}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer shrink-0"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4" />
           <span>OTM qo‘shish</span>
@@ -442,13 +442,13 @@ Kirish manzili: ${origin}/login`;
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/50 backdrop-blur-xs animate-in fade-in overscroll-contain">
           <div
-            className="w-full max-w-5xl lg:max-w-6xl bg-white rounded-2xl border border-slate-200/80 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[92vh] overscroll-contain"
+            className="w-full max-w-5xl lg:max-w-6xl bg-white rounded-md border border-slate-200/80 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[92vh] overscroll-contain"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <div className="px-6 py-4.5 bg-white border-b border-slate-200 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shadow-xs shrink-0 border border-blue-100">
+                <div className="w-10 h-10 rounded bg-blue-50 text-blue-600 flex items-center justify-center font-bold shadow-xs shrink-0 border border-blue-100">
                   <Building2 className="w-5 h-5" />
                 </div>
                 <h2 className="text-base sm:text-lg font-bold text-slate-900 truncate">
@@ -459,7 +459,7 @@ Kirish manzili: ${origin}/login`;
               <button
                 type="button"
                 onClick={handleClose}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
                 aria-label="Yopish"
               >
                 <X className="w-5 h-5" />
@@ -471,7 +471,7 @@ Kirish manzili: ${origin}/login`;
               {createdCredentials ? (
                 /* Success View with Credentials Card */
                 <div className="space-y-5 animate-in fade-in duration-200">
-                  <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-center gap-3">
+                  <div className="p-4 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                     <div>
                       <p className="font-bold">
@@ -484,7 +484,7 @@ Kirish manzili: ${origin}/login`;
                   </div>
 
                   {/* Credentials Card */}
-                  <div className="p-5 sm:p-6 rounded-2xl border border-slate-200/80 bg-slate-50/60 space-y-4">
+                  <div className="p-5 sm:p-6 rounded border border-slate-200/80 bg-slate-50/60 space-y-4">
                     <div className="flex items-center justify-between pb-3 border-b border-slate-200/60">
                       <div className="flex items-center gap-2">
                         <ShieldCheck className="w-4 h-4 text-blue-600" />
@@ -495,28 +495,28 @@ Kirish manzili: ${origin}/login`;
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs sm:text-sm">
-                      <div className="p-3.5 rounded-xl bg-white border border-slate-200/80">
+                      <div className="p-3.5 rounded bg-white border border-slate-200/80">
                         <span className="text-slate-400 block text-xs">Universitet:</span>
                         <span className="font-bold text-slate-900 mt-0.5 block truncate">
                           {createdCredentials.orgName}
                         </span>
                       </div>
 
-                      <div className="p-3.5 rounded-xl bg-white border border-slate-200/80">
+                      <div className="p-3.5 rounded bg-white border border-slate-200/80">
                         <span className="text-slate-400 block text-xs">Mas&apos;ul shaxs:</span>
                         <span className="font-bold text-slate-900 mt-0.5 block truncate">
                           {createdCredentials.fullName}
                         </span>
                       </div>
 
-                      <div className="p-3.5 rounded-xl bg-white border border-slate-200/80">
+                      <div className="p-3.5 rounded bg-white border border-slate-200/80">
                         <span className="text-slate-400 block text-xs">Admin logini:</span>
                         <span className="font-mono font-bold text-blue-600 mt-0.5 block truncate">
                           {createdCredentials.username || createdCredentials.email?.split("@")[0]}
                         </span>
                       </div>
 
-                      <div className="p-3.5 rounded-xl bg-white border border-slate-200/80">
+                      <div className="p-3.5 rounded bg-white border border-slate-200/80">
                         <span className="text-slate-400 block text-xs">Vaqtinchalik parol:</span>
                         <span className="font-mono font-bold text-slate-900 mt-0.5 block truncate">
                           {createdCredentials.temporaryPassword || adminPassword || "••••••••"}
@@ -524,7 +524,7 @@ Kirish manzili: ${origin}/login`;
                       </div>
 
                       {createdCredentials.phone && (
-                        <div className="p-3.5 rounded-xl bg-white border border-slate-200/80 sm:col-span-2 lg:col-span-4">
+                        <div className="p-3.5 rounded bg-white border border-slate-200/80 sm:col-span-2 lg:col-span-4">
                           <span className="text-slate-400 block text-xs">Telefon raqami:</span>
                           <span className="font-mono font-semibold text-slate-900 mt-0.5 block">
                             {createdCredentials.phone}
@@ -537,7 +537,7 @@ Kirish manzili: ${origin}/login`;
                       <button
                         type="button"
                         onClick={handleCopyCredentials}
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer"
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer"
                       >
                         {copied ? (
                           <>
@@ -555,7 +555,7 @@ Kirish manzili: ${origin}/login`;
                       <button
                         type="button"
                         onClick={handleFinishAndClose}
-                        className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer"
+                        className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer"
                       >
                         Tugatish va jadvalga qaytish
                       </button>
@@ -588,7 +588,7 @@ Kirish manzili: ${origin}/login`;
                     autoComplete="new-password"
                   />
                   {generalError && (
-                    <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm flex items-start gap-2.5">
+                    <div className="p-4 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm flex items-start gap-2.5">
                       <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                       <span>{generalError}</span>
                     </div>
@@ -619,7 +619,7 @@ Kirish manzili: ${origin}/login`;
                               className="hidden"
                             />
                             <div className="flex items-center gap-3.5">
-                              <div className="w-14 h-14 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden relative group">
+                              <div className="w-14 h-14 rounded border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden relative group">
                                 {logoUrl ? (
                                   // eslint-disable-next-line @next/next/no-img-element
                                   <img
@@ -644,7 +644,7 @@ Kirish manzili: ${origin}/login`;
                                   type="button"
                                   onClick={() => logoInputRef.current?.click()}
                                   disabled={isLogoUploading}
-                                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50 shadow-2xs"
+                                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50 shadow-2xs"
                                 >
                                   <Upload className="w-3.5 h-3.5 text-slate-500" />
                                   <span>{logoUrl ? "Logoni almashtirish" : "Logotip yuklash"}</span>
@@ -654,7 +654,7 @@ Kirish manzili: ${origin}/login`;
                                   <button
                                     type="button"
                                     onClick={() => setLogoUrl(null)}
-                                    className="inline-flex items-center gap-1 px-3 py-2 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+                                    className="inline-flex items-center gap-1 px-3 py-2 rounded border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
                                     <span>O‘chirish</span>
@@ -680,7 +680,7 @@ Kirish manzili: ${origin}/login`;
                                 if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }));
                               }}
                               placeholder="Masalan: Toshkent Axborot Texnologiyalari Universiteti"
-                              className={`w-full px-4 py-2.5 text-xs sm:text-sm rounded-xl border bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 transition-all font-medium ${
+                              className={`w-full px-4 py-2.5 text-xs sm:text-sm rounded border bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 transition-all font-medium ${
                                 fieldErrors.name
                                   ? "border-rose-300 focus:ring-rose-100 focus:border-rose-500"
                                   : "border-slate-200 focus:ring-blue-100 focus:border-blue-500"
@@ -702,7 +702,7 @@ Kirish manzili: ${origin}/login`;
                               <button
                                 type="button"
                                 onClick={handleDecreaseLimit}
-                                className="w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-base cursor-pointer transition-colors shadow-2xs active:scale-95"
+                                className="w-10 h-10 rounded border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-base cursor-pointer transition-colors shadow-2xs active:scale-95"
                                 title="Limitni kamaytirish (-)"
                               >
                                 <Minus className="w-4 h-4" />
@@ -715,17 +715,17 @@ Kirish manzili: ${origin}/login`;
                                   max={50000}
                                   value={assetLimitMlrd}
                                   onChange={(e) => setAssetLimitMlrd(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                                  className="w-full pl-4 pr-24 py-2.5 text-xs sm:text-sm font-mono font-bold rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
+                                  className="w-full pl-4 pr-16 py-2.5 text-xs sm:text-sm font-mono font-bold rounded border border-slate-200 bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
                                 />
                                 <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
-                                  mlrd so‘m
+                                  mlrd
                                 </div>
                               </div>
 
                               <button
                                 type="button"
                                 onClick={handleIncreaseLimit}
-                                className="w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-base cursor-pointer transition-colors shadow-2xs active:scale-95"
+                                className="w-10 h-10 rounded border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-base cursor-pointer transition-colors shadow-2xs active:scale-95"
                                 title="Limitni oshirish (+)"
                               >
                                 <Plus className="w-4 h-4" />
@@ -754,7 +754,7 @@ Kirish manzili: ${origin}/login`;
                                   key={p.id}
                                   type="button"
                                   onClick={() => handlePresetClick(p.id, p.value, p.unit)}
-                                  className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer border ${
+                                  className={`px-3.5 py-1.5 rounded text-xs sm:text-sm font-semibold transition-all cursor-pointer border ${
                                     isSel
                                       ? "bg-blue-600 text-white border-blue-600 shadow-2xs"
                                       : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
@@ -768,7 +768,7 @@ Kirish manzili: ${origin}/login`;
 
                           {/* Custom inputs */}
                           {selectedPreset === "custom" && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 animate-in fade-in">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded bg-slate-50 border border-slate-200/80 animate-in fade-in">
                               <div>
                                 <label className="block text-xs font-medium text-slate-500 mb-1">
                                   Muddat (qiymat va birlik)
@@ -780,12 +780,12 @@ Kirish manzili: ${origin}/login`;
                                     max={3650}
                                     value={customValue}
                                     onChange={(e) => handleCustomDurationChange(Math.max(1, parseInt(e.target.value, 10) || 1), customUnit)}
-                                    className="w-20 px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-900"
+                                    className="w-20 px-3 py-2 text-xs sm:text-sm font-semibold rounded border border-slate-200 bg-white text-slate-900"
                                   />
                                   <select
                                     value={customUnit}
                                     onChange={(e) => handleCustomDurationChange(customValue, e.target.value as "days" | "months" | "years")}
-                                    className="flex-1 px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-900"
+                                    className="flex-1 px-3 py-2 text-xs sm:text-sm font-semibold rounded border border-slate-200 bg-white text-slate-900"
                                   >
                                     <option value="days">Kun</option>
                                     <option value="months">Oy</option>
@@ -802,7 +802,7 @@ Kirish manzili: ${origin}/login`;
                                   type="date"
                                   value={customDate}
                                   onChange={(e) => handleCustomDateChange(e.target.value)}
-                                  className="w-full px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-900"
+                                  className="w-full px-3 py-2 text-xs sm:text-sm font-semibold rounded border border-slate-200 bg-white text-slate-900"
                                 />
                               </div>
                             </div>
@@ -834,7 +834,7 @@ Kirish manzili: ${origin}/login`;
                                 value={adminFullName}
                                 onChange={(e) => setAdminFullName(e.target.value)}
                                 placeholder="Azizjon Norimboyev"
-                                className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium"
+                                className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded border border-slate-200 bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium"
                               />
                             </div>
                           </div>
@@ -851,7 +851,7 @@ Kirish manzili: ${origin}/login`;
                                 value={adminPhone}
                                 onChange={(e) => setAdminPhone(e.target.value)}
                                 placeholder="+998 90 123 45 67"
-                                className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all font-mono font-medium"
+                                className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded border border-slate-200 bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all font-mono font-medium"
                               />
                             </div>
                           </div>
@@ -876,7 +876,7 @@ Kirish manzili: ${origin}/login`;
                                 }
                               }}
                               placeholder="masalan: tatu_admin"
-                              className={`w-full px-4 py-2.5 text-xs sm:text-sm rounded-xl border bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 transition-all font-mono font-medium ${
+                              className={`w-full px-4 py-2.5 text-xs sm:text-sm rounded border bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 transition-all font-mono font-medium ${
                                 fieldErrors.adminUsername
                                   ? "border-rose-300 focus:ring-rose-100 focus:border-rose-500"
                                   : "border-slate-200 focus:ring-blue-100 focus:border-blue-500"
@@ -920,7 +920,7 @@ Kirish manzili: ${origin}/login`;
                                   }
                                 }}
                                 placeholder="Kamida 6 ta belgi"
-                                className={`w-full pl-4 pr-11 py-2.5 text-xs sm:text-sm rounded-xl border bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 transition-all font-mono font-medium ${
+                                className={`w-full pl-4 pr-11 py-2.5 text-xs sm:text-sm rounded border bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 transition-all font-mono font-medium ${
                                   fieldErrors.adminPassword
                                     ? "border-rose-300 focus:ring-rose-100 focus:border-rose-500"
                                     : "border-slate-200 focus:ring-blue-100 focus:border-blue-500"
@@ -955,14 +955,14 @@ Kirish manzili: ${origin}/login`;
                     <button
                       type="button"
                       onClick={handleClose}
-                      className="px-5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+                      className="px-5 py-2.5 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
                     >
                       Bekor qilish
                     </button>
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                      className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                     >
                       {isLoading ? (
                         <>

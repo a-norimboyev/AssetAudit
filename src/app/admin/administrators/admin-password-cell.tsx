@@ -28,7 +28,7 @@ export function AdminPasswordCell({ password }: AdminPasswordCellProps) {
   }
 
   return (
-    <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-lg px-2.5 py-1 w-fit shadow-2xs">
+    <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded px-2.5 py-1 w-fit shadow-2xs">
       <KeyRound className="w-3.5 h-3.5 text-amber-600 shrink-0" />
       <span className="font-mono text-xs font-bold text-slate-800 tracking-wide">
         {show ? password : "••••••••"}

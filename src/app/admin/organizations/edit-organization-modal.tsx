@@ -247,7 +247,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
       ) : (
         <button
           onClick={() => setIsOpen(true)}
-          className="p-2 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+          className="p-2 rounded text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
           title="OTMni tahrirlash"
         >
           <Edit2 className="w-4 h-4" />
@@ -256,11 +256,11 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in overscroll-contain">
-          <div className="w-full max-w-3xl lg:max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden text-left overscroll-contain max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-150">
+          <div className="w-full max-w-3xl lg:max-w-4xl bg-white rounded-md shadow-2xl border border-slate-200 overflow-hidden text-left overscroll-contain max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-150">
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <div className="w-9 h-9 rounded bg-blue-50 text-blue-600 flex items-center justify-center">
                   <Building2 className="w-4 h-4" />
                 </div>
                 <div>
@@ -270,7 +270,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
+                className="p-1.5 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -279,14 +279,14 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
             {/* Form */}
             <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
               {result?.error && (
-                <div className="p-3.5 rounded-xl text-xs flex items-center gap-2.5 bg-rose-50 text-rose-800 border border-rose-200">
+                <div className="p-3.5 rounded text-xs flex items-center gap-2.5 bg-rose-50 text-rose-800 border border-rose-200">
                   <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                   <span>{result.error}</span>
                 </div>
               )}
 
               {toggleMessage && (
-                <div className="p-3.5 rounded-xl text-xs flex items-center gap-2.5 bg-blue-50 text-blue-800 border border-blue-200">
+                <div className="p-3.5 rounded text-xs flex items-center gap-2.5 bg-blue-50 text-blue-800 border border-blue-200">
                   <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
                   <span>{toggleMessage}</span>
                 </div>
@@ -305,7 +305,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                   className="hidden"
                 />
                 <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden relative">
+                  <div className="w-14 h-14 rounded border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden relative">
                     {logoUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -330,7 +330,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                       type="button"
                       onClick={() => logoInputRef.current?.click()}
                       disabled={isLogoUploading}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
                     >
                       <Upload className="w-3.5 h-3.5 text-slate-500" />
                       <span>{logoUrl ? "Logoni almashtirish" : "Logotip yuklash"}</span>
@@ -340,7 +340,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                       <button
                         type="button"
                         onClick={() => setLogoUrl(null)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition-colors cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                         <span>O‘chirish</span>
@@ -365,7 +365,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-slate-50/50 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded border border-slate-200 bg-slate-50/50 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all"
                 />
                 {result?.fieldErrors?.name && (
                   <p className="mt-1 text-[11px] text-rose-600">{result.fieldErrors.name}</p>
@@ -379,7 +379,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                     Aktivlar balansi limiti <span className="text-rose-500">*</span>
                   </label>
                   <span className="text-[11px] text-slate-400 font-mono">
-                    {assetLimitMlrd} mlrd so‘m
+                    {assetLimitMlrd} mlrd
                   </span>
                 </div>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
@@ -390,10 +390,10 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                       max={50000}
                       value={assetLimitMlrd}
                       onChange={(e) => setAssetLimitMlrd(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                      className="w-full pl-3.5 pr-24 py-2 text-xs sm:text-sm font-mono font-bold rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
+                      className="w-full pl-3.5 pr-16 py-2 text-xs sm:text-sm font-mono font-bold rounded border border-slate-200 bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 pointer-events-none">
-                      mlrd so‘m
+                      mlrd
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -402,7 +402,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                         key={preset}
                         type="button"
                         onClick={() => setAssetLimitMlrd(preset)}
-                        className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                        className={`px-2.5 py-1.5 text-xs font-semibold rounded border transition-all cursor-pointer ${
                           assetLimitMlrd === preset
                             ? "bg-blue-600 text-white border-blue-600 shadow-2xs"
                             : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
@@ -426,7 +426,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                   </div>
                   {organization.subscription && (
                     <span
-                      className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                      className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
                         organization.subscription.status === "active"
                           ? "bg-emerald-50 text-emerald-700"
                           : organization.subscription.status === "expiring_soon"
@@ -440,7 +440,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                 </div>
 
                 {organization.subscription && (
-                  <div className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-100 flex items-center justify-between">
+                  <div className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded border border-slate-100 flex items-center justify-between">
                     <span>Joriy: <strong>{organization.subscription.planLabel}</strong></span>
                     <span>Tugash: <strong>{new Intl.DateTimeFormat("uz-UZ").format(new Date(organization.subscription.expiresAt))}</strong></span>
                   </div>
@@ -453,7 +453,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                   <select
                     value={subscriptionAction}
                     onChange={(e) => setSubscriptionAction(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-slate-50/50 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all cursor-pointer"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded border border-slate-200 bg-slate-50/50 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all cursor-pointer"
                   >
                     <option value="keep">O‘zgarishsiz qoldirish</option>
                     <option value="1_month">+1 oyga uzaytirish</option>
@@ -467,7 +467,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                 </div>
 
                 {subscriptionAction === "custom" && (
-                  <div className="p-3.5 rounded-xl border border-indigo-100 bg-indigo-50/50 space-y-3">
+                  <div className="p-3.5 rounded border border-indigo-100 bg-indigo-50/50 space-y-3">
                     <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
                       <span>Maxsus muddatni belgilash:</span>
@@ -488,7 +488,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                               const val = Math.max(1, parseInt(e.target.value, 10) || 1);
                               handleCustomDurationChange(val, customUnit);
                             }}
-                            className="w-20 px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs sm:text-sm font-bold text-slate-900 focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                            className="w-20 px-3 py-2 rounded border border-slate-200 bg-white text-xs sm:text-sm font-bold text-slate-900 focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
                           />
                           <select
                             value={customUnit}
@@ -496,7 +496,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                               const u = e.target.value as "days" | "months" | "years";
                               handleCustomDurationChange(customValue, u);
                             }}
-                            className="flex-1 px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 cursor-pointer"
+                            className="flex-1 px-3 py-2 rounded border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 cursor-pointer"
                           >
                             <option value="months">Oy</option>
                             <option value="years">Yil</option>
@@ -514,12 +514,12 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                           required
                           value={customExpiresAt}
                           onChange={(e) => handleCustomDateChange(e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 cursor-pointer"
+                          className="w-full px-3 py-2 rounded border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 cursor-pointer"
                         />
                       </div>
                     </div>
 
-                    <div className="text-[11px] text-indigo-700 bg-white p-2 rounded-lg border border-indigo-200 flex items-center justify-between">
+                    <div className="text-[11px] text-indigo-700 bg-white p-2 rounded border border-indigo-200 flex items-center justify-between">
                       <span>Hisoblangan sana: <strong>{formatUzbekDate(customExpiresAt)}</strong></span>
                       <span className="font-semibold">
                         {customValue} {customUnit === "years" ? "yillik" : customUnit === "months" ? "oylik" : "kunlik"} dostup
@@ -545,7 +545,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                   type="button"
                   onClick={handleToggleStatus}
                   disabled={isTogglingStatus || isPending}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold border transition-colors cursor-pointer ${
                     organization.isActive
                       ? "text-rose-700 bg-rose-50 hover:bg-rose-100 border-rose-200"
                       : "text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200"
@@ -567,14 +567,14 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="px-4 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded text-xs font-medium text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
                 >
                   Yopish
                 </button>
                 <button
                   type="submit"
                   disabled={isPending || isTogglingStatus}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                 >
                   {isPending ? (
                     <>

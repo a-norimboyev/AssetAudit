@@ -182,7 +182,7 @@ export function NotificationsClient() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Xabarnomalar bo'yicha qidirish..."
-            className="w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 shadow-2xs transition-all"
+            className="w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm rounded border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 shadow-2xs transition-all"
           />
           {searchQuery && (
             <button
@@ -199,7 +199,7 @@ export function NotificationsClient() {
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-2xs transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-2xs transition-colors cursor-pointer shrink-0 whitespace-nowrap"
         >
           <Plus className="w-4 h-4" />
           <span>Yangi xabar</span>
@@ -208,8 +208,8 @@ export function NotificationsClient() {
 
       {/* Xabarnomalar ro'yxati */}
       {filteredNotifications.length === 0 ? (
-        <div className="p-8 sm:p-12 rounded-2xl bg-white border border-slate-200/80 text-center shadow-2xs">
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3.5 border border-blue-100">
+        <div className="p-8 sm:p-12 rounded bg-white border border-slate-200/80 text-center shadow-2xs">
+          <div className="w-12 h-12 rounded bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3.5 border border-blue-100">
             <Megaphone className="w-6 h-6" />
           </div>
           <h3 className="font-bold text-slate-900 text-sm sm:text-base">
@@ -219,7 +219,7 @@ export function NotificationsClient() {
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Yangi xabar</span>
@@ -231,10 +231,10 @@ export function NotificationsClient() {
           {filteredNotifications.map((item) => (
             <div
               key={item.id}
-              className="p-4 rounded-xl bg-white border border-slate-200/80 hover:border-slate-300 shadow-2xs transition-all flex items-start justify-between gap-3"
+              className="p-4 rounded bg-white border border-slate-200/80 hover:border-slate-300 shadow-2xs transition-all flex items-start justify-between gap-3"
             >
               <div className="flex items-start gap-3 min-w-0">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-blue-50 text-blue-600">
+                <div className="w-8 h-8 rounded flex items-center justify-center shrink-0 mt-0.5 bg-blue-50 text-blue-600">
                   <Megaphone className="w-4 h-4" />
                 </div>
 
@@ -275,11 +275,11 @@ export function NotificationsClient() {
       {/* Yangi xabar modali — Ixcham, qulay va toza oyna */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-xs animate-in fade-in overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-4xl xl:max-w-5xl w-full p-5 sm:p-6 shadow-2xl border border-slate-100 space-y-4 animate-in zoom-in-95 my-auto">
+          <div className="bg-white rounded max-w-4xl xl:max-w-5xl w-full p-5 sm:p-6 shadow-2xl border border-slate-100 space-y-4 animate-in zoom-in-95 my-auto">
             {/* Oyna sarlavhasi */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
+                <div className="w-10 h-10 rounded bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
                   <Megaphone className="w-5 h-5" />
                 </div>
                 <h3 className="font-bold text-slate-900 text-base sm:text-lg">
@@ -289,7 +289,7 @@ export function NotificationsClient() {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-slate-600 rounded hover:bg-slate-100 transition-colors cursor-pointer"
                 title="Yopish"
               >
                 <X className="w-5 h-5" />
@@ -310,7 +310,7 @@ export function NotificationsClient() {
                       value={newTitle}
                       onChange={(e) => setNewTitle(e.target.value)}
                       placeholder="Xabar sarlavhasi..."
-                      className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-50 focus:bg-white text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium"
+                      className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded border border-slate-200 bg-slate-50/70 hover:bg-slate-50 focus:bg-white text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium"
                     />
                   </div>
 
@@ -323,7 +323,7 @@ export function NotificationsClient() {
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Xabar matnini kiriting..."
-                      className="w-full flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-50 focus:bg-white text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 resize-none transition-all leading-relaxed font-medium min-h-[260px] lg:min-h-[290px]"
+                      className="w-full flex-1 px-3.5 py-2.5 rounded border border-slate-200 bg-slate-50/70 hover:bg-slate-50 focus:bg-white text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 resize-none transition-all leading-relaxed font-medium min-h-[260px] lg:min-h-[290px]"
                     />
                   </div>
                 </div>
@@ -339,14 +339,14 @@ export function NotificationsClient() {
                       <button
                         type="button"
                         onClick={() => setNewTarget("all")}
-                        className={`p-3 rounded-xl border-2 text-left transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
+                        className={`p-3 rounded border-2 text-left transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
                           newTarget === "all"
                             ? "border-blue-600 bg-blue-50/70 shadow-xs"
                             : "border-slate-200 bg-slate-50/50 hover:bg-slate-100/70 hover:border-slate-300"
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                          <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${
                             newTarget === "all" ? "bg-blue-600 text-white" : "bg-slate-200 text-slate-600"
                           }`}>
                             <Building2 className="w-4 h-4" />
@@ -365,14 +365,14 @@ export function NotificationsClient() {
                       <button
                         type="button"
                         onClick={() => setNewTarget("single")}
-                        className={`p-3 rounded-xl border-2 text-left transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
+                        className={`p-3 rounded border-2 text-left transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
                           newTarget === "single"
                             ? "border-blue-600 bg-blue-50/70 shadow-xs"
                             : "border-slate-200 bg-slate-50/50 hover:bg-slate-100/70 hover:border-slate-300"
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                          <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${
                             newTarget === "single" ? "bg-blue-600 text-white" : "bg-slate-200 text-slate-600"
                           }`}>
                             <Building2 className="w-4 h-4" />
@@ -391,8 +391,8 @@ export function NotificationsClient() {
                   </div>
 
                   {newTarget === "all" ? (
-                    <div className="p-6 rounded-xl bg-blue-50/60 border border-blue-100 flex flex-col justify-center items-center text-center space-y-2.5 min-h-[260px] lg:min-h-[290px]">
-                      <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                    <div className="p-6 rounded bg-blue-50/60 border border-blue-100 flex flex-col justify-center items-center text-center space-y-2.5 min-h-[260px] lg:min-h-[290px]">
+                      <div className="w-12 h-12 rounded bg-blue-600 text-white flex items-center justify-center shadow-xs">
                         <Building2 className="w-6 h-6" />
                       </div>
                       <h4 className="font-bold text-slate-900 text-sm sm:text-base">
@@ -400,13 +400,13 @@ export function NotificationsClient() {
                       </h4>
                     </div>
                   ) : (
-                    <div className="space-y-2.5 p-3.5 sm:p-4 rounded-xl bg-slate-50/80 border border-slate-200 flex flex-col min-h-[260px] lg:min-h-[290px]">
+                    <div className="space-y-2.5 p-3.5 sm:p-4 rounded bg-slate-50/80 border border-slate-200 flex flex-col min-h-[260px] lg:min-h-[290px]">
                       <div className="flex items-center justify-between gap-2 flex-wrap">
                         <div className="flex items-center gap-2">
                           <span className="text-xs sm:text-sm font-bold text-slate-800">
                             Kerakli OTMlarni tanlang
                           </span>
-                          <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                          <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-700">
                             {selectedUnivIds.length} ta tanlandi
                           </span>
                         </div>
@@ -424,7 +424,7 @@ export function NotificationsClient() {
 
                       {/* Tanlangan OTMlar teglari */}
                       {selectedUnivs.length > 0 && (
-                        <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto p-1.5 bg-white rounded-lg border border-slate-200/80 shadow-2xs">
+                        <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto p-1.5 bg-white rounded border border-slate-200/80 shadow-2xs">
                           {selectedUnivs.map((u) => (
                             <span
                               key={u.id}
@@ -452,7 +452,7 @@ export function NotificationsClient() {
                           value={univSearch}
                           onChange={(e) => setUnivSearch(e.target.value)}
                           placeholder="OTM nomi bo'yicha qidirish..."
-                          className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 shadow-2xs transition-all font-medium"
+                          className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm rounded border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 shadow-2xs transition-all font-medium"
                         />
                         {univSearch && (
                           <button
@@ -466,7 +466,7 @@ export function NotificationsClient() {
                       </div>
 
                       {/* Skrollanuvchi ro'yxat */}
-                      <div className="flex-1 max-h-[190px] overflow-y-auto space-y-1 bg-white rounded-lg border border-slate-200 p-1.5 shadow-2xs">
+                      <div className="flex-1 max-h-[190px] overflow-y-auto space-y-1 bg-white rounded border border-slate-200 p-1.5 shadow-2xs">
                         {filteredUniversities.length === 0 ? (
                           <div className="py-8 text-center text-xs text-slate-500 font-medium">
                             Bunday OTM topilmadi
@@ -479,7 +479,7 @@ export function NotificationsClient() {
                                 key={u.id}
                                 type="button"
                                 onClick={() => toggleUnivSelection(u.id)}
-                                className={`w-full px-3 py-2 rounded-lg text-left transition-all cursor-pointer flex items-center justify-between gap-2.5 border ${
+                                className={`w-full px-3 py-2 rounded text-left transition-all cursor-pointer flex items-center justify-between gap-2.5 border ${
                                   isSelected
                                     ? "bg-blue-50/90 text-blue-900 border-blue-300 shadow-2xs"
                                     : "hover:bg-slate-50/80 text-slate-800 border-slate-100"
@@ -511,14 +511,14 @@ export function NotificationsClient() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
                 >
                   Bekor qilish
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>{isSubmitting ? "Yuborilmoqda..." : "Yuborish"}</span>

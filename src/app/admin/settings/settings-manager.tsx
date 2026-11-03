@@ -172,7 +172,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
     <div className="space-y-6">
       {/* Profilaktika rejimi ogohlantirish banneri */}
       {settings.maintenance.enabled && (
-        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3 text-amber-900">
+        <div className="p-4 rounded bg-amber-500/10 border border-amber-500/30 flex items-start gap-3 text-amber-900">
           <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="text-xs">
             <span className="font-bold">
@@ -187,7 +187,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
 
       {/* Xatolik bildirishnomasi */}
       {feedback && feedback.type === "error" && (
-        <div className="p-4 rounded-xl flex items-center justify-between text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
+        <div className="p-4 rounded flex items-center justify-between text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
             <span>{feedback.message}</span>
@@ -202,7 +202,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
       )}
 
       {/* Asosiy Boshqaruv Konteyneri */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden flex flex-col md:flex-row min-h-[580px]">
+      <div className="bg-white rounded border border-slate-200/90 shadow-2xs overflow-hidden flex flex-col md:flex-row min-h-[580px]">
         {/* Chap Navigatsiya Tablari */}
         <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-slate-200/80 bg-slate-50/50 p-3 space-y-1 shrink-0">
           <div className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
@@ -214,7 +214,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-left cursor-pointer ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded text-xs font-semibold transition-all text-left cursor-pointer ${
                   isActive
                     ? "bg-blue-600 text-white shadow-2xs shadow-blue-500/20"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -271,7 +271,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           system: { ...settings.system, platformName: e.target.value },
                         })
                       }
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
                     />
                   </div>
 
@@ -288,7 +288,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           system: { ...settings.system, baseUrl: e.target.value },
                         })
                       }
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-mono font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
                       placeholder="http://localhost:3000 yoki https://assetaudit.uz"
                     />
                     <span className="text-[10px] text-slate-400">
@@ -310,7 +310,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           system: { ...settings.system, supportPhone: e.target.value },
                         })
                       }
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
                     />
                   </div>
 
@@ -327,7 +327,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           system: { ...settings.system, supportEmail: e.target.value },
                         })
                       }
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
                     />
                   </div>
 
@@ -343,7 +343,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           system: { ...settings.system, defaultQrSize: e.target.value },
                         })
                       }
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
                     >
                       <option value="50x30">50 x 30 mm — Standart Termo Etiketka</option>
                       <option value="40x25">40 x 25 mm — Ixcham Etiketka</option>
@@ -366,7 +366,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           },
                         })
                       }
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
                     >
                       <option value="M">M — Standart</option>
                       <option value="Q">Q — Yuqori</option>
@@ -377,7 +377,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                 </div>
 
                 <div className="pt-2">
-                  <label className="flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 cursor-pointer hover:bg-slate-50">
+                  <label className="flex items-center gap-3 p-3.5 rounded border border-slate-200 bg-slate-50/60 cursor-pointer hover:bg-slate-50">
                     <input
                       type="checkbox"
                       checked={settings.system.hideRoomAddressOnPublicScan}
@@ -436,7 +436,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           },
                         })
                       }
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
                     />
                     <span className="text-[10px] text-slate-400">
                       Tavsiya etiladi: kamida 8 ta belgi (sukut bo&apos;yicha xodimlar uchun 12)
@@ -461,7 +461,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           },
                         })
                       }
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
                     />
                     <span className="text-[10px] text-slate-400">
                       Foydalanuvchi tizimda qayta kirmasdan faol bo&apos;lish muddati
@@ -486,7 +486,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           },
                         })
                       }
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
                     />
                     <span className="text-[10px] text-slate-400">
                       Ushbu sondan so&apos;ng hisob yoki IP vaqtincha bloklanadi
@@ -511,7 +511,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           },
                         })
                       }
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
                     />
                     <span className="text-[10px] text-slate-400">
                       Ketma-ket xato paroldan so&apos;ng kutish vaqti
@@ -536,7 +536,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           },
                         })
                       }
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
                     />
                     <span className="text-[10px] text-slate-400">
                       0 — talab etilmaydi, odatda 90 kun
@@ -545,7 +545,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                 </div>
 
                 <div className="pt-2 space-y-3">
-                  <label className="flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 cursor-pointer hover:bg-slate-50">
+                  <label className="flex items-center gap-3 p-3.5 rounded border border-slate-200 bg-slate-50/60 cursor-pointer hover:bg-slate-50">
                     <input
                       type="checkbox"
                       checked={settings.security.enforceStrongPassword}
@@ -585,7 +585,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-4">
+                <div className="p-5 rounded border border-slate-200 bg-slate-50/60 space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-sm font-bold text-slate-900">
@@ -637,7 +637,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           },
                         })
                       }
-                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
                       placeholder="Profilaktika paytida saytda chiqadigan xabarni yozing..."
                     />
                   </div>
@@ -661,7 +661,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           },
                         })
                       }
-                      className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-mono font-medium focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                      className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded text-xs font-mono font-medium focus:outline-hidden focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
                       placeholder="127.0.0.1, ::1"
                     />
                     <span className="text-[10px] text-slate-400">
@@ -685,10 +685,10 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                 </div>
 
                 {/* Telegram Bot */}
-                <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-4">
+                <div className="p-5 rounded border border-slate-200 bg-slate-50/60 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
+                      <div className="w-9 h-9 rounded bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
                         <Send className="w-5 h-5" />
                       </div>
                       <div>
@@ -737,7 +737,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                             },
                           })
                         }
-                        className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium"
+                        className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded text-xs font-medium"
                         placeholder="@AssetAuditBot"
                       />
                     </div>
@@ -759,14 +759,14 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                               },
                             })
                           }
-                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-mono font-medium"
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded text-xs font-mono font-medium"
                           placeholder="-100234567890"
                         />
                         <button
                           type="button"
                           disabled={isTestingTelegram}
                           onClick={handleTestTelegram}
-                          className="px-3 py-1.5 bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                          className="px-3 py-1.5 bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200 rounded text-xs font-semibold whitespace-nowrap cursor-pointer transition-colors disabled:opacity-50 flex items-center gap-1.5"
                         >
                           {isTestingTelegram ? (
                             <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -785,7 +785,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                       Qaysi hodisalarda Telegramga xabar yuborilsin?
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <label className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white cursor-pointer hover:bg-slate-50">
+                      <label className="flex items-center gap-2 p-2.5 rounded border border-slate-200 bg-white cursor-pointer hover:bg-slate-50">
                         <input
                           type="checkbox"
                           checked={settings.integrations.notifyOnCriticalConflict}
@@ -805,7 +805,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                         </span>
                       </label>
 
-                      <label className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white cursor-pointer hover:bg-slate-50">
+                      <label className="flex items-center gap-2 p-2.5 rounded border border-slate-200 bg-white cursor-pointer hover:bg-slate-50">
                         <input
                           type="checkbox"
                           checked={settings.integrations.notifyOnNewTenant}
@@ -829,10 +829,10 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                 </div>
 
                 {/* SMS Gateway */}
-                <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-4">
+                <div className="p-5 rounded border border-slate-200 bg-slate-50/60 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center font-bold">
+                      <div className="w-9 h-9 rounded bg-violet-50 text-violet-600 flex items-center justify-center font-bold">
                         <Smartphone className="w-5 h-5" />
                       </div>
                       <div>
@@ -879,7 +879,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           },
                         })
                       }
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded text-xs font-medium"
                     >
                       <option value="eskiz">Eskiz.uz SMS Gateway (O&apos;zbekiston)</option>
                       <option value="playmobile">PlayMobile SMS Gateway (O&apos;zbekiston)</option>
@@ -901,7 +901,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                   </p>
                 </div>
 
-                <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-200/80 flex items-start gap-3 text-blue-900">
+                <div className="p-4 rounded bg-blue-50/60 border border-blue-200/80 flex items-start gap-3 text-blue-900">
                   <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                   <div className="text-xs leading-relaxed">
                     <strong>Avtomatik biriktirish:</strong> Yangi ochilgan har bir tashkilot yaratilganda ushbu ko&apos;rsatkichlar uning profiliga avtomatik kiritiladi.
@@ -909,7 +909,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                  <div className="p-4 rounded border border-slate-200 bg-slate-50/50 space-y-2">
                     <label className="text-xs font-semibold text-slate-700 block">
                       Maksimal Inventarlar Soni
                     </label>
@@ -926,14 +926,14 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           },
                         })
                       }
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded text-xs font-bold text-slate-900"
                     />
                     <span className="text-[10px] text-slate-400 block">
                       Sukut bo&apos;yicha: 10,000 dona aktiv
                     </span>
                   </div>
 
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                  <div className="p-4 rounded border border-slate-200 bg-slate-50/50 space-y-2">
                     <label className="text-xs font-semibold text-slate-700 block">
                       Disk Xotirasi (MB)
                     </label>
@@ -950,14 +950,14 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           },
                         })
                       }
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded text-xs font-bold text-slate-900"
                     />
                     <span className="text-[10px] text-slate-400 block">
                       Rasmlar va hujjatlar uchun: 2048 MB (2 GB)
                     </span>
                   </div>
 
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                  <div className="p-4 rounded border border-slate-200 bg-slate-50/50 space-y-2">
                     <label className="text-xs font-semibold text-slate-700 block">
                       Bir Vaqtdagi Faol Auditlar
                     </label>
@@ -975,7 +975,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                           },
                         })
                       }
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded text-xs font-bold text-slate-900"
                     />
                     <span className="text-[10px] text-slate-400 block">
                       Bir vaqtda faol o&apos;tkaziladigan davrlar
@@ -997,7 +997,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-5">
+                <div className="p-5 rounded border border-slate-200 bg-slate-50/60 space-y-5">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200/80">
                     <div>
                       <div className="flex items-center gap-2">
@@ -1022,7 +1022,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                       <a
                         href="/api/admin/backup/download"
                         download
-                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold border border-blue-200 shadow-2xs transition-all"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold border border-blue-200 shadow-2xs transition-all"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Yuklab Olish</span>
@@ -1032,7 +1032,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                         type="button"
                         disabled={isPending}
                         onClick={handleBackupNow}
-                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all disabled:opacity-50 cursor-pointer"
+                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all disabled:opacity-50 cursor-pointer"
                       >
                         <RefreshCw className={`w-3.5 h-3.5 text-blue-600 ${isPending ? "animate-spin" : ""}`} />
                         <span>Hozir Zaxira Olish</span>
@@ -1041,7 +1041,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <label className="flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 bg-white cursor-pointer hover:bg-slate-50">
+                    <label className="flex items-center gap-3 p-3.5 rounded border border-slate-200 bg-white cursor-pointer hover:bg-slate-50">
                       <input
                         type="checkbox"
                         checked={settings.backup.autoBackupEnabled}
@@ -1066,7 +1066,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                       </div>
                     </label>
 
-                    <div className="p-3.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between">
+                    <div className="p-3.5 rounded border border-slate-200 bg-white flex items-center justify-between">
                       <div>
                         <div className="text-xs font-bold text-slate-800">
                           Zaxira Chastotasi
@@ -1086,7 +1086,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                             },
                           })
                         }
-                        className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 cursor-pointer"
+                        className="px-2.5 py-1 rounded bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 cursor-pointer"
                       >
                         <option value="daily">Kunlik</option>
                         <option value="weekly">Haftalik</option>
@@ -1100,7 +1100,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
                       <div className="text-xs font-bold text-slate-800 mb-2">
                         Mavjud Zaxira Fayllari
                       </div>
-                      <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
+                      <div className="border border-slate-200 rounded overflow-hidden bg-white">
                         <table className="w-full text-left text-xs">
                           <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500">
                             <tr>
@@ -1150,7 +1150,7 @@ export function SettingsManager({ initialSettings }: SettingsManagerProps) {
               type="button"
               disabled={isPending}
               onClick={handleSave}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs hover:shadow-sm transition-all disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs hover:shadow-sm transition-all disabled:opacity-50 cursor-pointer"
             >
               {isPending ? (
                 <>

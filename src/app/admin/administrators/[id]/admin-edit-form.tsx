@@ -101,7 +101,7 @@ export function AdminEditForm({ admin }: AdminEditFormProps) {
       <div className="flex items-center justify-between pb-2">
         <Link
           href="/admin/administrators"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
           <span>Administratorlar ro&apos;yxatiga qaytish</span>
@@ -109,11 +109,11 @@ export function AdminEditForm({ admin }: AdminEditFormProps) {
       </div>
 
       {/* Asosiy Tahrirlash Kartasi */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+      <div className="bg-white rounded border border-slate-200/80 shadow-xs overflow-hidden">
         {/* Karta boshi */}
         <div className="px-7 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 rounded bg-blue-600 text-white flex items-center justify-center shadow-xs">
               <User className="w-5 h-5" />
             </div>
             <div>
@@ -127,7 +127,7 @@ export function AdminEditForm({ admin }: AdminEditFormProps) {
           </div>
           <div className="flex items-center gap-2">
             <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+              className={`inline-flex items-center px-3 py-1 rounded text-xs font-semibold ${
                 isActive
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-rose-50 text-rose-700 border border-rose-200"
@@ -141,14 +141,14 @@ export function AdminEditForm({ admin }: AdminEditFormProps) {
         {/* Forma */}
         <form onSubmit={handleSubmit} className="p-7 space-y-4">
           {error && (
-            <div className="p-3.5 rounded-xl text-xs sm:text-sm flex items-center gap-2.5 bg-rose-50 text-rose-800 border border-rose-200">
+            <div className="p-3.5 rounded text-xs sm:text-sm flex items-center gap-2.5 bg-rose-50 text-rose-800 border border-rose-200">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           {successMessage && (
-            <div className="p-3.5 rounded-xl text-xs sm:text-sm flex items-center gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <div className="p-3.5 rounded text-xs sm:text-sm flex items-center gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{successMessage}</span>
             </div>
@@ -159,7 +159,7 @@ export function AdminEditForm({ admin }: AdminEditFormProps) {
             <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
               OTM
             </label>
-            <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium text-slate-800">
+            <div className="flex items-center gap-2.5 px-4 py-3 rounded bg-slate-50 border border-slate-200 text-sm font-medium text-slate-800">
               <Building2 className="w-4 h-4 text-indigo-600 shrink-0" />
               <span>{admin.organizationName || "Biriktirilmagan"}</span>
             </div>
@@ -176,7 +176,7 @@ export function AdminEditForm({ admin }: AdminEditFormProps) {
               onChange={(e) => setFullName(e.target.value)}
               required
               placeholder="Ism va familiya"
-              className="w-full px-4 py-3 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-medium text-slate-900 transition-all"
+              className="w-full px-4 py-3 text-sm rounded border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-medium text-slate-900 transition-all"
             />
           </div>
 
@@ -192,7 +192,7 @@ export function AdminEditForm({ admin }: AdminEditFormProps) {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 placeholder="Login"
-                className="w-full px-4 py-3 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono font-medium text-slate-900 transition-all"
+                className="w-full px-4 py-3 text-sm rounded border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono font-medium text-slate-900 transition-all"
               />
             </div>
 
@@ -208,7 +208,7 @@ export function AdminEditForm({ admin }: AdminEditFormProps) {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+998 90 123 45 67"
-                  className="w-full pl-10 pr-4 py-3 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono text-slate-900 transition-all"
+                  className="w-full pl-10 pr-4 py-3 text-sm rounded border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono text-slate-900 transition-all"
                 />
               </div>
             </div>
@@ -237,7 +237,7 @@ export function AdminEditForm({ admin }: AdminEditFormProps) {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Yangi parol (ixtiyoriy)"
-                className="w-full px-4 py-3 pr-20 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono text-slate-900 transition-all"
+                className="w-full px-4 py-3 pr-20 text-sm rounded border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 font-mono text-slate-900 transition-all"
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
                 {newPassword && (
@@ -275,7 +275,7 @@ export function AdminEditForm({ admin }: AdminEditFormProps) {
               <button
                 type="button"
                 onClick={() => setIsActive(true)}
-                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-4 py-1.5 rounded text-xs font-semibold transition-all cursor-pointer ${
                   isActive
                     ? "bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-2xs"
                     : "bg-slate-50 text-slate-500 border border-slate-200 hover:bg-slate-100"
@@ -286,7 +286,7 @@ export function AdminEditForm({ admin }: AdminEditFormProps) {
               <button
                 type="button"
                 onClick={() => setIsActive(false)}
-                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-4 py-1.5 rounded text-xs font-semibold transition-all cursor-pointer ${
                   !isActive
                     ? "bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs"
                     : "bg-slate-50 text-slate-500 border border-slate-200 hover:bg-slate-100"
@@ -302,7 +302,7 @@ export function AdminEditForm({ admin }: AdminEditFormProps) {
             <button
               type="submit"
               disabled={isPending}
-              className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-60"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-60"
             >
               {isPending ? (
                 <>

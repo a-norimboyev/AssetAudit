@@ -13,6 +13,7 @@ import {
   verifyTenantAdmin,
   verifyRole,
   verifyTenantAccess,
+  canManageLocations,
 } from "./authorization-rules";
 
 export type AuthErrorCode =
@@ -137,6 +138,69 @@ export async function requireOrganizationAdmin(): Promise<TenantAdminContext> {
     ...context,
     organization: context.organization!,
   };
+}
+
+/**
+ * 2c. Infratuzilma Boshqaruvi Himoyasi (Binolar, Qavatlar, Xonalar)
+ * Vakolat: Ro'yxatga oluvchi (Registrar) va Tashkilot Administratori
+ */
+export async function requireLocationManager(): Promise<TenantAdminContext> {
+  const context = await requireAuthenticatedUser();
+
+  if (context.profile.role === "super_admin") {
+    redirect("/admin");
+  }
+
+  if (!context.organization || !context.organization.isActive) {
+    throw new AuthError(
+      "ORGANIZATION_INACTIVE",
+      "Tashkilot faoliyati vaqtincha to'xtatilgan yoki topilmadi."
+    );
+  }
+
+  if (!canManageLocations(context.profile.role)) {
+    throw new AuthError(
+      "FORBIDDEN",
+      "Infratuzilmani (bino va xonalarni) boshqarish uchun vakolat yetarli emas."
+    );
+  }
+
+  return {
+    ...context,
+    organization: context.organization,
+  };
+}
+
+/**
+ * 2c. Universitet Rahbariyati (Boshliq / Rektorat) Himoyasi (/boshliq marshruti)
+ * Multi-tenant izolyatsiya qoidasi:
+ * - Super Admin kirganda avtomatik /admin ga yo'naltiriladi
+ * - head yoki organization_admin (rahbariyat ko'rinishida) ruxsat etiladi
+ * - 100% Read-Only rejimda ishlaydi
+ * - Tashkilot mavjud va faol (is_active = true) bo'lishi shart
+ */
+export async function requireHeadAccess(): Promise<AuthenticatedContext> {
+  const context = await requireAuthenticatedUser();
+
+  if (context.profile.role === "super_admin") {
+    redirect("/admin");
+  }
+
+  if (context.profile.role !== "head" && context.profile.role !== "organization_admin") {
+    throw new AuthError(
+      "FORBIDDEN",
+      "Ushbu bo'lim faqat universitet rahbariyati (Boshliq) uchun ruxsat etilgan."
+    );
+  }
+
+  if (!context.organization || !context.organization.isActive) {
+    throw new AuthError(
+      "ORGANIZATION_INACTIVE",
+      "Tashkilot faoliyati vaqtincha to'xtatilgan yoki topilmadi."
+    );
+  }
+
+  return context;
 }
 
 /**

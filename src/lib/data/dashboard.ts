@@ -83,7 +83,7 @@ export async function getOrgDashboardData(organizationId: string): Promise<Dashb
   const floorsCount = fRes[0]?.count ?? 0;
   const roomsCount = rRes[0]?.count ?? 0;
 
-  // 3. Mas'ul xodimlar soni (Inspector va Registrar)
+  // 3. Mas'ul xodimlar soni (Head, Inspector va Registrar)
   const [staffRes] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(profiles)
@@ -91,7 +91,7 @@ export async function getOrgDashboardData(organizationId: string): Promise<Dashb
       and(
         eq(profiles.organizationId, organizationId),
         eq(profiles.isActive, true),
-        inArray(profiles.role, ["inspector", "registrar"])
+        inArray(profiles.role, ["head", "inspector", "registrar"])
       )
     );
   const activeStaffCount = staffRes?.count ?? 0;
@@ -188,8 +188,8 @@ export async function getOrgDashboardData(organizationId: string): Promise<Dashb
     recentActivity.push({
       id: s.id,
       type: "scan",
-      title: `${s.itemName} (${s.invNum})`,
-      subtitle: s.isMatch ? "Rejaviy joylashuvda tasdiqlandi" : "Joylashuv nomuvofiqligi (Konflikt)",
+      title: `${s.itemName} - ${s.invNum}`,
+      subtitle: s.isMatch ? "Rejaviy joylashuvda tasdiqlandi" : "Joylashuv nomuvofiqligi",
       timestamp: s.scannedAt,
       statusBadge: s.isMatch
         ? { label: "Mos keldi", variant: "success" }
@@ -201,7 +201,7 @@ export async function getOrgDashboardData(organizationId: string): Promise<Dashb
     recentActivity.push({
       id: itm.id,
       type: "item",
-      title: `${itm.name} (${itm.invNum})`,
+      title: `${itm.name} - ${itm.invNum}`,
       subtitle: "Yangi inventar ro'yxatga olindi",
       timestamp: itm.createdAt,
       statusBadge: { label: "Yangi", variant: "info" },

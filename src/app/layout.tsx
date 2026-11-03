@@ -19,14 +19,15 @@ export const metadata: Metadata = {
     "Universitetlar va tashkilotlar uchun QR kod orqali inventarlarni hisobga olish, xonalar bo‘yicha tekshirish va joylashuv nomuvofiqliklarini aniqlash platformasi.",
   icons: {
     icon: [
+      { url: "/favicon.ico" },
       { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon.ico" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
     ],
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
-    shortcut: "/favicon.svg",
+    shortcut: "/favicon.ico",
   },
 };
 

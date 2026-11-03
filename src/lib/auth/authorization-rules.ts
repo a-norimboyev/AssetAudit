@@ -79,7 +79,7 @@ export function verifyPlatformAdmin(profile: Profile): AuthorizationResult {
     return {
       allowed: false,
       errorCode: "FORBIDDEN",
-      errorMessage: "Ushbu amal faqat Platforma Bosh Administratori (Super Admin) uchun ruxsat etilgan.",
+      errorMessage: "Ushbu amal faqat Platforma Bosh Administratori uchun ruxsat etilgan.",
     };
   }
 
@@ -237,6 +237,39 @@ export function canPerformAudit(role: UserRole): boolean {
  * Tashkilot xodimlarini boshqarish huquqi
  */
 export function canManageOrganizationUsers(role: UserRole): boolean {
+  return role === "organization_admin";
+}
+
+/**
+ * Tashkilot administratori tomonidan boshqarilishi mumkin bo'lgan xodim rollari:
+ * Qat'iy qoida: Faqat 3 ta rol (Boshliq, Ro'yxatga oluvchi, Tekshiruvchi).
+ * Universitet administratori Super Admin yoki yangi Organization Admin yarata OLMAYDI!
+ */
+export function isManageableStaffRole(role: string): boolean {
+  return role === "head" || role === "registrar" || role === "inspector";
+}
+
+/**
+ * Boshliq (Rektor / Prorektor / Bosh hisobchi) roli tekshiruvi:
+ * 100% Read-Only kuzatuvchi.
+ */
+export function isHeadReadOnly(role: UserRole): boolean {
+  return role === "head";
+}
+
+/**
+ * Infratuzilmani (bino, qavat, xonalarni) ochish va tahrirlash huquqi
+ * Qat'iy qoida: Ro'yxatga oluvchi (Registrar) va Tashkilot Administratori ruxsat etilgan.
+ */
+export function canManageLocations(role: UserRole): boolean {
+  return role === "organization_admin" || role === "registrar";
+}
+
+/**
+ * Inventarni hisobdan chiqarish (spisanie / arxivlash) huquqi
+ * Qat'iy qoida: Faqat Organization Admin ruxsat etilgan. Ro'yxatga oluvchi (Registrar) spisanie qila OLMAYDI!
+ */
+export function canArchiveItem(role: UserRole): boolean {
   return role === "organization_admin";
 }
 

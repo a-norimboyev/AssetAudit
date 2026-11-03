@@ -12,6 +12,8 @@ import {
   canPerformAudit,
   canManageOrganizationUsers,
   canManagePlatformOrganizations,
+  isManageableStaffRole,
+  isHeadReadOnly,
 } from "../authorization-rules";
 import { auth } from "../../auth";
 import type { Profile } from "../../db/schema/profiles";
@@ -182,8 +184,24 @@ describe("AssetAudit — Multi-Organization Avtorizatsiya va Xavfsizlik Qoidalar
     assert.equal(canManageOrganizationUsers("organization_admin"), true);
     assert.equal(canManageOrganizationUsers("inspector"), false);
     assert.equal(canManageOrganizationUsers("registrar"), false);
+    assert.equal(canManageOrganizationUsers("head"), false);
     assert.equal(canManagePlatformOrganizations("super_admin"), true);
     assert.equal(canManagePlatformOrganizations("organization_admin"), false);
+
+    // Universitet Administratori faqat 3 ta rolni boshqara oladi
+    assert.equal(isManageableStaffRole("head"), true);
+    assert.equal(isManageableStaffRole("registrar"), true);
+    assert.equal(isManageableStaffRole("inspector"), true);
+    assert.equal(isManageableStaffRole("organization_admin"), false);
+    assert.equal(isManageableStaffRole("super_admin"), false);
+
+    // Boshliq roli 100% Read-Only
+    assert.equal(isHeadReadOnly("head"), true);
+    assert.equal(isHeadReadOnly("organization_admin"), false);
+    assert.equal(canCreateNewItem("head"), false);
+    assert.equal(canRelocateItem("head"), false);
+    assert.equal(canUploadOfficialItemPhoto("head"), false);
+    assert.equal(canPerformAudit("head"), false);
   });
 
   // 7. Better Auth Ochiq Ro'yxatdan O'tish (Sign-up) Himoyasi

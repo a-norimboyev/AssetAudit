@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AssetAudit (MulkNazorat) — 5 ta Asosiy Rol Spetsifikatsiyasi</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 8mm 10mm 8mm 10mm;
+            @bottom-right {
+                content: "Sahifa " counter(page) " / " counter(pages);
+                font-size: 7.5pt;
+                color: #64748b;
+                font-family: Arial, sans-serif;
+            }
+        }
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #0f172a;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            font-size: 7.5pt;
+            line-height: 1.32;
+        }
+
+        /* Header */
+        .doc-header {
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .doc-header h1 {
+            font-size: 14pt;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 2px 0;
+            letter-spacing: -0.3px;
+        }
+        .doc-header .doc-subtitle {
+            font-size: 8.5pt;
+            color: #2563eb;
+            font-weight: 600;
+            margin: 0;
+        }
+        .doc-meta {
+            text-align: right;
+            font-size: 6.8pt;
+            color: #64748b;
+            line-height: 1.25;
+        }
+        .badge-role {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-weight: 700;
+            font-size: 6.8pt;
+            margin-bottom: 2px;
+        }
+
+        /* Banner */
+        .summary-banner {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            padding: 5px 8px;
+            margin-bottom: 8px;
+            font-size: 7.2pt;
+            color: #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .summary-banner b { color: #0f172a; }
+
+        /* Section Headings */
+        .section-title {
+            font-size: 8.5pt;
+            font-weight: 800;
+            color: #0f172a;
+            border-left: 3px solid #2563eb;
+            padding-left: 6px;
+            margin: 6px 0 4px 0;
+        }
+
+        /* Table Styling */
+        table.matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 6.8pt;
+            margin-bottom: 6px;
+        }
+        table.matrix-table th {
+            background-color: #0f172a;
+            color: #ffffff;
+            font-weight: 700;
+            text-align: center;
+            padding: 4px 5px;
+            border: 1px solid #0f172a;
+        }
+        table.matrix-table th.th-left {
+            text-align: left;
+        }
+        table.matrix-table td {
+            padding: 2.5px 5px;
+            border: 1px solid #cbd5e1;
+            vertical-align: middle;
+            line-height: 1.25;
+        }
+        table.matrix-table tr:nth-child(even) td {
+            background-color: #f8fafc;
+        }
+
+        .check-yes {
+            color: #16a34a;
+            font-weight: 800;
+            text-align: center;
+        }
+        .check-no {
+            color: #dc2626;
+            font-weight: 600;
+            text-align: center;
+        }
+        .check-readonly {
+            color: #0284c7;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /* Role Cards on Page 2 */
+        .role-cards-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .role-card {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            padding: 6px 8px;
+            border-left: 4px solid #2563eb;
+        }
+        .rc-super { border-left-color: #7c3aed; }
+        .rc-admin { border-left-color: #2563eb; }
+        .rc-head  { border-left-color: #0284c7; }
+        .rc-reg   { border-left-color: #059669; }
+        .rc-insp  { border-left-color: #d97706; }
+
+        .rc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+        .rc-title {
+            font-size: 8.5pt;
+            font-weight: 800;
+            color: #0f172a;
+        }
+        .rc-device {
+            font-size: 6.8pt;
+            background: #f1f5f9;
+            color: #475569;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .rc-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 6.8pt;
+        }
+        .rc-pro {
+            color: #166534;
+            line-height: 1.3;
+        }
+        .rc-con {
+            color: #991b1b;
+            line-height: 1.3;
+        }
+        .rc-pro b, .rc-con b {
+            font-weight: 700;
+        }
+
+        /* Conclusion Box */
+        .conclusion-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 5px;
+            padding: 6px 10px;
+            margin-top: 6px;
+            font-size: 7pt;
+            line-height: 1.35;
+        }
+        .conclusion-box h4 {
+            margin: 0 0 2px 0;
+            font-size: 8pt;
+            color: #1e3a8a;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== SAHIFA 1: QIYOSIY MATRITSA ==================== -->
+    <div class="doc-header">
+        <div>
+            <span class="badge-role">RBAC & Vakolatlar Taqsimoti Hujjati</span>
+            <h1>AssetAudit (MulkNazorat) — 5 ta Rol Spetsifikatsiyasi</h1>
+            <p class="doc-subtitle">Superadmin, Universitet Admini, Boshliq, Registrar va Auditor Vakolatlari</p>
+        </div>
+        <div class="doc-meta">
+            <div><b>Tizim turi:</b> Multi-Tenant SaaS</div>
+            <div><b>Qat'iy RBAC:</b> 5 ta Izolyatsiya Qilingan Rol</div>
+            <div><b>Sana:</b> 2026-yil Oktyabr</div>
+        </div>
+    </div>
+
+    <div class="summary-banner">
+        <div><b>Asosiy Qoida:</b> Manfaatlar to‘qnashuvining 100% oldi olingan: Rektorat faqat ko‘radi, Registrar kiritadi, Auditor joyida tekshiradi.</div>
+        <div><b>Xavfsizlik:</b> Rektor uchun 100% Read-Only kafolati</div>
+    </div>
+
+    <div class="section-title">1-Qism: 20 ta Asosiy Funksiya Bo‘yicha Ruxsatlar Matritsasi</div>
+
+    <table class="matrix-table">
+        <thead>
+            <tr>
+                <th class="th-left" style="width: 38%;">Tizimdagi Funksional Vazifalar va Jarayonlar</th>
+                <th style="width: 12%;">1. Superadmin<br><span style="font-size:5.5pt; font-weight:normal;">Platforma</span></th>
+                <th style="width: 13%;">2. OTM Admini<br><span style="font-size:5.5pt; font-weight:normal;">Boshqaruvchi</span></th>
+                <th style="width: 13%;">3. Boshliq<br><span style="font-size:5.5pt; font-weight:normal;">Rektor (Kuzatuvchi)</span></th>
+                <th style="width: 12%;">4. Registrar<br><span style="font-size:5.5pt; font-weight:normal;">Hisobchi</span></th>
+                <th style="width: 12%;">5. Auditor<br><span style="font-size:5.5pt; font-weight:normal;">Dala Xodimi</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><b>Yangi universitet qo‘shish / Muzlatish (bloklash)</b></td>
+                <td class="check-yes">✅ HA</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Obuna muddatini belgilash va tariflarni boshqarish</b></td>
+                <td class="check-yes">✅ HA</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Respublika bo‘yicha global statistikani ko‘rish</b></td>
+                <td class="check-yes">✅ HA</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Fakultet, bino, qavat va xonalarni ochish/tahrirlash</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA</td>
+                <td class="check-readonly">👁️ Ko‘radi</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Moddiy javobgar shaxsni (MJS) xonalarga biriktirish</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA</td>
+                <td class="check-readonly">👁️ Ko‘radi</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Xodimlarni yaratish (Boshliq, Registrar, Auditor)</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Rektor buyrug‘idagi Xatlov Komissiyasini tuzish</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA</td>
+                <td class="check-readonly">👁️ Ko‘radi</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Auditorga bino va xonalarni biriktirish (Vazifa yuklash)</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA</td>
+                <td class="check-readonly">👁️ Ko‘radi</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Yangi jihoz kiritish (Yakka tartibda yoki Bulk 30-50 ta)</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA (Asosiy)</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Erkin inson kodini berish (<code>E-210-xona-001</code>)</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Minimalist QR-stiker chop etish (Termoprinter 40x25mm)</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ Qayta chop</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA (Asosiy)</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Jihozni xonadan-xonaga ko‘chirish (<code>asset_transfers</code>)</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ Tasdiqlaydi</td>
+                <td class="check-readonly">👁️ Ko‘radi</td>
+                <td class="check-yes">✅ HA (Kiritadi)</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Mobil telefon kamerasi orqali QR skanerlab audit qilish</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA (Asosiy)</td>
+            </tr>
+            <tr>
+                <td><b>Jihoz holatini belgilash (🟢 Soz, 🟡 Ta'mirtalab, 🔴 Topilmadi)</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA</td>
+            </tr>
+            <tr>
+                <td><b>Ta'mirtalab buyumning nuqson rasmini yuklash</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA</td>
+            </tr>
+            <tr>
+                <td><b>Begona buyum ogohlantirishi (Xona nazorati)</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-readonly">👁️ Xabar oladi</td>
+                <td class="check-readonly">👁️ Xabar oladi</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA (Avtomatik)</td>
+            </tr>
+            <tr>
+                <td><b>100% Read-Only iyerarxik chuqur monitoring (Drill-down)</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA</td>
+                <td class="check-yes">✅ HA (Asosiy)</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Hisobdan chiqarishni (Spisanie) rasmiylashtirish</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ Tasdiqlaydi</td>
+                <td class="check-readonly">👁️ Ko‘radi</td>
+                <td class="check-yes">📝 Ariza beradi</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>Rasmiy davlat xatlov hisobotlarini (INV-1, INV-3) eksport</b></td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-yes">✅ HA</td>
+                <td class="check-yes">✅ HA</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+            <tr>
+                <td><b>O‘zgarmas xavfsizlik jurnali (<code>system_audit_logs</code>) ko‘rish</b></td>
+                <td class="check-yes">✅ Global</td>
+                <td class="check-yes">✅ OTM bo‘yicha</td>
+                <td class="check-readonly">👁️ Ko‘radi</td>
+                <td class="check-no">❌ Yo‘q</td>
+                <td class="check-no">❌ Yo‘q</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==================== SAHIFA 2: HAR BIR ROLNING BATAFSIL TARIXI ==================== -->
+    <div class="page-break"></div>
+
+    <div class="doc-header">
+        <div>
+            <h1>AssetAudit (MulkNazorat) — 5 ta Rol Spetsifikatsiyasi</h1>
+            <p class="doc-subtitle">2-Qism: Har Bir Rolning Batafsil Huquqlari, Taqiqlari va Ish Maydoni</p>
+        </div>
+        <div class="doc-meta">
+            <div><b>Qat'iy RBAC Standarti</b></div>
+            <div><b>Sahifa 2 / 2</b></div>
+        </div>
+    </div>
+
+    <div class="role-cards-grid">
+
+        <!-- 1. SUPERADMIN -->
+        <div class="role-card rc-super">
+            <div class="rc-header">
+                <span class="rc-title">1. SUPERADMIN (Platforma Egasi / SaaS Owner)</span>
+                <span class="rc-device">💻 Kompyuter / Veb-Brauzer</span>
+            </div>
+            <div class="rc-content">
+                <div class="rc-pro">
+                    🟢 <b>Nimalar Bo‘ladi (Vakolatlari):</b><br>
+                    • Yangi universitetlarni qo‘shish (OTM nomi, STIR, 1-admin, shartnoma muddati).<br>
+                    • Universitet faoliyatini <b>Faollashtirish</b> yoki to‘lov bo‘lmasa <b>Muzlatish</b>.<br>
+                    • Universitet Administratori parolini tiklab berish.<br>
+                    • Respublika bo‘yicha umumiy statistika (Jami OTMlar, jami aktivlar soni).
+                </div>
+                <div class="rc-con">
+                    🔴 <b>Nimalar Bo‘lmaydi (Qat’iy Taqiqlari):</b><br>
+                    • Universitet ichidagi xona, bino yoki fakultetlarni kiritmaydi.<br>
+                    • Jihoz qo‘shmaydi, QR-kod chiqarmaydi, inventar kodlariga aralashmaydi.<br>
+                    • Universitet xodimlarini (Boshliq, Registrar, Auditor) boshqarmaydi.
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. UNIVERSITET ADMINISTRATORI -->
+        <div class="role-card rc-admin">
+            <div class="rc-header">
+                <span class="rc-title">2. UNIVERSITET ADMINISTRATORI (Bosh Boshqaruvchi / Dvigatel)</span>
+                <span class="rc-device">💻 Kompyuter / Admin Dashboard</span>
+            </div>
+            <div class="rc-content">
+                <div class="rc-pro">
+                    🟢 <b>Nimalar Bo‘ladi (Vakolatlari):</b><br>
+                    • Fakultet, kafedra, bino, qavat va auditoriyalarni noldan yaratish.<br>
+                    • Moddiy javobgar shaxslarni (MJS) tegishli xonalarga biriktirish.<br>
+                    • 3 ta rolni yaratish: <b>Boshliq</b>, <b>Ro‘yxatga Oluvchi</b> va <b>Auditor</b>.<br>
+                    • Xatlov komissiyasini tuzish va auditorlarga qaysi binolarni tekshirishni yuklash.<br>
+                    • Buxgalteriya ko‘chirishlari va hisobdan chiqarish dalolatnomalarini tasdiqlash.
+                </div>
+                <div class="rc-con">
+                    🔴 <b>Nimalar Bo‘lmaydi (Qat’iy Taqiqlari):</b><br>
+                    • Boshqa universitetlarning ma’lumotlariga kira olmaydi (Tenant Isolation).<br>
+                    • Yangi universitet qo‘sha olmaydi va o‘z obuna muddatini uzaytira olmaydi.<br>
+                    • Joyida QR skanerlab audit o‘tkazmaydi (bu auditorning mustaqil vazifasi).
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. BOSHLIQ -->
+        <div class="role-card rc-head">
+            <div class="rc-header">
+                <span class="rc-title">3. BOSHLIQ (Rektor / Prorektor — 100% Read-Only Kuzatuvchi)</span>
+                <span class="rc-device">💻 Kompyuter / Planshet / Smartfon</span>
+            </div>
+            <div class="rc-content">
+                <div class="rc-pro">
+                    🟢 <b>Nimalar Bo‘ladi (Vakolatlari — 100% FAQAT KO‘RISH):</b><br>
+                    • <b>Iyerarxik chuqur ko‘rish (Drill-down):</b> Universitet -> Bino -> Qona -> Jihoz kartochkasi.<br>
+                    • Barcha moliyaviy balans, amortizatsiya va mablag‘ manbalarini ko‘rish.<br>
+                    • <b>Muammolar filtri:</b> Ta'mir talab va kamomad (yo‘qolgan) aktivlarni alohida monitoring qilish.<br>
+                    • Tayyor rasmiy dalolatnomalarni (INV-1, INV-3) PDF/Excel shaklida yuklab olish.
+                </div>
+                <div class="rc-con">
+                    🔴 <b>Nimalar Bo‘lmaydi (Qat’iy Taqiqlari):</b><br>
+                    • <b>Bitta ham tahrirlash tugmasi bo‘lmaydi!</b> (Qo‘shish, O‘chirish, Saqlash tugmalari yo‘q).<br>
+                    • Tizim ma’lumotlarini tasodifan buzib qo‘yish yoki o‘zgartirib yuborishdan 100% xoli.
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. RO'YXATGA OLUVCHI -->
+        <div class="role-card rc-reg">
+            <div class="rc-header">
+                <span class="rc-title">4. RO‘YXATGA OLUVCHI (Moddiy Hisobchi / Registrar)</span>
+                <span class="rc-device">💻 Kompyuter + Termoprinter (40x25mm)</span>
+            </div>
+            <div class="rc-content">
+                <div class="rc-pro">
+                    🟢 <b>Nimalar Bo‘ladi (Vakolatlari):</b><br>
+                    • Yangi jihoz kiritish (yakka yoki birdaniga 30–50 talab to‘p qilib).<br>
+                    • Inson o‘qiydigan erkin nom berish (<code>custom_label</code>: <code>E-210-xona-001</code>).<br>
+                    • Tizim bergan maxfiy Base62 tokenni (<code>secret_token</code>) olish.<br>
+                    • Minimalist QR-stikerni termoprinterda chop etish va partalarga yopishtirish.<br>
+                    • Jihozni xonadan-xonaga ko‘chirish (<code>transfers</code>) arizasini kiritish.
+                </div>
+                <div class="rc-con">
+                    🔴 <b>Nimalar Bo‘lmaydi (Qat’iy Taqiqlari):</b><br>
+                    • Yangi bino yoki yangi xona ocha olmaydi (faqat tayyor xonalarni tanlaydi).<br>
+                    • Joyida QR skanerlab audit o‘tkaza olmaydi.<br>
+                    • Jihozni balansdan o‘chirib yubora (spisanie qila) olmaydi. Xodimlarni boshqara olmaydi.
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. TEKSHIRUVCHI -->
+        <div class="role-card rc-insp">
+            <div class="rc-header">
+                <span class="rc-title">5. TEKSHIRUVCHI (Auditor / Joyidagi Nazoratchi)</span>
+                <span class="rc-device">📱 Smartfon / Mobil Kamera</span>
+            </div>
+            <div class="rc-content">
+                <div class="rc-pro">
+                    🟢 <b>Nimalar Bo‘ladi (Vakolatlari):</b><br>
+                    • Mobil telefon kamerasi orqali QR-kodni chaqmoqdek tez skanerlash.<br>
+                    • Xonaning reja ro‘yxatini ko‘rish (*"20 ta parta, 1 ta doska"*).<br>
+                    • Holatni qayd etish: 🟢 <b>Soz</b>, 🟡 <b>Ta'mir talab</b> (rasm ilova qilinadi), 🔴 <b>Topilmadi</b>.<br>
+                    • <b>Begona buyum ogohlantirishi:</b> Boshqa xonaning buyumi bo‘lsa darhol xabar oladi.<br>
+                    • Xona auditini yakunlash va dalolatnoma topshirish.
+                </div>
+                <div class="rc-con">
+                    🔴 <b>Nimalar Bo‘lmaydi (Qat’iy Taqiqlari):</b><br>
+                    • Yangi jihoz yarata olmaydi. QR-stiker chiqara olmaydi.<br>
+                    • Buyumning nomi, kodi yoki narxini o‘zgartira olmaydi.<br>
+                    • Yangi xona yoki bino ocha olmaydi.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CONCLUSION -->
+    <div class="conclusion-box">
+        <h4>⚖️ Manfaatlar To‘qnashuvining Oldini Olish Qoidasi (Xulosa)</h4>
+        <p>
+            Ushbu 5 ta rol orqali universitetda tizimli xolislik kafolatlanadi: <b>Admin</b> sharoit yaratadi (bino, xona ochadi); <b>Registrar</b> jihozni kiritib QR yopishtiradi; <b>Auditor</b> o‘zi kiritmagan buyumlarni xolisona skanerlaydi; <b>Rektor</b> esa ma’lumotlarni o‘zgartirmasdan real ahvolni kuzatadi. Bu OTM mulkining talon-taroj qilinishini 100% to‘xtatadi.
+        </p>
+    </div>
+
+</body>
+</html>

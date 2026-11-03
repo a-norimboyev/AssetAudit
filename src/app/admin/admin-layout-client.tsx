@@ -4,19 +4,16 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
   Building2,
   Users,
-  Sliders,
+  Megaphone,
   Settings,
   X,
   Menu,
-  ShieldCheck,
-  CheckCircle2,
 } from "lucide-react";
-import { AdminLogoutButton } from "./admin-logout-button";
 import { LogoIcon } from "@/components/ui/logo";
 import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
+import { AdminToastProvider } from "./admin-toast-context";
 
 interface AdminLayoutClientProps {
   children: React.ReactNode;
@@ -27,6 +24,7 @@ interface AdminLayoutClientProps {
   user: {
     username?: string | null;
     email?: string | null;
+    image?: string | null;
   };
 }
 
@@ -67,15 +65,10 @@ export function AdminLayoutClient({
 
   const navItems: NavItem[] = [
     {
-      name: "Bosh sahifa",
+      name: "Universitetlar",
       href: "/admin",
-      icon: LayoutDashboard,
-      exact: true,
-    },
-    {
-      name: "Tashkilotlar",
-      href: "/admin/organizations",
       icon: Building2,
+      exact: true,
     },
     {
       name: "Administratorlar",
@@ -83,9 +76,9 @@ export function AdminLayoutClient({
       icon: Users,
     },
     {
-      name: "Platforma sozlamalari",
-      href: "/admin/settings",
-      icon: Sliders,
+      name: "Xabarnomalar",
+      href: "/admin/notifications",
+      icon: Megaphone,
     },
     {
       name: "Sozlamalar",
@@ -95,15 +88,16 @@ export function AdminLayoutClient({
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex">
-      {/* Mobil fon qoplami (Backdrop) */}
-      {isSidebarOpen && (
-        <div
-          onClick={() => setIsSidebarOpen(false)}
-          className="fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-xs lg:hidden transition-opacity overscroll-contain"
-          aria-hidden="true"
-        />
-      )}
+    <AdminToastProvider>
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex">
+        {/* Mobil fon qoplami (Backdrop) */}
+        {isSidebarOpen && (
+          <div
+            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-xs lg:hidden transition-opacity overscroll-contain"
+            aria-hidden="true"
+          />
+        )}
 
       {/* Asosiy Chap Sidebar paneli */}
       <aside
@@ -121,8 +115,8 @@ export function AdminLayoutClient({
               <div className="font-bold text-base tracking-tight text-slate-950 flex items-center gap-1.5">
                 Asset<span className="text-blue-600">Audit</span>
               </div>
-              <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
-                Platforma Boshqaruvi
+              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                Super Admin
               </div>
             </div>
           </Link>
@@ -197,25 +191,6 @@ export function AdminLayoutClient({
             );
           })}
         </nav>
-
-        {/* Pastki xavfsizlik va Super Admin profil bloki */}
-        <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shadow-xs shrink-0">
-              {initials}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-slate-900 truncate" title={profile.fullName || "Super Admin"}>
-                {profile.fullName || "Super Admin"}
-              </p>
-              <div className="flex items-center gap-1 text-[11px] text-blue-600 font-semibold font-mono">
-                <ShieldCheck className="w-3 h-3 shrink-0" />
-                <span className="truncate">{user.username?.includes("@") ? user.username : `@${user.username || "superadmin"}`}</span>
-              </div>
-            </div>
-          </div>
-          <AdminLogoutButton />
-        </div>
       </aside>
 
       {/* Asosiy kontent maydoni */}
@@ -234,30 +209,44 @@ export function AdminLayoutClient({
             </button>
 
             <div className="hidden sm:flex items-center gap-2 text-xs text-slate-500">
-              <span className="font-semibold text-slate-700">Platforma Boshqaruvi</span>
+              <span className="font-semibold text-slate-700">Super Admin</span>
               <span>/</span>
               <span className="text-slate-900 font-medium">
-                {pathname === "/admin"
-                  ? "Bosh sahifa"
-                  : pathname.startsWith("/admin/organizations")
-                  ? "Tashkilotlar"
+                {pathname === "/admin" || pathname.startsWith("/admin/organizations")
+                  ? "Universitetlar"
                   : pathname.startsWith("/admin/administrators")
                   ? "Administratorlar"
-                  : pathname.startsWith("/admin/settings")
-                  ? "Platforma sozlamalari"
+                  : pathname.startsWith("/admin/notifications")
+                  ? "Xabarnomalar"
                   : pathname.startsWith("/admin/profile")
                   ? "Sozlamalar"
-                  : "Konsol"}
+                  : "Boshqaruv"}
               </span>
             </div>
           </div>
 
-          {/* O'ng qism: Faollik holati */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Super Admin Faol</span>
-            </span>
+          {/* O'ng qism: Profil */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/admin/profile"
+              className="flex items-center gap-2.5 group hover:opacity-90 transition-opacity p-1 rounded-xl hover:bg-slate-50"
+              title="Sozlamalar"
+            >
+              <span className="text-xs sm:text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors hidden sm:block">
+                {profile.fullName || "Super Admin"}
+              </span>
+              {user.image ? (
+                <img
+                  src={user.image}
+                  alt={profile.fullName || "Super Admin"}
+                  className="w-9 h-9 rounded-full object-cover border border-slate-200 shadow-xs shrink-0 group-hover:ring-2 group-hover:ring-blue-400 group-hover:ring-offset-1 transition-all"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shadow-xs shrink-0 group-hover:ring-2 group-hover:ring-blue-400 group-hover:ring-offset-1 transition-all">
+                  {initials}
+                </div>
+              )}
+            </Link>
           </div>
         </header>
 
@@ -265,5 +254,6 @@ export function AdminLayoutClient({
         <main className="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">{children}</main>
       </div>
     </div>
+    </AdminToastProvider>
   );
 }

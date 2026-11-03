@@ -13,7 +13,7 @@ export const E2E_CREDENTIALS = {
   superAdmin: {
     username: "superadmin",
     password: "SuperAdminPass123!",
-    fullName: "Bosh Super Admin",
+    fullName: "Azizjon Norimboyev",
     role: "super_admin",
   },
   admin: {

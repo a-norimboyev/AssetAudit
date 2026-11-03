@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { Edit2, X, Building2, Loader2, CheckCircle2, AlertCircle, Power, Hourglass, Sparkles } from "lucide-react";
+import { useState, useRef } from "react";
+import { Edit2, X, Building2, Loader2, CheckCircle2, AlertCircle, Power, Hourglass, Sparkles, Upload, Trash2 } from "lucide-react";
 import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
 import {
   updateOrganizationAction,
   toggleOrganizationStatusAction,
   type UpdateOrganizationActionResult,
 } from "./actions";
+import { useAdminToast } from "../admin-toast-context";
 
 const UZ_MONTHS = [
   "yanvar", "fevral", "mart", "aprel", "may", "iyun",
@@ -28,6 +29,11 @@ interface EditOrganizationModalProps {
     typeId: string;
     typeName: string | null;
     isActive: boolean;
+    settings?: {
+      logoUrl?: string;
+      assetLimitMlrd?: number;
+      [key: string]: unknown;
+    };
     subscription?: {
       plan: string;
       planLabel: string;
@@ -47,8 +53,16 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
   useBodyScrollLock(isOpen);
   const [isPending, setIsPending] = useState(false);
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
+  const { showSuccessToast } = useAdminToast();
   const [name, setName] = useState(organization.name);
   const [typeId, setTypeId] = useState(organization.typeId);
+  const [logoUrl, setLogoUrl] = useState<string | null>(organization.settings?.logoUrl || null);
+  const [isLogoUploading, setIsLogoUploading] = useState(false);
+  const [logoError, setLogoError] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const [assetLimitMlrd, setAssetLimitMlrd] = useState<number>(
+    organization.settings?.assetLimitMlrd || 500
+  );
   const [subscriptionAction, setSubscriptionAction] = useState<string>("keep");
   const [customValue, setCustomValue] = useState<number>(1);
   const [customUnit, setCustomUnit] = useState<"days" | "months" | "years">("years");
@@ -99,6 +113,52 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
     }
   };
 
+  const handleLogoFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp", "image/svg+xml"].includes(file.type)) {
+      setLogoError("Faqat JPG, PNG, WebP yoki SVG formatidagi rasmlar qabul qilinadi.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setLogoError("Rasm hajmi 5MB dan oshmasligi kerak.");
+      return;
+    }
+
+    setIsLogoUploading(true);
+    setLogoError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "logos");
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (!data.success || !data.url) {
+        setLogoError(data.error || "Logoni yuklashda xatolik yuz berdi.");
+        setIsLogoUploading(false);
+        return;
+      }
+
+      setLogoUrl(data.url);
+      setLogoError(null);
+    } catch {
+      setLogoError("Server bilan aloqa uzildi.");
+    } finally {
+      setIsLogoUploading(false);
+      if (logoInputRef.current) {
+        logoInputRef.current.value = "";
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsPending(true);
@@ -109,6 +169,8 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
         id: string;
         name: string;
         typeId: string;
+        logoUrl?: string | null;
+        assetLimitMlrd?: number;
         subscriptionPlan?: string;
         subscriptionExpiresAt?: string;
         subscriptionNotes?: string;
@@ -116,6 +178,8 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
         id: organization.id,
         name,
         typeId,
+        logoUrl,
+        assetLimitMlrd: Number(assetLimitMlrd) || 500,
       };
 
       if (subscriptionAction !== "keep") {
@@ -133,10 +197,9 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
       const res = await updateOrganizationAction(payload);
       setResult(res);
       if (res.success) {
-        setTimeout(() => {
-          setIsOpen(false);
-          setResult(null);
-        }, 1000);
+        showSuccessToast("Muvaffaqiyatli o'zgartirildi");
+        setIsOpen(false);
+        setResult(null);
       }
     } catch {
       setResult({
@@ -151,8 +214,8 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
   const handleToggleStatus = async () => {
     const nextState = !organization.isActive;
     const confirmText = nextState
-      ? `"${organization.name}" tashkilotini faollashtirmoqchimisiz?`
-      : `"${organization.name}" tashkilotini nofaol (bloklangan) holatga o'tkazmoqchimisiz? Undagi foydalanuvchilar kirishi to'xtatiladi.`;
+      ? `"${organization.name}" OTMini faollashtirmoqchimisiz?`
+      : `"${organization.name}" OTMini muzlatilgan holatga o'tkazmoqchimisiz? Undagi foydalanuvchilar kirishi to'xtatiladi.`;
 
     if (!confirm(confirmText)) return;
 
@@ -162,11 +225,9 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
     try {
       const res = await toggleOrganizationStatusAction(organization.id, nextState);
       if (res.success) {
-        setToggleMessage(`Tashkilot holati muvaffaqiyatli o'zgartirildi.`);
-        setTimeout(() => {
-          setIsOpen(false);
-          setToggleMessage(null);
-        }, 1000);
+        showSuccessToast("Muvaffaqiyatli o'zgartirildi");
+        setIsOpen(false);
+        setToggleMessage(null);
       } else {
         setToggleMessage(res.error || "Holatni o'zgartirishda xatolik yuz berdi.");
       }
@@ -187,7 +248,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
         <button
           onClick={() => setIsOpen(true)}
           className="p-2 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
-          title="Tashkilotni tahrirlash"
+          title="OTMni tahrirlash"
         >
           <Edit2 className="w-4 h-4" />
         </button>
@@ -195,7 +256,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in overscroll-contain">
-          <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden text-left overscroll-contain max-h-[90vh] flex flex-col">
+          <div className="w-full max-w-3xl lg:max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden text-left overscroll-contain max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-150">
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
@@ -203,7 +264,7 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                   <Building2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">Tashkilotni tahrirlash</h3>
+                  <h3 className="text-sm font-bold text-slate-900">OTMni tahrirlash</h3>
                   <p className="text-[11px] text-slate-500 font-mono">Kod: {organization.code}</p>
                 </div>
               </div>
@@ -217,13 +278,6 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
-              {result?.success && (
-                <div className="p-3.5 rounded-xl text-xs flex items-center gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Tashkilot ma&apos;lumotlari muvaffaqiyatli saqlandi.</span>
-                </div>
-              )}
-
               {result?.error && (
                 <div className="p-3.5 rounded-xl text-xs flex items-center gap-2.5 bg-rose-50 text-rose-800 border border-rose-200">
                   <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
@@ -238,9 +292,73 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                 </div>
               )}
 
+              {/* Universitet logotipi */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Tashkilot nomi <span className="text-rose-500">*</span>
+                  Universitet logotipi
+                </label>
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  onChange={handleLogoFileChange}
+                  className="hidden"
+                />
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden relative">
+                    {logoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={logoUrl}
+                        alt="OTM logosi"
+                        className="w-full h-full object-contain p-1"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
+                        <Building2 className="w-6 h-6 stroke-1" />
+                      </div>
+                    )}
+                    {isLogoUploading && (
+                      <div className="absolute inset-0 bg-white/80 flex items-center justify-center">
+                        <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex-1 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={isLogoUploading}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-slate-500" />
+                      <span>{logoUrl ? "Logoni almashtirish" : "Logotip yuklash"}</span>
+                    </button>
+
+                    {logoUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setLogoUrl(null)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>O‘chirish</span>
+                      </button>
+                    )}
+                    <span className="text-[11px] text-slate-400 block w-full">
+                      PNG, JPG, SVG yoki WebP (maks. 5MB)
+                    </span>
+                  </div>
+                </div>
+                {logoError && (
+                  <p className="mt-1 text-xs text-rose-600 font-medium">{logoError}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  OTM nomi <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -254,25 +372,47 @@ export function EditOrganizationModal({ organization, types, trigger }: EditOrga
                 )}
               </div>
 
+              {/* Aktivlar balansi limiti */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Tashkilot turi <span className="text-rose-500">*</span>
-                </label>
-                <select
-                  value={typeId}
-                  onChange={(e) => setTypeId(e.target.value)}
-                  required
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-slate-50/50 focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all cursor-pointer"
-                >
-                  {types.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                    </option>
-                  ))}
-                </select>
-                {result?.fieldErrors?.typeId && (
-                  <p className="mt-1 text-[11px] text-rose-600">{result.fieldErrors.typeId}</p>
-                )}
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700">
+                    Aktivlar balansi limiti <span className="text-rose-500">*</span>
+                  </label>
+                  <span className="text-[11px] text-slate-400 font-mono">
+                    {assetLimitMlrd} mlrd so‘m
+                  </span>
+                </div>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="number"
+                      min={1}
+                      max={50000}
+                      value={assetLimitMlrd}
+                      onChange={(e) => setAssetLimitMlrd(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                      className="w-full pl-3.5 pr-24 py-2 text-xs sm:text-sm font-mono font-bold rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 pointer-events-none">
+                      mlrd so‘m
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {[100, 250, 500, 1000].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => setAssetLimitMlrd(preset)}
+                        className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                          assetLimitMlrd === preset
+                            ? "bg-blue-600 text-white border-blue-600 shadow-2xs"
+                            : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                        }`}
+                      >
+                        {preset >= 1000 ? `${preset / 1000} trln` : `${preset} mlrd`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               {/* Litsenziya / Muddatni uzaytirish */}

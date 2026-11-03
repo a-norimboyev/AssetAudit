@@ -41,7 +41,7 @@ export async function uploadOfficialItemPhoto(
     return {
       success: false,
       isConfigured: false,
-      error: "Tashkilot media-fayllari uchun xavfsiz Object Storage (S3/Supabase) xizmati hali to‘liq ulanmagan. Fotosurat saqlanmadi.",
+      error: "Tashkilot media-fayllari uchun xavfsiz Object Storage bulut xizmati hali to‘liq ulanmagan. Fotosurat saqlanmadi.",
     };
   }
 

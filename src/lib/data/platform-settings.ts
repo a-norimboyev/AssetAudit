@@ -50,7 +50,7 @@ export interface PlatformSettings {
 export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
   system: {
     platformName: "AssetAudit — Mulk Nazorati",
-    supportPhone: "+998 (71) 200-00-00",
+    supportPhone: "+998 71 200 00 00",
     supportEmail: "support@assetaudit.uz",
     baseUrl: "http://localhost:3000",
     defaultQrSize: "50x30",

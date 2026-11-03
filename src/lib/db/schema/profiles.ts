@@ -4,14 +4,21 @@ import { user } from "./auth";
 import { organizations } from "./organizations";
 
 /**
- * 4 ta rasmiy biznes rol:
+ * 5 ta rasmiy biznes rol:
  * - super_admin: Platforma Boshqaruvchisi
- * - organization_admin: Tashkilot Rahbari (eski university_admin o'rniga)
- * - inspector: Inventarizatsiya Tekshiruvchisi
- * - registrar: Moddiy Javobgar Shaxs / Hisobchi
+ * - organization_admin: Tashkilot Rahbari (Universitet Administratori)
+ * - head: Boshliq (Rektor / Prorektor / Bosh hisobchi) — 100% faqat ko'rish (monitoring)
+ * - inspector: Inventarizatsiya Tekshiruvchisi (Auditor)
+ * - registrar: Ro'yxatga oluvchi (Moddiy hisobchi)
  */
-export const USER_ROLES = ["super_admin", "organization_admin", "inspector", "registrar"] as const;
+export const USER_ROLES = ["super_admin", "organization_admin", "head", "inspector", "registrar"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
+
+/**
+ * Universitet Administratori tomonidan boshqariladigan 3 ta rol:
+ */
+export const MANAGED_STAFF_ROLES = ["head", "registrar", "inspector"] as const;
+export type ManagedStaffRole = (typeof MANAGED_STAFF_ROLES)[number];
 
 /**
  * Profiles jadvali — MulkNazorat biznes-profili va rollar boshqaruvi
@@ -38,10 +45,10 @@ export const profiles = pgTable(
       .notNull(),
   },
   (table) => [
-    // 1. Faqat 4 ta rasmiy biznes rol qabul qilinishi cheklovi
+    // 1. Faqat 5 ta rasmiy biznes rol qabul qilinishi cheklovi
     check(
       "chk_profiles_role_valid",
-      sql`${table.role} IN ('super_admin', 'organization_admin', 'inspector', 'registrar')`
+      sql`${table.role} IN ('super_admin', 'organization_admin', 'head', 'inspector', 'registrar')`
     ),
     // 2. Ism bo'sh yoki faqat probellardan iborat bo'lmasligi cheklovi
     check(
@@ -50,10 +57,10 @@ export const profiles = pgTable(
     ),
     // 3. Rol va tashkilot bog'liqligi qat'iy qoidasi:
     //    super_admin: organization_id NULL bo'lishi shart
-    //    organization_admin, inspector, registrar: organization_id majburiy (NOT NULL)
+    //    organization_admin, head, inspector, registrar: organization_id majburiy (NOT NULL)
     check(
       "chk_profiles_role_organization",
-      sql`(${table.role} = 'super_admin' AND ${table.organizationId} IS NULL) OR (${table.role} IN ('organization_admin', 'inspector', 'registrar') AND ${table.organizationId} IS NOT NULL)`
+      sql`(${table.role} = 'super_admin' AND ${table.organizationId} IS NULL) OR (${table.role} IN ('organization_admin', 'head', 'inspector', 'registrar') AND ${table.organizationId} IS NOT NULL)`
     ),
     // 4. Multi-tenancy: Tashkilot bo'yicha xodimlarni tezkor filtrlash indeksi
     index("idx_profiles_organization_id").on(table.organizationId),

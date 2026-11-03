@@ -133,7 +133,7 @@ export async function importInventoryAction(formData: FormData): Promise<ImportR
     if (!worksheet || worksheet.rowCount === 0) {
       return {
         success: false,
-        message: "Faylda ma'lumotlar varag'i (sheet) topilmadi yoki u bo'sh.",
+        message: "Faylda ma'lumotlar varag'i topilmadi yoki u bo'sh.",
         totalRows: 0,
         importedCount: 0,
         skippedCount: 0,
@@ -153,7 +153,7 @@ export async function importInventoryAction(formData: FormData): Promise<ImportR
     if (headers.size === 0) {
       return {
         success: false,
-        message: "Jadval sarlavhalari (headers) topilmadi.",
+        message: "Jadval sarlavhalari topilmadi.",
         totalRows: 0,
         importedCount: 0,
         skippedCount: 0,
@@ -327,7 +327,7 @@ export async function importInventoryAction(formData: FormData): Promise<ImportR
         .toLowerCase();
 
       const conditionRaw = (
-        row["Holati (Sifat)"] ||
+        row["Sifat darajasi"] ||
         row["condition"] ||
         row["Sifat"] ||
         "good"

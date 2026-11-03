@@ -112,7 +112,7 @@ export async function recordScanAction(
       if (foundCycle.status !== "in_progress") {
         return {
           success: false,
-          message: `Ushbu audit sikli faol emas (holati: ${foundCycle.status}). Faqat "in_progress" (jarayonda) bo'lgan sikllarda skanerlash mumkin.`,
+          message: `Ushbu audit sikli faol emas, holati: ${foundCycle.status}. Faqat in_progress bo'lgan sikllarda skanerlash mumkin.`,
         };
       }
 
@@ -560,7 +560,7 @@ export async function updateCycleStatusAction(
     if (existing.status === "completed") {
       return {
         success: false,
-        message: "Yakunlangan audit sikli qulflangan (immutability siyosati). Rasmiy audit ma'lumotlari buzilmasligi uchun uning holatini o'zgartirib bo'lmaydi.",
+        message: "Yakunlangan audit sikli qulflangan. Rasmiy audit ma'lumotlari buzilmasligi uchun uning holatini o'zgartirib bo'lmaydi.",
       };
     }
 
@@ -653,9 +653,9 @@ export async function exportReportExcelAction(cycleId: string): Promise<{
     summarySheet.addRow({ metric: "Audit Sikli", value: report.cycleTitle });
     summarySheet.addRow({ metric: "Jami kutilgan mulklar", value: report.totalExpectedItems });
     summarySheet.addRow({ metric: "Skanerlangan mulklar", value: report.totalScannedItems });
-    summarySheet.addRow({ metric: "Mos kelganlar (Match)", value: report.matchedItemsCount });
-    summarySheet.addRow({ metric: "Konfliktlar (Location mismatch)", value: report.conflictItemsCount });
-    summarySheet.addRow({ metric: "Topilmagan mulklar (Missing)", value: report.missingItemsCount });
+    summarySheet.addRow({ metric: "Mos kelgan mulklar", value: report.matchedItemsCount });
+    summarySheet.addRow({ metric: "Joylashuvi nomuvofiq mulklar", value: report.conflictItemsCount });
+    summarySheet.addRow({ metric: "Topilmagan mulklar", value: report.missingItemsCount });
     summarySheet.addRow({ metric: "Tekshirilgan xonalar", value: `${report.completedRooms} / ${report.totalRooms}` });
 
     // 2. Joylashuv Konfliktlari varag'i

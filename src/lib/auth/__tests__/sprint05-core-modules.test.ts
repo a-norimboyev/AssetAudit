@@ -19,15 +19,33 @@ describe("AssetAudit — Tezkor Sprint 05: Asosiy Modullar (Core Modules) Test T
   // 1. JOYLAShUVLAR MODULI (LOCATIONS)
   // =========================================================================
   describe("1. Joylashuvlar Moduli va Validatsiya Qoidalari", () => {
-    it("Xona turlari (ROOM_TYPES) me'yoriy 8 ta turdan iborat bo'lishi shart", () => {
+    it("Xona turlari OTM ixtisoslashuviga mos bo'lishi shart", () => {
       const expectedTypes = [
         "classroom",
+        "lecture_hall",
+        "study_room",
         "lab",
+        "computer_lab",
         "office",
-        "warehouse",
+        "teachers_room",
+        "deans_office",
+        "department_head",
+        "dorm_room",
+        "dorm_study",
+        "dorm_manager",
+        "gym_main",
+        "fitness_room",
+        "sports_equipment",
+        "canteen_hall",
+        "canteen_kitchen",
         "library",
+        "library_archive",
+        "rector_office",
+        "accounting",
         "conference",
+        "conference_room",
         "server_room",
+        "warehouse",
         "other",
       ];
       assert.deepEqual([...ROOM_TYPES], expectedTypes);

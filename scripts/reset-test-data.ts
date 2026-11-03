@@ -24,7 +24,7 @@ async function cleanDatabase(connectionString: string, dbLabel: string) {
     } else {
       const createRes = await client.query(`
         INSERT INTO "user" (id, name, email, email_verified, username, display_username, created_at, updated_at)
-        VALUES ('1aa4a1ce-0c99-473b-b444-17efbe0aa55c', 'Bosh Super Admin', 'superadmin@auth.assetaudit.uz', true, 'superadmin', 'superadmin', NOW(), NOW())
+        VALUES ('1aa4a1ce-0c99-473b-b444-17efbe0aa55c', 'Azizjon Norimboyev', 'superadmin@auth.assetaudit.uz', true, 'superadmin', 'superadmin', NOW(), NOW())
         RETURNING id;
       `);
       superAdminUserId = createRes.rows[0].id;
@@ -60,7 +60,7 @@ async function cleanDatabase(connectionString: string, dbLabel: string) {
 
     await client.query(`
       UPDATE "user" 
-      SET name = 'Bosh Super Admin',
+      SET name = 'Azizjon Norimboyev',
           email = 'superadmin@auth.assetaudit.uz',
           username = 'superadmin',
           display_username = 'superadmin',
@@ -77,7 +77,7 @@ async function cleanDatabase(connectionString: string, dbLabel: string) {
 
     await client.query(`
       INSERT INTO profiles (user_id, organization_id, role, full_name, is_active, must_change_password, created_at, updated_at)
-      VALUES ($1, NULL, 'super_admin', 'Bosh Super Admin', true, false, NOW(), NOW())
+      VALUES ($1, NULL, 'super_admin', 'Azizjon Norimboyev', true, false, NOW(), NOW())
       ON CONFLICT (user_id) DO UPDATE 
       SET organization_id = NULL, role = 'super_admin', is_active = true, must_change_password = false, updated_at = NOW();
     `, [superAdminUserId]);

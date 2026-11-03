@@ -30,7 +30,7 @@ export function mapLoginError(error: AuthErrorInput | null | undefined): string 
     error.code === "INVALID_EMAIL_OR_PASSWORD" ||
     error.code === "INVALID_USERNAME_OR_PASSWORD"
   ) {
-    return "Login, email yoki parol noto'g'ri kiritildi.";
+    return "Login yoki parol noto'g'ri kiritildi.";
   }
 
   // 3. Server yoki Baza uzilishi (500 Internal Server Error)

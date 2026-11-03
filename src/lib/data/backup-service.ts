@@ -256,7 +256,7 @@ export async function restoreDatabaseFromJsonBackup(filename: string): Promise<{
   const parsed = JSON.parse(content);
 
   if (!parsed.metadata || !parsed.tables) {
-    throw new Error("Zaxira fayli formati noto'g'ri yoki buzilgan (metadata/tables topilmadi).");
+    throw new Error("Zaxira fayli formati noto'g'ri yoki buzilgan: metadata va jadvallar topilmadi.");
   }
 
   const tables = parsed.tables;

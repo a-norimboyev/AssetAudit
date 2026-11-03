@@ -4,7 +4,7 @@ import { items, itemCategories, type ItemStatus, type ItemCondition } from "@/li
 import { buildings, floors, rooms } from "@/lib/db/schema/locations";
 import { organizations, type OrganizationSettings } from "@/lib/db/schema/organizations";
 import { user } from "@/lib/db/schema/auth";
-import { and, or, ilike, eq, desc, sql } from "drizzle-orm";
+import { and, or, ilike, eq, desc, sql, inArray } from "drizzle-orm";
 
 export interface ItemCategoryOption {
   id: string;
@@ -138,6 +138,7 @@ export async function getInventoryList(options: {
   search?: string;
   page?: number;
   pageSize?: number;
+  itemIds?: string[];
 }): Promise<PaginatedInventoryResult> {
   const page = Math.max(1, options.page || 1);
   const maxAllowed = options.pageSize && options.pageSize > 100 ? 10000 : 100;
@@ -145,6 +146,10 @@ export async function getInventoryList(options: {
   const offset = (page - 1) * pageSize;
 
   const conditions = [eq(items.organizationId, options.organizationId)];
+
+  if (options.itemIds && options.itemIds.length > 0) {
+    conditions.push(inArray(items.id, options.itemIds));
+  }
 
   if (options.categoryId && options.categoryId !== "all") {
     conditions.push(eq(items.categoryId, options.categoryId));

@@ -3,13 +3,14 @@
 import { revalidatePath } from "next/cache";
 import ExcelJS from "exceljs";
 import { requireAuthenticatedUser } from "@/lib/auth/authorization";
-import { canCreateNewItem, canRelocateItem } from "@/lib/auth/authorization-rules";
+import { canCreateNewItem, canRelocateItem, canArchiveItem } from "@/lib/auth/authorization-rules";
 import { db } from "@/lib/db";
 import { items, type ItemStatus, type ItemCondition, ITEM_STATUSES, ITEM_CONDITIONS } from "@/lib/db/schema/inventory";
 import { rooms } from "@/lib/db/schema/locations";
 import { generateSecureQrToken } from "@/lib/qr";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { getInventoryList } from "@/lib/data/inventory";
+import { getNextInventoryCodes } from "@/lib/inventory/code-generator";
 
 export interface ActionResponse {
   success: boolean;
@@ -38,7 +39,7 @@ export async function createItemAction(
     if (!canCreateNewItem(profile.role)) {
       return {
         success: false,
-        message: "Sizning rolingiz (Inspektor) yangi inventarni ro'yxatga olish huquqiga ega emas.",
+        message: "Inspektor roli yangi inventarni ro'yxatga olish huquqiga ega emas.",
       };
     }
 
@@ -56,7 +57,7 @@ export async function createItemAction(
 
     const fieldErrors: Record<string, string> = {};
 
-    if (!name || name.length < 2) fieldErrors.name = "Inventar nomi kiritilishi shart (kamida 2 belgi).";
+    if (!name || name.length < 2) fieldErrors.name = "Inventar nomi kiritilishi shart, kamida 2 ta belgi bo'lishi kerak.";
     if (!inventoryNumber) fieldErrors.inventoryNumber = "Inventar raqami kiritilishi shart.";
     if (!categoryId) fieldErrors.categoryId = "Toifa tanlanishi shart.";
     if (!buildingId) fieldErrors.buildingId = "Bino tanlanishi shart.";
@@ -269,6 +270,57 @@ export async function updateItemAction(
 
     if (!existing) return { success: false, message: "Inventar topilmadi yoki boshqa tashkilotga tegishli." };
 
+    const newInventoryNumber = (formData.get("inventoryNumber") as string)?.trim().toUpperCase();
+    const newBuildingId = (formData.get("buildingId") as string)?.trim();
+    const newFloorId = (formData.get("floorId") as string)?.trim();
+    const newRoomId = (formData.get("roomId") as string)?.trim();
+
+    let locationUpdate: { buildingId?: string; floorId?: string; roomId?: string } = {};
+    if (newRoomId && newFloorId && newBuildingId) {
+      const [room] = await db
+        .select({ id: rooms.id })
+        .from(rooms)
+        .where(
+          and(
+            eq(rooms.id, newRoomId),
+            eq(rooms.organizationId, organization.id),
+            eq(rooms.buildingId, newBuildingId),
+            eq(rooms.floorId, newFloorId)
+          )
+        )
+        .limit(1);
+
+      if (room) {
+        locationUpdate = {
+          buildingId: newBuildingId,
+          floorId: newFloorId,
+          roomId: newRoomId,
+        };
+      }
+    }
+
+    let invNumberUpdate: { inventoryNumber?: string } = {};
+    if (newInventoryNumber && newInventoryNumber !== existing.inventoryNumber) {
+      const [duplicate] = await db
+        .select({ id: items.id })
+        .from(items)
+        .where(
+          and(
+            eq(items.organizationId, organization.id),
+            eq(items.inventoryNumber, newInventoryNumber)
+          )
+        )
+        .limit(1);
+
+      if (duplicate) {
+        return {
+          success: false,
+          message: `"${newInventoryNumber}" raqamli inventar tashkilotda allaqachon mavjud.`,
+        };
+      }
+      invNumberUpdate = { inventoryNumber: newInventoryNumber };
+    }
+
     await db
       .update(items)
       .set({
@@ -278,6 +330,8 @@ export async function updateItemAction(
         status,
         condition,
         price,
+        ...locationUpdate,
+        ...invNumberUpdate,
         updatedAt: new Date(),
       })
       .where(and(eq(items.id, itemId), eq(items.organizationId, organization.id)));
@@ -286,7 +340,8 @@ export async function updateItemAction(
     revalidatePath("/org/inventory");
     revalidatePath("/org");
 
-    return { success: true, message: `"${name}" (${existing.inventoryNumber}) inventari muvaffaqiyatli yangilandi.` };
+    const finalNumber = invNumberUpdate.inventoryNumber || existing.inventoryNumber;
+    return { success: true, message: `"${name}" (${finalNumber}) inventari muvaffaqiyatli yangilandi.` };
   } catch (err) {
     return {
       success: false,
@@ -307,8 +362,11 @@ export async function archiveItemAction(itemId: string): Promise<ActionResponse>
       return { success: false, message: "Tashkilot topilmadi." };
     }
 
-    if (!canCreateNewItem(profile.role)) {
-      return { success: false, message: "Inventarni hisobdan chiqarish huquqingiz yo'q." };
+    if (!canArchiveItem(profile.role)) {
+      return {
+        success: false,
+        message: "Xavfsizlik cheklovi: Faqat Universitet Administratori inventarni hisobdan chiqarish (spisanie qilish) huquqiga ega. Ro‘yxatga oluvchi hisobdan chiqara olmaydi.",
+      };
     }
 
     if (!itemId) return { success: false, message: "Inventar ID ko'rsatilmadi." };
@@ -335,7 +393,7 @@ export async function archiveItemAction(itemId: string): Promise<ActionResponse>
 
     return {
       success: true,
-      message: `"${existing.name}" (${existing.inventoryNumber}) hisobdan chiqarildi (arxivlandi).`,
+      message: `"${existing.name}" - ${existing.inventoryNumber} hisobdan chiqarildi va arxivlandi.`,
     };
   } catch (err) {
     return {
@@ -470,7 +528,7 @@ export async function exportInventoryExcelAction(filters?: {
       { header: "Xona", key: "room", width: 20 },
       { header: "Holati", key: "status", width: 16 },
       { header: "Sifati", key: "cond", width: 16 },
-      { header: "Narxi (so'm)", key: "price", width: 18 },
+      { header: "Narxi so'mda", key: "price", width: 18 },
       { header: "Tavsif", key: "desc", width: 30 },
       { header: "Kiritilgan sana", key: "date", width: 16 },
     ];
@@ -531,5 +589,205 @@ export async function exportInventoryExcelAction(filters?: {
     };
   }
 }
+
+/**
+ * 6. Xona bo'yicha aqlli inventar raqamini generatsiya qilish (Server Action)
+ * Masalan: B1-210-0001 dan B1-210-0020 gacha
+ */
+export async function getNextSuggestedCodesAction(
+  buildingId: string,
+  roomId: string,
+  quantity = 1
+): Promise<{
+  success: boolean;
+  prefix?: string;
+  sampleStart?: string;
+  sampleEnd?: string;
+  codes?: string[];
+  message?: string;
+}> {
+  try {
+    const { organization } = await requireAuthenticatedUser();
+    if (!organization) {
+      return { success: false, message: "Tashkilot topilmadi." };
+    }
+
+    const res = await getNextInventoryCodes({
+      organizationId: organization.id,
+      buildingId,
+      roomId,
+      quantity,
+    });
+
+    return {
+      success: true,
+      prefix: res.prefix,
+      sampleStart: res.sampleStart,
+      sampleEnd: res.sampleEnd,
+      codes: res.codes,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "Kod generatsiyasida xatolik yuz berdi.",
+    };
+  }
+}
+
+/**
+ * 7. Ommaviy inventar kiritish (Bulk creation Server Action)
+ * Masalan: 210-auditoriyaga birdaniga 20 ta parta kiritish va har biriga alohida QR token va ketma-ket kod berish
+ */
+export async function createBulkItemsAction(
+  _prevState: ActionResponse | null,
+  formData: FormData
+): Promise<ActionResponse> {
+  try {
+    const { profile, organization } = await requireAuthenticatedUser();
+
+    if (!organization) {
+      return { success: false, message: "Foydalanuvchi birorta faol tashkilotga biriktirilmagan." };
+    }
+
+    if (!canCreateNewItem(profile.role)) {
+      return {
+        success: false,
+        message: "Ushbu rol yangi inventarni ro'yxatga olish huquqiga ega emas.",
+      };
+    }
+
+    const name = (formData.get("name") as string)?.trim() || "";
+    const categoryId = (formData.get("categoryId") as string)?.trim() || "";
+    const buildingId = (formData.get("buildingId") as string)?.trim() || "";
+    const floorId = (formData.get("floorId") as string)?.trim() || "";
+    const roomId = (formData.get("roomId") as string)?.trim() || "";
+    const model = (formData.get("model") as string)?.trim() || "";
+    const description = (formData.get("description") as string)?.trim() || "";
+    const condition = ((formData.get("condition") as string)?.trim() || "good") as ItemCondition;
+    const status = ((formData.get("status") as string)?.trim() || "active") as ItemStatus;
+    const priceRaw = (formData.get("price") as string)?.trim();
+    const price = priceRaw ? parseFloat(priceRaw).toFixed(2) : null;
+    const quantity = Math.max(1, Math.min(100, parseInt((formData.get("quantity") as string) || "1", 10)));
+    const customCodesRaw = (formData.get("customCodes") as string)?.trim();
+
+    const fieldErrors: Record<string, string> = {};
+    if (!name || name.length < 2) fieldErrors.name = "Inventar nomi kiritilishi shart (kamida 2 ta belgi).";
+    if (!categoryId) fieldErrors.categoryId = "Toifa tanlanishi shart.";
+    if (!buildingId) fieldErrors.buildingId = "Bino tanlanishi shart.";
+    if (!floorId) fieldErrors.floorId = "Qavat tanlanishi shart.";
+    if (!roomId) fieldErrors.roomId = "Xona tanlanishi shart.";
+    if (quantity < 1 || quantity > 100) fieldErrors.quantity = "Miqdor 1 dan 100 gacha bo'lishi kerak.";
+
+    if (Object.keys(fieldErrors).length > 0) {
+      return { success: false, message: "Kiritilgan ma'lumotlarda xatolik bor.", fieldErrors };
+    }
+
+    // Xona iyerarxiyasini tekshirish
+    const [room] = await db
+      .select({ id: rooms.id })
+      .from(rooms)
+      .where(
+        and(
+          eq(rooms.id, roomId),
+          eq(rooms.organizationId, organization.id),
+          eq(rooms.buildingId, buildingId),
+          eq(rooms.floorId, floorId)
+        )
+      )
+      .limit(1);
+
+    if (!room) {
+      return {
+        success: false,
+        message: "Tanlangan xona, qavat va bino o'zaro mos kelmadi yoki boshqa tashkilotga tegishli.",
+      };
+    }
+
+    let itemCodes: string[] = [];
+    if (customCodesRaw) {
+      itemCodes = customCodesRaw
+        .split(/[\n,]+/)
+        .map((c) => c.trim().toUpperCase())
+        .filter(Boolean);
+    }
+
+    if (itemCodes.length !== quantity) {
+      // Aqlli kod generatsiyasi
+      const genResult = await getNextInventoryCodes({
+        organizationId: organization.id,
+        buildingId,
+        roomId,
+        quantity,
+      });
+      itemCodes = genResult.codes;
+    }
+
+    // Takroriy kodlarni tekshirish
+    const existing = await db
+      .select({ inventoryNumber: items.inventoryNumber })
+      .from(items)
+      .where(
+        and(
+          eq(items.organizationId, organization.id),
+          inArray(items.inventoryNumber, itemCodes)
+        )
+      );
+
+    if (existing.length > 0) {
+      return {
+        success: false,
+        message: `Quyidagi inventar raqamlari bazada allaqachon mavjud: ${existing.map((e) => e.inventoryNumber).join(", ")}`,
+      };
+    }
+
+    const fullDescription = [model ? `Model: ${model}` : "", description]
+      .filter(Boolean)
+      .join(" | ") || null;
+
+    const insertData = itemCodes.map((code) => ({
+      organizationId: organization.id,
+      inventoryNumber: code,
+      name,
+      categoryId,
+      description: fullDescription,
+      buildingId,
+      floorId,
+      roomId,
+      status,
+      condition,
+      price,
+      currency: "UZS",
+      qrToken: generateSecureQrToken(),
+      metadata: model ? { model } : {},
+    }));
+
+    const inserted = await db.insert(items).values(insertData).returning({
+      id: items.id,
+      inventoryNumber: items.inventoryNumber,
+      qrToken: items.qrToken,
+    });
+
+    revalidatePath("/org/inventory");
+    revalidatePath("/org/rooms");
+    revalidatePath("/org");
+
+    return {
+      success: true,
+      message: `${inserted.length} ta "${name}" jihozi muvaffaqiyatli ro'yxatga olindi (${itemCodes[0]} — ${itemCodes[itemCodes.length - 1]}).`,
+      data: {
+        count: inserted.length,
+        itemIds: inserted.map((i) => i.id),
+        sampleStart: itemCodes[0],
+        sampleEnd: itemCodes[itemCodes.length - 1],
+      },
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "Ommaviy kiritishda server xatoligi yuz berdi.",
+    };
+  }
+}
+
 
 

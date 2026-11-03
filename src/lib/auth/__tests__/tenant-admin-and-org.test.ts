@@ -91,6 +91,15 @@ describe("AssetAudit — Bosqich 2C: Tashkilot Administratori va Tenant Dashboar
       assert.equal(result.errorCode, "FORBIDDEN");
     });
 
+    it("Boshliq (head) /org boshqaruvchisi emas — Read-Only bo'lgani sababli verifyTenantAdmin rad etishi shart", () => {
+      const profile = createMockProfile({ role: "head" });
+      const org = createMockOrganization();
+      const result = verifyTenantAdmin(profile, org);
+
+      assert.equal(result.allowed, false);
+      assert.equal(result.errorCode, "FORBIDDEN");
+    });
+
     it("Tashkilotga bog'lanmagan organization_admin rad etilishi shart (TENANT_ACCESS_DENIED)", () => {
       const profile = createMockProfile({ organizationId: null });
       const org = createMockOrganization();

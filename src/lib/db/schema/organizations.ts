@@ -28,6 +28,7 @@ export interface OrganizationSettings {
   subscriptionNotes?: string;
   logoUrl?: string;
   adminPhone?: string;
+  assetLimitMlrd?: number;
   [key: string]: unknown;
 }
 

@@ -1,0 +1,14 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Rounded App Badge Background -->
+  <rect width="64" height="64" rx="14" fill="#2563eb" />
+  
+  <!-- QR Scan Reticle Brackets (White) -->
+  <path d="M 12 25 V 19 C 12 15.13 15.13 12 19 12 H 25" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 39 12 H 45 C 48.87 12 52 15.13 52 19 V 25" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 12 39 V 45 C 12 48.87 15.13 52 19 52 H 25" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 39 52 H 45 C 48.87 52 52 48.87 52 45 V 39" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Centered 'A' (White) -->
+  <path d="M 21.5 44 L 30.5 19.5 C 31 18.2 33 18.2 33.5 19.5 L 42.5 44" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 25 34.5 H 39" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
+</svg>

@@ -18,17 +18,17 @@ describe("AssetAudit — Bosqich 2A Tashkilotlar Moduli va Ruxsatlar", () => {
       assert.equal(typeof stats.active, "number");
       assert.equal(typeof stats.inactive, "number");
       assert.equal(typeof stats.typesCount, "number");
-      assert.equal(stats.typesCount, 9, "organization_types katalogida 9 ta tur bo'lishi shart");
+      assert.equal(stats.typesCount, 4, "organization_types katalogida 4 ta OTM turi bo'lishi shart");
     });
 
-    it("getOrganizationTypesList(): 9 ta tashkilot turini ro'yxat sifatida qaytarishi shart", async () => {
+    it("getOrganizationTypesList(): 4 ta OTM turini ro'yxat sifatida qaytarishi shart", async () => {
       const types = await getOrganizationTypesList();
       assert.equal(Array.isArray(types), true);
-      assert.equal(types.length, 9);
+      assert.equal(types.length, 4);
       const ids = types.map((t) => t.id);
       assert.ok(ids.includes("university"), "university turi mavjud bo'lishi shart");
-      assert.ok(ids.includes("school"), "school turi mavjud bo'lishi shart");
-      assert.ok(ids.includes("enterprise"), "enterprise turi mavjud bo'lishi shart");
+      assert.ok(ids.includes("institute"), "institute turi mavjud bo'lishi shart");
+      assert.ok(ids.includes("academy"), "academy turi mavjud bo'lishi shart");
     });
 
     it("getOrganizationsList(): sahifalash va bo'sh natija strukturasini to'g'ri qaytarishi kerak", async () => {

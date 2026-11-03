@@ -11,6 +11,7 @@ import {
   unique,
   foreignKey,
   index,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 import { organizations } from "./organizations";
@@ -460,3 +461,31 @@ export const cycleConflictsRelations = relations(cycleConflicts, ({ one }) => ({
 
 export type CycleConflict = typeof cycleConflicts.$inferSelect;
 export type NewCycleConflict = typeof cycleConflicts.$inferInsert;
+
+/**
+ * 6. Tizim Xavfsizlik Jurnali (System Security & Audit Logs)
+ * Davlat darajasidagi o'zgarmas qora quti (Audit Trail)
+ */
+export const systemAuditLogs = pgTable(
+  "system_audit_logs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    actorUserId: text("actor_user_id"),
+    actorName: varchar("actor_name", { length: 255 }),
+    organizationId: uuid("organization_id"),
+    organizationName: varchar("organization_name", { length: 255 }),
+    event: varchar("event", { length: 100 }).notNull(),
+    action: varchar("action", { length: 255 }).notNull(),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().default({}).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("idx_system_audit_logs_created_at").on(table.createdAt),
+    index("idx_system_audit_logs_event").on(table.event),
+  ]
+);
+
+export type SystemAuditLog = typeof systemAuditLogs.$inferSelect;
+export type NewSystemAuditLog = typeof systemAuditLogs.$inferInsert;
